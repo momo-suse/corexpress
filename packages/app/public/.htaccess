@@ -1,0 +1,17 @@
+# Corexpress — Apache rewrite rules
+# Routes all requests through index.php (Slim 4 front-controller pattern)
+
+Options -Indexes
+
+RewriteEngine On
+
+# Redirect requests for /setup to the installer (before reaching Slim)
+RewriteCond %{REQUEST_URI} ^/setup(/.*)?$
+RewriteRule ^ - [L]
+
+# Skip existing files and directories
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Route everything else through Slim
+RewriteRule ^ index.php [QSA,L]

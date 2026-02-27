@@ -1,0 +1,31 @@
+# ── PHP dependencies (installed inside container by entrypoint) ───────────────
+packages/app/vendor/
+
+# ── Node.js (not used in the hosting container) ───────────────────────────────
+node_modules/
+**/node_modules/
+packages/web/
+
+# ── Build outputs ─────────────────────────────────────────────────────────────
+dist/
+build/
+
+# ── Secrets / config (never bake into image) ──────────────────────────────────
+.env
+.env.*
+packages/app/config.php
+packages/installer/config.php
+
+# ── Git ───────────────────────────────────────────────────────────────────────
+.git/
+.gitignore
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── OS / editor files ─────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

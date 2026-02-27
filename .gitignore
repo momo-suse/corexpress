@@ -1,0 +1,42 @@
+# ── PHP ───────────────────────────────────────────────────────────────────────
+packages/app/vendor/
+packages/app/config.php
+packages/installer/config.php
+*.php.log
+
+# ── Node.js (packages/web — frontend dev only) ────────────────────────────────
+node_modules/
+**/node_modules/
+package-lock.json
+
+# ── Build outputs ─────────────────────────────────────────────────────────────
+dist/
+build/
+packages/app/public/assets/   # React built assets (generated, not committed)
+
+# ── Environment / secrets ─────────────────────────────────────────────────────
+.env
+.env.*
+config.php
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+logs/
+*.log
+
+# ── Test coverage ─────────────────────────────────────────────────────────────
+coverage/
+.phpunit.result.cache
+
+# ── OS files ──────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Editor files ──────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── TypeScript (frontend) ─────────────────────────────────────────────────────
+*.tsbuildinfo
+CLAUDE.md
