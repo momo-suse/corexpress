@@ -1,0 +1,34 @@
+{
+    "name": "corexpress/app",
+    "description": "Corexpress — personal blog platform for Hostinger shared hosting",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": "^8.3",
+        "slim/slim": "^4.14",
+        "slim/psr7": "^1.7",
+        "illuminate/database": "^11.0",
+        "illuminate/events": "^11.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Corexpress\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Corexpress\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "minimum-stability": "stable"
+}

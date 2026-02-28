@@ -1,0 +1,63 @@
+services:
+
+  # ── Shared hosting simulation ─────────────────────────────────────────────
+  # PHP 8.3 + Apache, mirroring what Hostinger shared hosting provides.
+  # packages/app/ is mounted as the Apache DocumentRoot.
+  hosting:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: corexpress-hosting
+    hostname: hostinger-shared-sim
+    ports:
+      - "8080:80"     # Apache HTTP (8080 → rootless Podman can't bind port 80)
+    volumes:
+      # Mount the PHP app as if it were uploaded to the hosting root
+      # :z relabels for SELinux (required on Fedora with Podman rootless)
+      - ./packages/app:/var/www/html:z
+      # Mount the installer separately so it can be accessed at /setup
+      - ./packages/installer:/var/www/html/public/setup:z
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=corexpress_db
+      - DB_USER=corexpress
+      - DB_PASSWORD=secret
+    networks:
+      - corexpress
+    depends_on:
+      - mysql
+
+  # ── MySQL 8.0 ─────────────────────────────────────────────────────────────
+  # Separate service, matching how Hostinger provides a managed MySQL instance.
+  mysql:
+    image: docker.io/library/mysql:8.0
+    container_name: corexpress-mysql
+    hostname: mysql
+    # Disable SSL requirement — dev environment only
+    command: --require-secure-transport=OFF
+    ports:
+      - "3306:3306"   # Exposed for external DB clients (TablePlus, DBeaver, etc.)
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: corexpress_db
+      MYSQL_USER: corexpress
+      MYSQL_PASSWORD: secret
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      corexpress:
+        aliases:
+          - mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+networks:
+  corexpress:
+    driver: bridge
+
+volumes:
+  mysql_data:

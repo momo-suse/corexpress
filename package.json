@@ -1,0 +1,22 @@
+{
+  "name": "corexpress",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Corexpress — personal blog platform for Hostinger shared hosting",
+  "scripts": {
+    "dev:web": "npm run dev --workspace=packages/web",
+    "build:web": "npm run build --workspace=packages/web",
+    "test:web": "npm run test --workspace=packages/web",
+    "docker:build": "podman compose -f compose.dev.yml build",
+    "docker:up": "podman compose -f compose.dev.yml up -d",
+    "docker:down": "podman compose -f compose.dev.yml down -v",
+    "docker:logs": "podman compose -f compose.dev.yml logs -f"
+  },
+  "workspaces": [
+    "packages/web"
+  ],
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}
