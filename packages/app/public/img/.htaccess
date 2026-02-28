@@ -1,0 +1,11 @@
+# Prevent script execution in the image upload directory.
+# Only static image files should be served from here.
+
+<FilesMatch "\.php[0-9]?$|\.phtml$|\.phar$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+Options -ExecCGI
+RemoveHandler .php .phtml .phar
+RemoveType   .php .phtml .phar

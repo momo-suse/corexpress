@@ -14,7 +14,7 @@ $app->get('/health', function (Request $request, Response $response): Response {
 // ── Blog public view ───────────────────────────────────────────────────────
 // Serves the pre-built React SPA for all non-API routes.
 $app->get('[/{path:.*}]', function (Request $request, Response $response): Response {
-    $indexPath = __DIR__ . '/../../public/assets/index.html';
+    $indexPath = __DIR__ . '/../../public/index.html';
 
     if (!file_exists($indexPath)) {
         $response->getBody()->write('<h1>Corexpress</h1><p>Frontend not built yet. Run <code>npm run build</code> in packages/web/.</p>');

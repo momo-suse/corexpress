@@ -610,12 +610,12 @@ function renderReview(): void
 
                 if (j.ok) {
                     document.getElementById('overlay-logo').classList.add('done');
-                    document.getElementById('overlay-msg').textContent = 'All done! Your blog is ready.';
-                    document.getElementById('overlay-sub').textContent = '';
+                    document.getElementById('overlay-msg').textContent = 'All done! Corexpress is installed.';
+                    document.getElementById('overlay-sub').textContent = 'Sign in to continue with your blog setup.';
                     document.getElementById('overlay-inner').insertAdjacentHTML(
                         'beforeend',
                         '<div class="overlay-check">✓</div>' +
-                        '<a href="/" class="btn btn-primary btn-large" style="margin-top:1.5rem;">Go to Blog</a>'
+                        '<a href="/cx-admin/login" class="btn btn-primary btn-large" style="margin-top:1.5rem;">Go to Admin Setup →</a>'
                     );
                 } else {
                     overlay.classList.remove('visible');
@@ -642,7 +642,7 @@ function renderAlreadyInstalled(): void
         echo '<p class="step-desc">Corexpress is already configured on this server.</p>';
         echo '<div class="alert alert-info" style="text-align:left;">To reinstall, remove <code>config.php</code> from the app root and return to this page.</div>';
         echo '<div style="margin-top:1.5rem;">';
-        echo '<a href="/" class="btn btn-primary">Go to Blog</a>';
+        echo '<a href="/cx-admin/login" class="btn btn-primary">Go to Admin →</a>';
         echo '</div>';
         echo '</div>';
     });
@@ -678,6 +678,7 @@ function renderLayout(string $pageTitle, int $currentStep, callable $body): void
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Corexpress Installer — <?= $esc($pageTitle) ?></title>
+    <link rel="icon" type="image/png" href="docs/corexpress.png">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -789,8 +790,8 @@ function renderLayout(string $pageTitle, int $currentStep, callable $body): void
         .welcome-body { padding: 2.5rem 2.5rem; }
         .welcome-hero { text-align: center; margin-bottom: 2rem; }
         .welcome-title { font-size: 1.6rem; font-weight: 700; letter-spacing: -.02em; margin-bottom: .5rem; }
-        .brand-name    { display: inline-flex; align-items: center; white-space: nowrap; gap: .01em; }
-        .brand-chevron { font-size: 1.85em; font-weight: 900; letter-spacing: -.18em; line-height: 1; margin-right: .08em; }
+        .brand-name    { display: inline-flex; align-items: center; white-space: nowrap; }
+        .brand-chevron { font-size: 1.2em; font-weight: 900; }
         .welcome-sub { color: var(--muted); font-size: 1rem; }
         .welcome-form { text-align: center; margin-top: 2rem; margin-bottom: 1.25rem; }
 

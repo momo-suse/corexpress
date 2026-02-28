@@ -18,6 +18,7 @@ services:
       # Mount the installer separately so it can be accessed at /setup
       - ./packages/installer:/var/www/html/public/setup:z
     environment:
+      - APP_ENV=development
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_NAME=corexpress_db

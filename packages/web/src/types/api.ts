@@ -1,0 +1,109 @@
+export interface User {
+  id: number
+  email: string
+  created_at: string
+}
+
+export interface Post {
+  id: number
+  title: string
+  slug: string
+  content: string
+  excerpt: string | null
+  status: 'draft' | 'published'
+  author_id: number
+  created_at: string
+  updated_at: string
+}
+
+export interface Comment {
+  id: number
+  post_id: number
+  author_name: string
+  content: string
+  status: 'pending' | 'approved' | 'spam'
+  created_at: string
+}
+
+export interface Setting {
+  key: string
+  value: string
+}
+
+export interface Settings {
+  blog_name: string
+  blog_description: string
+  /** DB key: blog_theme — set by installer */
+  blog_theme: 'default' | 'minimal' | 'dark'
+  active_style_collection: string
+  setup_complete: string
+  social_linkedin: string
+  social_instagram: string
+  social_youtube: string
+  social_facebook: string
+  [key: string]: string
+}
+
+export interface ImageAsset {
+  id: number
+  post_id: number | null
+  filename: string
+  original_name: string
+  mime_type: string
+  file_size: number
+  url: string
+  created_at: string
+}
+
+export interface ComponentDefinition {
+  id: number
+  name: string
+  label: string
+  description: string
+}
+
+export interface ComponentStyle {
+  id: number
+  component_definition_id: number
+  style_collection_id: number
+  styles_config: Record<string, string>
+}
+
+export interface StyleCollection {
+  id: number
+  name: string
+  label: string
+  is_default: boolean
+  component_styles: ComponentStyle[]
+}
+
+export interface PageComponent {
+  id: number
+  page_id: number
+  component_definition_id: number
+  is_visible: boolean
+  display_order: number
+  name: string
+  styles: Record<string, string>
+}
+
+export interface Page {
+  id: number
+  slug: string
+  title: string
+  components: PageComponent[]
+}
+
+export interface PaginatedResponse<T> {
+  data: T[]
+  meta: {
+    current_page: number
+    last_page: number
+    per_page: number
+    total: number
+  }
+}
+
+export interface ApiResponse<T> {
+  data: T
+}
