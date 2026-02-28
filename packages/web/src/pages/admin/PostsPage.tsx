@@ -16,16 +16,17 @@ import type { Post } from '@/types/api'
 
 interface PostForm {
   title: string
+  tags: string
   excerpt: string
   content: string
   status: 'draft' | 'published'
 }
 
-const EMPTY_FORM: PostForm = { title: '', excerpt: '', content: '', status: 'draft' }
+const EMPTY_FORM: PostForm = { title: '', tags: '', excerpt: '', content: '', status: 'draft' }
 
 export default function PostsPage() {
   const [page, setPage] = useState(1)
-  const { data, isLoading } = usePosts(page)
+  const { data, isLoading } = usePosts(page, true)
   const { create, update, remove } = useMutatePost()
 
   const [open, setOpen] = useState(false)
@@ -45,6 +46,7 @@ export default function PostsPage() {
     setEditing(post)
     setForm({
       title: post.title,
+      tags: post.tags ?? '',
       excerpt: post.excerpt ?? '',
       content: post.content,
       status: post.status,
@@ -53,7 +55,7 @@ export default function PostsPage() {
   }
 
   async function handleSave() {
-    const payload = { ...form, excerpt: form.excerpt || null }
+    const payload = { ...form, excerpt: form.excerpt || null, tags: form.tags || null }
     try {
       if (editing) {
         await update.mutateAsync({ id: editing.id, data: payload })
@@ -106,6 +108,7 @@ export default function PostsPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Title</TableHead>
+                <TableHead>Tags</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead className="w-24" />
@@ -115,6 +118,14 @@ export default function PostsPage() {
               {data.data.map((post) => (
                 <TableRow key={post.id}>
                   <TableCell className="font-medium">{post.title}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {post.tags
+                      ? post.tags.split(',').map((t) => (
+                          <Badge key={t} variant="outline" className="mr-1 text-xs">{t.trim()}</Badge>
+                        ))
+                      : <span className="text-muted-foreground/50">—</span>
+                    }
+                  </TableCell>
                   <TableCell>
                     <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
                       {post.status}
@@ -184,6 +195,34 @@ export default function PostsPage() {
               />
             </div>
 
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Status</Label>
+                <Select
+                  value={form.status}
+                  onValueChange={(v) => setForm((f) => ({ ...f, status: v as PostForm['status'] }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="published">Published</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="post-tags">Tags</Label>
+                <Input
+                  id="post-tags"
+                  value={form.tags}
+                  onChange={(e) => setForm((f) => ({ ...f, tags: e.target.value }))}
+                  placeholder="php, design, tutorial"
+                />
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="post-excerpt">Excerpt (optional)</Label>
               <Input
@@ -196,29 +235,14 @@ export default function PostsPage() {
 
             <div className="space-y-2">
               <Label>Content</Label>
-              {/* Wrap editor to prevent Dialog from capturing Tiptap keyboard shortcuts */}
+              {/* key forces Tiptap to remount with fresh content when switching posts */}
               <div onKeyDown={(e) => e.stopPropagation()}>
                 <PostEditor
+                  key={editing?.id ?? 'new'}
                   content={form.content}
                   onChange={(html) => setForm((f) => ({ ...f, content: html }))}
                 />
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <Select
-                value={form.status}
-                onValueChange={(v) => setForm((f) => ({ ...f, status: v as PostForm['status'] }))}
-              >
-                <SelectTrigger className="w-40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="published">Published</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </div>
 

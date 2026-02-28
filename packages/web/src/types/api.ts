@@ -10,6 +10,7 @@ export interface Post {
   slug: string
   content: string
   excerpt: string | null
+  tags: string | null
   status: 'draft' | 'published'
   author_id: number
   created_at: string

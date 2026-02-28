@@ -13,9 +13,10 @@ require __DIR__ . '/../vendor/autoload.php';
 $configPath = __DIR__ . '/../config.php';
 
 if (!file_exists($configPath)) {
-    http_response_code(503);
-    header('Content-Type: application/json');
-    echo json_encode(['error' => 'Application not configured. Run the installer at /setup first.']);
+    // Installer hasn't been run — send the browser to the web installer.
+    // API clients hitting /api/* will also land here; the installer page
+    // is a better UX than a raw JSON error for anyone opening the root URL.
+    header('Location: /setup/', true, 302);
     exit;
 }
 

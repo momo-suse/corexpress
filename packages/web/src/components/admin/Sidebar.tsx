@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, FileText, MessageSquare, Settings, LogOut, Sliders } from 'lucide-react'
+import { LayoutDashboard, FileText, MessageSquare, Settings, LogOut, Sliders, Globe } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { logout } from '@/api/auth'
 
@@ -46,7 +46,14 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <div className="px-3 pb-4">
+      <div className="px-3 pb-4 space-y-1">
+        <a
+          href="/"
+          className="flex w-full items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+        >
+          <Globe className="h-4 w-4 shrink-0" />
+          View blog
+        </a>
         <button
           onClick={handleLogout}
           className="flex w-full items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"

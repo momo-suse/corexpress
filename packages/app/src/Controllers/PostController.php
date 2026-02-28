@@ -23,10 +23,17 @@ class PostController extends Controller
         $page    = max(1, (int) ($params['page']     ?? 1));
         $perPage = min(self::MAX_PER_PAGE, max(1, (int) ($params['per_page'] ?? self::DEFAULT_PER_PAGE)));
 
-        $query = Post::published()->orderBy('created_at', 'desc');
+        // Authenticated admins can pass ?all=1 to include drafts
+        $isAdmin = !empty($_SESSION['user_id']);
+        $showAll = $isAdmin && ($params['all'] ?? '') === '1';
+
+        $query = $showAll
+            ? Post::orderBy('created_at', 'desc')
+            : Post::published()->orderBy('created_at', 'desc');
+
         $total = $query->count();
         $posts = (clone $query)
-            ->select(['id', 'title', 'slug', 'excerpt', 'status', 'created_at', 'updated_at'])
+            ->select(['id', 'title', 'slug', 'excerpt', 'tags', 'status', 'created_at', 'updated_at'])
             ->skip(($page - 1) * $perPage)
             ->take($perPage)
             ->get();
@@ -80,6 +87,7 @@ class PostController extends Controller
             'slug'    => $this->generateSlug(trim((string) $body['title'])),
             'content' => trim((string) $body['content']),
             'excerpt' => isset($body['excerpt']) ? trim((string) $body['excerpt']) : null,
+            'tags'    => isset($body['tags']) && $body['tags'] !== '' ? trim((string) $body['tags']) : null,
             'status'  => in_array($body['status'] ?? '', ['draft', 'published'], true)
                 ? $body['status']
                 : 'draft',
@@ -119,6 +127,10 @@ class PostController extends Controller
 
         if (array_key_exists('excerpt', $body)) {
             $post->excerpt = $body['excerpt'] !== null ? trim((string) $body['excerpt']) : null;
+        }
+
+        if (array_key_exists('tags', $body)) {
+            $post->tags = $body['tags'] !== null && $body['tags'] !== '' ? trim((string) $body['tags']) : null;
         }
 
         if (isset($body['status']) && in_array($body['status'], ['draft', 'published'], true)) {

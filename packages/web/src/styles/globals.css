@@ -96,6 +96,34 @@
   --accent-foreground: 0 0% 12%;
 }
 
+/* ─── Tiptap ProseMirror ─────────────────────────────────────────────────── */
+
+/* The contenteditable area — no default outline (ring comes from the wrapper) */
+.ProseMirror {
+  outline: none;
+}
+
+/* Placeholder text rendered by the Placeholder extension */
+.ProseMirror p.is-empty:first-child::before,
+.ProseMirror h1.is-empty:first-child::before,
+.ProseMirror h2.is-empty:first-child::before,
+.ProseMirror h3.is-empty:first-child::before {
+  color: hsl(var(--muted-foreground));
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Highlight mark rendered by the Highlight extension */
+.ProseMirror mark {
+  background-color: #fef08a;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+/* ─── Admin themes ────────────────────────────────────────────────────── */
+
 .theme-dark {
   --background: 222.2 84% 4.9%;
   --foreground: 210 40% 98%;

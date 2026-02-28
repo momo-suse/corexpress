@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS `posts` (
     `slug`       VARCHAR(500)                       NOT NULL,
     `content`    LONGTEXT                           NOT NULL,
     `excerpt`    TEXT,
+    `tags`       VARCHAR(500)                       NULL     DEFAULT NULL,
     `status`     ENUM('draft','published')          NOT NULL DEFAULT 'draft',
     `created_at` TIMESTAMP                          NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP                          NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
