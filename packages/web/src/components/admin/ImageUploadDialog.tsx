@@ -135,7 +135,7 @@ export default function ImageUploadDialog({ open, onClose, onInsert, postId }: I
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/jpeg,image/png,image/gif,image/webp"
+              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/avif,.jpg,.jpeg,.png,.gif,.webp,.avif"
               className="hidden"
               onChange={handleFileChange}
             />

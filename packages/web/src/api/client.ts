@@ -14,8 +14,8 @@ const BASE_URL = '/api/v1'
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
 
-/** Fetch a fresh CSRF token from the server and store it. Returns null on failure. */
-async function refreshCsrfToken(): Promise<string | null> {
+/** Fetch a fresh CSRF token from the server and store it. Returns the token or null on failure. */
+export async function refreshCsrfToken(): Promise<string | null> {
   try {
     const res = await fetch(`${BASE_URL}/auth/csrf`, {
       credentials: 'include',
@@ -30,10 +30,38 @@ async function refreshCsrfToken(): Promise<string | null> {
   }
 }
 
-function forceLogin(status: number): never {
+/**
+ * Force re-login. For mutations (non-GET), we THROW instead of doing a full
+ * page reload — this lets the calling code catch the error and show a message
+ * without destroying React state (and user's form data).
+ */
+function forceLogin(status: number, isMutation: boolean): never {
   useAuthStore.getState().clearAuth()
+  if (isMutation) {
+    // During a save operation, throw so the caller can handle gracefully
+    throw new ApiError(
+      status,
+      status === 401
+        ? 'Tu sesión ha expirado. Vuelve a iniciar sesión y reintenta.'
+        : 'Error de autenticación. Por favor recarga la página.'
+    )
+  }
+  // For regular navigation (GET), redirect is fine
   window.location.href = '/cx-admin/login'
-  throw new ApiError(status, status === 403 ? 'Session expired' : 'Unauthorized')
+  throw new ApiError(status, 'Unauthorized')
+}
+
+/** Check if the current session is still valid. Returns true if authenticated. */
+export async function checkSession(): Promise<boolean> {
+  try {
+    const res = await fetch(`${BASE_URL}/auth/me`, {
+      credentials: 'include',
+      headers: { Accept: 'application/json' },
+    })
+    return res.ok
+  } catch {
+    return false
+  }
 }
 
 async function request<T>(
@@ -68,12 +96,12 @@ async function request<T>(
     if (newToken) {
       return request<T>(endpoint, method, body, true)
     }
-    forceLogin(403)
+    forceLogin(403, isMutation)
   }
 
   // 401 = session gone; 403 after retry = unrecoverable → re-login
   if (response.status === 401 || response.status === 403) {
-    forceLogin(response.status)
+    forceLogin(response.status, isMutation)
   }
 
   if (response.status === 204) {

@@ -25,16 +25,18 @@ CREATE TABLE IF NOT EXISTS `settings` (
 
 -- ── Blog posts ─────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS `posts` (
-    `id`         INT UNSIGNED                       NOT NULL AUTO_INCREMENT,
-    `user_id`    INT UNSIGNED                       NOT NULL,
-    `title`      VARCHAR(500)                       NOT NULL,
-    `slug`       VARCHAR(500)                       NOT NULL,
-    `content`    LONGTEXT                           NOT NULL,
-    `excerpt`    TEXT,
-    `tags`       VARCHAR(500)                       NULL     DEFAULT NULL,
-    `status`     ENUM('draft','published')          NOT NULL DEFAULT 'draft',
-    `created_at` TIMESTAMP                          NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` TIMESTAMP                          NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `id`                 INT UNSIGNED                       NOT NULL AUTO_INCREMENT,
+    `user_id`            INT UNSIGNED                       NOT NULL,
+    `title`              VARCHAR(500)                       NOT NULL,
+    `slug`               VARCHAR(500)                       NOT NULL,
+    `content`            LONGTEXT                           NOT NULL,
+    `excerpt`            TEXT,
+    `tags`               VARCHAR(500)                       NULL     DEFAULT NULL,
+    `featured_image_id`  INT UNSIGNED                       NULL     DEFAULT NULL COMMENT 'Optional thumbnail / hero image for the post',
+    `map_embed_url`      VARCHAR(2048)                      NULL     DEFAULT NULL COMMENT 'Optional map embed URL (Google Maps, OpenStreetMap, etc.)',
+    `status`             ENUM('draft','published')          NOT NULL DEFAULT 'draft',
+    `created_at`         TIMESTAMP                          NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at`         TIMESTAMP                          NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     UNIQUE KEY `uq_posts_slug` (`slug`),
     CONSTRAINT `fk_posts_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)

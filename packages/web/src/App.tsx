@@ -40,9 +40,12 @@ export default function App() {
 
           {/* Protected admin */}
           <Route element={<ProtectedRoute />}>
+            {/* Setup: full-screen, no sidebar */}
+            <Route path="/cx-admin/setup" element={<SetupPage />} />
+
+            {/* Admin dashboard with sidebar layout */}
             <Route path="/cx-admin" element={<AdminLayout />}>
               <Route index element={<DashboardPage />} />
-              <Route path="setup" element={<SetupPage />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="posts" element={<PostsPage />} />
               <Route path="comments" element={<CommentsPage />} />

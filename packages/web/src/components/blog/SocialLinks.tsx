@@ -1,18 +1,39 @@
 import { useSettings } from '@/hooks/useSettings'
-import { applyComponentStyles } from '@/lib/utils'
+import { Linkedin, Instagram, Youtube, Facebook } from 'lucide-react'
 
 interface SocialLinksProps {
-  styles: Record<string, string>
+  styles?: Record<string, string>
+  settings?: Record<string, string>
 }
 
 const NETWORKS = [
-  { key: 'social_linkedin', label: 'LinkedIn' },
-  { key: 'social_instagram', label: 'Instagram' },
-  { key: 'social_youtube', label: 'YouTube' },
-  { key: 'social_facebook', label: 'Facebook' },
+  {
+    key: 'social_linkedin',
+    label: 'LinkedIn',
+    Icon: Linkedin,
+    hoverClass: 'hover:bg-[#0A66C2] hover:text-white dark:hover:bg-[#0A66C2] dark:hover:text-white',
+  },
+  {
+    key: 'social_instagram',
+    label: 'Instagram',
+    Icon: Instagram,
+    hoverClass: 'hover:bg-rose-500 hover:text-white dark:hover:bg-rose-500 dark:hover:text-white',
+  },
+  {
+    key: 'social_youtube',
+    label: 'YouTube',
+    Icon: Youtube,
+    hoverClass: 'hover:bg-red-600 hover:text-white dark:hover:bg-red-600 dark:hover:text-white',
+  },
+  {
+    key: 'social_facebook',
+    label: 'Facebook',
+    Icon: Facebook,
+    hoverClass: 'hover:bg-[#1877F2] hover:text-white dark:hover:bg-[#1877F2] dark:hover:text-white',
+  },
 ] as const
 
-export default function SocialLinks({ styles }: SocialLinksProps) {
+export default function SocialLinks(_props: SocialLinksProps) {
   const { data } = useSettings()
   const settings = data?.data
 
@@ -22,21 +43,27 @@ export default function SocialLinks({ styles }: SocialLinksProps) {
   if (links.length === 0) return null
 
   return (
-    <section className="py-8 px-6 text-center" style={applyComponentStyles(styles)}>
-      <h3 className="text-sm font-medium text-muted-foreground mb-3">Find me on</h3>
-      <div className="flex justify-center gap-4 flex-wrap">
-        {links.map(({ key, label }) => (
+    <div
+      className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-md border border-gray-200 dark:border-gray-700"
+    >
+      <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-5 pb-2 border-b border-gray-100 dark:border-gray-800">
+        Conéctate
+      </h3>
+
+      <div className="flex justify-center gap-3 flex-wrap">
+        {links.map(({ key, label, Icon, hoverClass }) => (
           <a
             key={key}
             href={settings[key]}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm font-medium hover:underline"
+            aria-label={label}
+            className={`p-3.5 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded-xl transition-all duration-300 shadow-sm ${hoverClass}`}
           >
-            {label}
+            <Icon size={20} />
           </a>
         ))}
       </div>
-    </section>
+    </div>
   )
 }

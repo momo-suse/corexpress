@@ -1,13 +1,12 @@
 import { useComments } from '@/hooks/useComments'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import { applyComponentStyles } from '@/lib/utils'
+import { MessageCircle } from 'lucide-react'
 
 interface CommentListProps {
   postId: number
-  styles: Record<string, string>
 }
 
-export default function CommentList({ postId, styles }: CommentListProps) {
+export default function CommentList({ postId }: CommentListProps) {
   const { data, isLoading } = useComments({ post_id: postId, status: 'approved' })
 
   if (isLoading) return <LoadingSpinner className="py-6" />
@@ -15,27 +14,42 @@ export default function CommentList({ postId, styles }: CommentListProps) {
   const comments = data?.data ?? []
 
   return (
-    <section className="py-8 px-6 max-w-3xl mx-auto" style={applyComponentStyles(styles)}>
-      <h3 className="text-lg font-semibold mb-4">
-        {comments.length} {comments.length === 1 ? 'Comment' : 'Comments'}
-      </h3>
+    <section>
+      <div className="flex items-center gap-2 mb-6">
+        <MessageCircle size={18} className="text-indigo-500" />
+        <h3 className="text-lg font-bold">
+          {comments.length} {comments.length === 1 ? 'Comentario' : 'Comentarios'}
+        </h3>
+      </div>
 
       {comments.length === 0 && (
-        <p className="text-sm text-muted-foreground">No comments yet. Be the first!</p>
+        <p className="text-sm text-muted-foreground py-4">
+          Aún no hay comentarios. ¡Sé el primero!
+        </p>
       )}
 
       <div className="space-y-6">
         {comments.map((comment) => {
-          const date = new Date(comment.created_at).toLocaleDateString('en-US', {
+          const date = new Date(comment.created_at).toLocaleDateString('es-MX', {
             year: 'numeric', month: 'long', day: 'numeric',
           })
           return (
-            <div key={comment.id} className="border-b pb-4 last:border-0">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="font-medium text-sm">{comment.author_name}</span>
-                <span className="text-xs text-muted-foreground">{date}</span>
+            <div key={comment.id} className="flex gap-4">
+              {/* Avatar with initials */}
+              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-sm">
+                {comment.author_name[0]?.toUpperCase()}
               </div>
-              <p className="text-sm leading-relaxed">{comment.content}</p>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-semibold text-sm text-gray-900 dark:text-white">
+                    {comment.author_name}
+                  </span>
+                  <span className="text-xs text-muted-foreground">{date}</span>
+                </div>
+                <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                  {comment.content}
+                </p>
+              </div>
             </div>
           )
         })}
