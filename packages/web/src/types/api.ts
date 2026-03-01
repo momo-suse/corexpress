@@ -11,6 +11,9 @@ export interface Post {
   content: string
   excerpt: string | null
   tags: string | null
+  featured_image_id: number | null
+  featured_image_url: string | null
+  map_embed_url: string | null
   status: 'draft' | 'published'
   author_id: number
   created_at: string
@@ -38,6 +41,20 @@ export interface Settings {
   blog_theme: 'default' | 'minimal' | 'dark'
   active_style_collection: string
   setup_complete: string
+  // Blog logo
+  blog_logo_id: string
+  blog_logo_url: string
+  // Hero Banner
+  hero_text: string
+  hero_image_id: string
+  hero_image_url: string
+  // Profile / About
+  profile_name: string
+  profile_summary: string
+  profile_description: string
+  profile_image_id: string
+  profile_image_url: string
+  // Social links
   social_linkedin: string
   social_instagram: string
   social_youtube: string

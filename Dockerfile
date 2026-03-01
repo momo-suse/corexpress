@@ -70,7 +70,10 @@ WORKDIR /var/www/html
 RUN echo "error_reporting = E_ALL" >> /usr/local/etc/php/php.ini && \
     echo "display_errors = On" >> /usr/local/etc/php/php.ini && \
     echo "log_errors = On" >> /usr/local/etc/php/php.ini && \
-    echo "date.timezone = UTC" >> /usr/local/etc/php/php.ini
+    echo "date.timezone = UTC" >> /usr/local/etc/php/php.ini && \
+    echo "upload_max_filesize = 20M" >> /usr/local/etc/php/php.ini && \
+    echo "post_max_size = 22M" >> /usr/local/etc/php/php.ini && \
+    echo "memory_limit = 128M" >> /usr/local/etc/php/php.ini
 
 # ── Entrypoint ────────────────────────────────────────────────────────────────
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh

@@ -10,9 +10,11 @@ import PostEditor from '@/components/admin/PostEditor'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import { usePosts, useMutatePost } from '@/hooks/usePosts'
+import { uploadImage } from '@/api/images'
 import { toast } from '@/hooks/useToast'
-import { Pencil, Trash2, Plus } from 'lucide-react'
+import { Pencil, Trash2, Plus, Upload, X } from 'lucide-react'
 import type { Post } from '@/types/api'
+import { useRef } from 'react'
 
 interface PostForm {
   title: string
@@ -20,9 +22,20 @@ interface PostForm {
   excerpt: string
   content: string
   status: 'draft' | 'published'
+  featured_image_id: number | null
+  featured_image_url: string | null
+  map_embed_url: string
+  /** Local preview for a newly selected file */
+  _imageFile: File | null
+  _imagePreview: string | null
 }
 
-const EMPTY_FORM: PostForm = { title: '', tags: '', excerpt: '', content: '', status: 'draft' }
+const EMPTY_FORM: PostForm = {
+  title: '', tags: '', excerpt: '', content: '', status: 'draft',
+  featured_image_id: null, featured_image_url: null,
+  map_embed_url: '',
+  _imageFile: null, _imagePreview: null,
+}
 
 export default function PostsPage() {
   const [page, setPage] = useState(1)
@@ -35,6 +48,8 @@ export default function PostsPage() {
 
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [deletingId, setDeletingId] = useState<number | null>(null)
+
+  const imageInputRef = useRef<HTMLInputElement>(null)
 
   function openCreate() {
     setEditing(null)
@@ -50,12 +65,65 @@ export default function PostsPage() {
       excerpt: post.excerpt ?? '',
       content: post.content,
       status: post.status,
+      featured_image_id: post.featured_image_id,
+      featured_image_url: post.featured_image_url,
+      map_embed_url: post.map_embed_url ?? '',
+      _imageFile: null,
+      _imagePreview: null,
     })
     setOpen(true)
   }
 
+  function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0] ?? null
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (ev) =>
+        setForm((f) => ({
+          ...f,
+          _imageFile: file,
+          _imagePreview: ev.target?.result as string,
+        }))
+      reader.readAsDataURL(file)
+    }
+  }
+
+  function removeImage() {
+    setForm((f) => ({
+      ...f,
+      featured_image_id: null,
+      featured_image_url: null,
+      _imageFile: null,
+      _imagePreview: null,
+    }))
+  }
+
   async function handleSave() {
-    const payload = { ...form, excerpt: form.excerpt || null, tags: form.tags || null }
+    let imageId = form.featured_image_id
+
+    // Upload new image if selected
+    if (form._imageFile) {
+      try {
+        const result = await uploadImage(form._imageFile)
+        imageId = result.data.id
+      } catch {
+        toast({ title: 'Failed to upload image.', variant: 'destructive' })
+        return
+      }
+    }
+
+    const payload = {
+      ...form,
+      excerpt: form.excerpt || null,
+      tags: form.tags || null,
+      map_embed_url: form.map_embed_url.trim() || null,
+      featured_image_id: imageId,
+    }
+    // Remove internal fields
+    delete (payload as any)._imageFile
+    delete (payload as any)._imagePreview
+    delete (payload as any).featured_image_url
+
     try {
       if (editing) {
         await update.mutateAsync({ id: editing.id, data: payload })
@@ -90,6 +158,9 @@ export default function PostsPage() {
 
   const saving = create.isPending || update.isPending
 
+  // Current image to display (new upload preview takes priority)
+  const displayImage = form._imagePreview ?? form.featured_image_url
+
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
@@ -107,6 +178,7 @@ export default function PostsPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-12" />
                 <TableHead>Title</TableHead>
                 <TableHead>Tags</TableHead>
                 <TableHead>Status</TableHead>
@@ -117,12 +189,25 @@ export default function PostsPage() {
             <TableBody>
               {data.data.map((post) => (
                 <TableRow key={post.id}>
+                  <TableCell>
+                    {post.featured_image_url ? (
+                      <img
+                        src={post.featured_image_url}
+                        alt=""
+                        className="h-8 w-8 rounded object-cover"
+                      />
+                    ) : (
+                      <div className="h-8 w-8 rounded bg-muted flex items-center justify-center">
+                        <Upload className="h-3 w-3 text-muted-foreground" />
+                      </div>
+                    )}
+                  </TableCell>
                   <TableCell className="font-medium">{post.title}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">
                     {post.tags
                       ? post.tags.split(',').map((t) => (
-                          <Badge key={t} variant="outline" className="mr-1 text-xs">{t.trim()}</Badge>
-                        ))
+                        <Badge key={t} variant="outline" className="mr-1 text-xs">{t.trim()}</Badge>
+                      ))
                       : <span className="text-muted-foreground/50">—</span>
                     }
                   </TableCell>
@@ -153,7 +238,7 @@ export default function PostsPage() {
               ))}
               {data.data.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
                     No posts yet.
                   </TableCell>
                 </TableRow>
@@ -233,6 +318,40 @@ export default function PostsPage() {
               />
             </div>
 
+            {/* Featured image upload */}
+            <div className="space-y-2">
+              <Label>Featured image <span className="text-xs text-muted-foreground">(optional — shown as thumbnail in post list)</span></Label>
+              {displayImage ? (
+                <div className="relative inline-block">
+                  <img src={displayImage} alt="Featured" className="max-h-32 rounded object-cover" />
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-0.5"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <div
+                  className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:border-primary transition-colors"
+                  onClick={() => imageInputRef.current?.click()}
+                >
+                  <div className="space-y-1 text-muted-foreground">
+                    <Upload className="h-6 w-6 mx-auto" />
+                    <p className="text-sm">Click to upload a featured image</p>
+                  </div>
+                </div>
+              )}
+              <input
+                ref={imageInputRef}
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/avif,.jpg,.jpeg,.png,.gif,.webp,.avif"
+                className="hidden"
+                onChange={handleImageSelect}
+              />
+            </div>
+
             <div className="space-y-2">
               <Label>Content</Label>
               {/* key forces Tiptap to remount with fresh content when switching posts */}
@@ -243,6 +362,24 @@ export default function PostsPage() {
                   onChange={(html) => setForm((f) => ({ ...f, content: html }))}
                 />
               </div>
+            </div>
+
+            {/* Map embed URL */}
+            <div className="space-y-2">
+              <Label htmlFor="post-map">
+                Map embed URL{' '}
+                <span className="text-xs text-muted-foreground">(optional — paste the embed URL from Google Maps or OpenStreetMap)</span>
+              </Label>
+              <Input
+                id="post-map"
+                type="url"
+                value={form.map_embed_url}
+                onChange={(e) => setForm((f) => ({ ...f, map_embed_url: e.target.value }))}
+                placeholder="https://www.google.com/maps/embed?pb=..."
+              />
+              <p className="text-xs text-muted-foreground">
+                In Google Maps: Share → Embed a map → copy the <code className="bg-muted px-1 rounded">src</code> URL from the iframe code.
+              </p>
             </div>
           </div>
 

@@ -1,4 +1,3 @@
-import type { FC } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useBlogPage } from '@/hooks/useBlogPage'
@@ -10,23 +9,19 @@ import HeroSection from '@/components/blog/HeroSection'
 import ProfileSection from '@/components/blog/ProfileSection'
 import PostList from '@/components/blog/PostList'
 import SocialLinks from '@/components/blog/SocialLinks'
+import { Linkedin, Instagram, Youtube, Facebook, BookOpen } from 'lucide-react'
 import type { PageComponent } from '@/types/api'
 
-interface ComponentProps {
-  styles: Record<string, string>
-}
-
-const COMPONENT_MAP: Record<string, FC<ComponentProps>> = {
-  hero: HeroSection,
-  profile: ProfileSection,
-  'post-list': PostList,
-  'social-links': SocialLinks,
+const SOCIAL_ICONS: Record<string, typeof Linkedin> = {
+  social_linkedin: Linkedin,
+  social_instagram: Instagram,
+  social_youtube: Youtube,
+  social_facebook: Facebook,
 }
 
 export default function BlogHomePage() {
   const user = useAuthStore((s) => s.user)
 
-  // retry: false so a single API failure immediately signals the installer hasn't run
   const { data: settingsData, isLoading: settingsLoading, isError: settingsError } = useQuery({
     queryKey: ['settings'],
     queryFn: getSettings,
@@ -34,41 +29,118 @@ export default function BlogHomePage() {
   })
   const { data: pageData, isLoading: pageLoading, isError: pageError } = useBlogPage()
 
-  // Wait for settings before deciding what to show
   if (settingsLoading) return <LoadingSpinner className="min-h-screen" size="lg" />
-
-  // Settings API failed → installer hasn't been run yet
   if (settingsError) return <Navigate to="/setup" replace />
 
-  // Installer ran but blog initial setup not complete
   if (!settingsData || settingsData.data.setup_complete !== '1') {
     return <Navigate to={user ? '/cx-admin/setup' : '/cx-admin/login'} replace />
   }
 
   if (pageLoading) return <LoadingSpinner className="min-h-screen" size="lg" />
-
   if (pageError) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Failed to load the blog. Please try again.</p>
+        <p className="text-muted-foreground">Error al cargar el blog.</p>
       </div>
     )
   }
 
+  const settings = settingsData.data as unknown as Record<string, string>
+  const blogName = settings.blog_name || 'Blog'
   const components: PageComponent[] = pageData?.data.components ?? []
-  const visible = components
-    .filter((c) => c.is_visible)
-    .sort((a, b) => a.display_order - b.display_order)
+
+  const isVisible = (name: string) =>
+    components.find((c) => c.name === name)?.is_visible ?? false
+
+  const getStyles = (name: string): Record<string, string> =>
+    (components.find((c) => c.name === name)?.styles ?? {}) as Record<string, string>
+
+  const heroVisible = isVisible('hero')
+  const postListVisible = isVisible('post-list')
+  const profileVisible = isVisible('profile')
+  const socialVisible = isVisible('social-links')
+  const hasSidebar = profileVisible || socialVisible
+
+  // Social links for footer
+  const socialNetworks = Object.entries(SOCIAL_ICONS)
+    .filter(([key]) => settings[key])
+    .map(([key, Icon]) => ({ key, href: settings[key], Icon }))
 
   return (
-    <>
-      <AdminBar />
-      <main>
-        {visible.map((c) => {
-          const Component = COMPONENT_MAP[c.name]
-          return Component ? <Component key={c.id} styles={c.styles} /> : null
-        })}
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+      {/* Admin bar — only shown to authenticated users */}
+      {user && <AdminBar />}
+
+      <main className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 ${user ? 'mt-9' : ''}`}>
+        {/* Hero */}
+        {heroVisible && (
+          <HeroSection styles={getStyles('hero')} settings={settings} />
+        )}
+
+        {/* Main content + optional sidebar */}
+        <div className={`grid grid-cols-1 gap-10 lg:gap-12 ${hasSidebar ? 'lg:grid-cols-12' : ''}`}>
+          {/* Post list column */}
+          {postListVisible && (
+            <div className={hasSidebar ? 'lg:col-span-8' : 'lg:col-span-12'}>
+              <PostList styles={getStyles('post-list')} settings={settings} />
+            </div>
+          )}
+
+          {/* Sidebar */}
+          {hasSidebar && (
+            <aside className="lg:col-span-4">
+              <div className="sticky top-20 space-y-8">
+                {profileVisible && (
+                  <ProfileSection styles={getStyles('profile')} settings={settings} />
+                )}
+                {socialVisible && (
+                  <SocialLinks styles={getStyles('social-links')} settings={settings} />
+                )}
+              </div>
+            </aside>
+          )}
+        </div>
       </main>
-    </>
+
+      {/* Footer */}
+      <footer className="bg-white dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 mt-20 transition-colors duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            {/* Brand */}
+            <div className="flex items-center gap-2">
+              {settings.blog_logo_url ? (
+                <img src={settings.blog_logo_url} alt={blogName} className="h-6 w-6 rounded-full object-cover" />
+              ) : (
+                <BookOpen size={20} className="text-indigo-600" />
+              )}
+              <span className="font-bold text-base tracking-tight">{blogName}</span>
+            </div>
+
+            {/* Copyright */}
+            <p className="text-muted-foreground text-sm">
+              © {new Date().getFullYear()} {blogName}. Todos los derechos reservados.
+            </p>
+
+            {/* Social icons in footer */}
+            {socialNetworks.length > 0 && (
+              <div className="flex gap-4">
+                {socialNetworks.map(({ key, href, Icon }) => (
+                  <a
+                    key={key}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                    aria-label={key}
+                  >
+                    <Icon size={20} />
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </footer>
+    </div>
   )
 }

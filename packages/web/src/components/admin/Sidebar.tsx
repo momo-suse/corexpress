@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, FileText, MessageSquare, Settings, LogOut, Sliders, Globe } from 'lucide-react'
+import { LayoutDashboard, FileText, MessageSquare, Settings, LogOut, Globe } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { logout } from '@/api/auth'
 
@@ -7,7 +7,6 @@ const NAV = [
   { to: '/cx-admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
   { to: '/cx-admin/posts', label: 'Posts', icon: FileText, end: false },
   { to: '/cx-admin/comments', label: 'Comments', icon: MessageSquare, end: false },
-  { to: '/cx-admin/setup', label: 'Setup', icon: Sliders, end: false },
   { to: '/cx-admin/settings', label: 'Settings', icon: Settings, end: false },
 ]
 
