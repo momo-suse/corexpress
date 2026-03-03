@@ -20,3 +20,7 @@ export function updateComment(id: number, data: { status: Comment['status'] }) {
 export function deleteComment(id: number) {
   return api.delete<void>(`/comments/${id}`)
 }
+
+export function clearSpamComments() {
+  return api.delete<void>('/comments/spam')
+}

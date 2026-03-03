@@ -119,6 +119,17 @@ class CommentController extends Controller
     }
 
     /**
+     * DELETE /api/v1/comments/spam   [Auth + CSRF required]
+     * Bulk-deletes all comments with status=spam.
+     */
+    public function clearSpam(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    {
+        Comment::where('status', 'spam')->delete();
+
+        return $response->withStatus(204);
+    }
+
+    /**
      * DELETE /api/v1/comments/{id}   [Auth + CSRF required]
      */
     public function destroy(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface

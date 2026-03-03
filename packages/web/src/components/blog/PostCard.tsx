@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, Clock } from 'lucide-react'
 import type { Post } from '@/types/api'
 
+import { formatTimeAgo } from '@/lib/utils'
+
 interface PostCardProps {
   post: Post
 }
@@ -9,12 +11,6 @@ interface PostCardProps {
 function readingTime(content: string): string {
   const words = content.replace(/<[^>]+>/g, '').split(/\s+/).filter(Boolean).length
   return `${Math.max(1, Math.round(words / 200))} min`
-}
-
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('es-MX', {
-    day: 'numeric', month: 'long', year: 'numeric',
-  })
 }
 
 function firstTag(tags: string | null): string | null {
@@ -25,7 +21,7 @@ function firstTag(tags: string | null): string | null {
 
 /** Regular post card — displayed in the "Últimos Artículos" 2-column grid. */
 export default function PostCard({ post }: PostCardProps) {
-  const date = formatDate(post.created_at)
+  const date = formatTimeAgo(post.created_at)
   const time = readingTime(post.content || post.excerpt || '')
   const hasImage = Boolean(post.featured_image_url)
   const tag = firstTag(post.tags)
@@ -99,7 +95,7 @@ export default function PostCard({ post }: PostCardProps) {
 
 /** Featured (Destacado) post card — large 2-column card for the most recent post. */
 export function FeaturedPostCard({ post }: PostCardProps) {
-  const date = formatDate(post.created_at)
+  const date = formatTimeAgo(post.created_at)
   const time = readingTime(post.content || post.excerpt || '')
   const hasImage = Boolean(post.featured_image_url)
   const tag = firstTag(post.tags)

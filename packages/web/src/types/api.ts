@@ -18,6 +18,8 @@ export interface Post {
   author_id: number
   created_at: string
   updated_at: string
+  comments_count?: number
+  comments_pending_count?: number
 }
 
 export interface Comment {
@@ -27,6 +29,7 @@ export interface Comment {
   content: string
   status: 'pending' | 'approved' | 'spam'
   created_at: string
+  post?: { id: number; title: string; slug: string }
 }
 
 export interface Setting {

@@ -35,6 +35,10 @@ class PostController extends Controller
         $total = $query->count();
         $posts = (clone $query)
             ->select(['id', 'title', 'slug', 'excerpt', 'tags', 'featured_image_id', 'status', 'created_at', 'updated_at'])
+            ->withCount([
+                'comments as comments_count',
+                'comments as comments_pending_count' => static fn ($q) => $q->where('status', 'pending'),
+            ])
             ->skip(($page - 1) * $perPage)
             ->take($perPage)
             ->get()

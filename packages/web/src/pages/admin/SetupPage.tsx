@@ -224,7 +224,12 @@ export default function SetupPage() {
 
       await saveSettings(settingsPayload)
 
-      await qc.invalidateQueries({ queryKey: ['settings'] })
+      // Wait for the fresh settings to be in cache BEFORE navigating.
+      // invalidateQueries (from useMutateSettings.onSuccess) only marks stale and
+      // returns immediately — the DashboardPage useEffect would fire with stale data
+      // (setup_complete !== '1') and redirect back here. refetchQueries waits for
+      // the actual network response so the cache is fresh when we navigate.
+      await qc.refetchQueries({ queryKey: ['settings'] })
       qc.invalidateQueries({ queryKey: ['pages', 'home'] })
       toast({ title: '¡Configuración guardada!' })
       navigate('/cx-admin', { replace: true })

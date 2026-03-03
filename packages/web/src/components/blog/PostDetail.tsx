@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { Clock, ArrowLeft, Share2, Check, MapPin } from 'lucide-react'
 import type { Post } from '@/types/api'
 
+import { formatTimeAgo } from '@/lib/utils'
+
 interface PostDetailProps {
   post: Post
   settings?: Record<string, string>
@@ -22,9 +24,7 @@ function firstTag(tags: string | null): string | null {
 export default function PostDetail({ post, settings = {} }: PostDetailProps) {
   const [copied, setCopied] = useState(false)
 
-  const date = new Date(post.created_at).toLocaleDateString('es-MX', {
-    day: 'numeric', month: 'long', year: 'numeric',
-  })
+  const date = formatTimeAgo(post.created_at)
   const time = readingTime(post.content || '')
   const tag = firstTag(post.tags)
 

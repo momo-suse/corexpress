@@ -67,6 +67,8 @@ $app->group('/api/v1', function (\Slim\Routing\RouteCollectorProxy $group) use (
 
     // Admin write (Auth + CSRF)
     $group->put('/comments/{id}',    [CommentController::class, 'update'])->add($csrfMiddleware)->add($authMiddleware);
+    // Static route BEFORE {id} so the router does not treat 'spam' as a numeric ID
+    $group->delete('/comments/spam',  [CommentController::class, 'clearSpam'])->add($csrfMiddleware)->add($authMiddleware);
     $group->delete('/comments/{id}', [CommentController::class, 'destroy'])->add($csrfMiddleware)->add($authMiddleware);
 
     // ── Pages ──────────────────────────────────────────────────────────────────
