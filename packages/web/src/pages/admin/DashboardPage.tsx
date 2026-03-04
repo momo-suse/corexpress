@@ -98,6 +98,7 @@ export default function DashboardPage() {
   const pendingCount = pendingCommentsData?.meta.total ?? 0
   const pendingComments = pendingCommentsData?.data ?? []
   const displayImage = form._imagePreview ?? form.featured_image_url
+  const commentsEnabled = (settingsData?.data.comments_enabled ?? '1') === '1'
 
   // ── Handlers: editor ────────────────────────────────────────────────────────
   function openCreate() {
@@ -318,14 +319,22 @@ export default function DashboardPage() {
               <div className="p-5 flex flex-col gap-2 rounded-xl border bg-card shadow-sm">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-muted-foreground">Pending Comments</span>
-                  <MessageCircle className="h-4 w-4 text-muted-foreground" />
+                  <MessageCircle className={`h-4 w-4 ${commentsEnabled ? 'text-muted-foreground' : 'text-amber-500'}`} />
                 </div>
                 <span className="text-3xl font-bold">{pendingCount}</span>
+                {!commentsEnabled && (
+                  <a
+                    href="/cx-admin/settings"
+                    className="text-xs text-amber-500 hover:text-amber-600 transition-colors -mt-1"
+                  >
+                    Disabled — Enable in Settings →
+                  </a>
+                )}
               </div>
             </section>
 
             {/* Quick Actions: Pending Comments */}
-            {pendingComments.length > 0 && (
+            {commentsEnabled && pendingComments.length > 0 && (
               <section>
                 <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">
                   Quick Action: Pending

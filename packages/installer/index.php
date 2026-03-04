@@ -249,6 +249,7 @@ function handleInstallAjax(): void
             'blog_name'        => $blog['name'],
             'blog_description' => $blog['description'],
             'blog_theme'       => $blog['theme'],
+            'comments_enabled' => '1',
         ] as $key => $value) {
             $stmt->execute([':k' => $key, ':v' => $value]);
         }

@@ -6,6 +6,7 @@ namespace Corexpress\Controllers;
 
 use Corexpress\Models\Comment;
 use Corexpress\Models\Post;
+use Corexpress\Models\Setting;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -20,6 +21,12 @@ class CommentController extends Controller
      */
     public function store(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
+        // Check global comments toggle
+        $commentsEnabled = Setting::where('key', 'comments_enabled')->value('value') ?? '1';
+        if ($commentsEnabled !== '1') {
+            return $this->error($response, 'Comments are disabled.', 403);
+        }
+
         $post = Post::find((int) $args['postId']);
 
         if ($post === null || $post->status !== 'published') {

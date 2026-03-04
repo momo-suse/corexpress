@@ -72,6 +72,7 @@ export default function PostPage() {
   const profileVisible = isVisible('profile')
   const socialVisible = isVisible('social-links')
   const hasSidebar = profileVisible || socialVisible
+  const commentsEnabled = (settings.comments_enabled ?? '1') === '1'
 
   // Recent posts: exclude current, max 4
   const recentPosts = (recentData?.data ?? [])
@@ -157,14 +158,17 @@ export default function PostPage() {
               <PostDetail post={post} settings={settings} />
             </div>
 
-            {/* Comments */}
-            <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 p-4 md:p-6 mb-4">
-              <CommentList postId={post.id} />
-            </div>
-
-            <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 p-4 md:p-6">
-              <CommentForm postId={post.id} onSubmitted={handleCommentSubmitted} />
-            </div>
+            {/* Comments — only rendered when enabled */}
+            {commentsEnabled && (
+              <>
+                <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 p-4 md:p-6 mb-4">
+                  <CommentList postId={post.id} />
+                </div>
+                <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 p-4 md:p-6">
+                  <CommentForm postId={post.id} onSubmitted={handleCommentSubmitted} />
+                </div>
+              </>
+            )}
           </div>
 
         </div>

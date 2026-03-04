@@ -277,31 +277,46 @@ export default function SettingsPage() {
           <div className="lg:col-span-7 space-y-6">
 
             {/* Blog sections toggles */}
-            {components.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Blog sections</CardTitle>
-                  <CardDescription>Toggle which sections appear on your blog homepage.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {components.map((c) => (
-                    <div key={c.id} className="flex items-center justify-between">
-                      <Label htmlFor={`sect-${c.id}`} className="font-normal cursor-pointer">
-                        {COMPONENT_LABELS[c.name] ?? c.name}
-                      </Label>
-                      <Switch
-                        id={`sect-${c.id}`}
-                        checked={getVisible(c)}
-                        disabled={ALWAYS_ON.has(c.name)}
-                        onCheckedChange={(checked) =>
-                          setComponentVisibility((prev) => ({ ...prev, [c.id]: checked }))
-                        }
-                      />
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            )}
+            <Card>
+              <CardHeader>
+                <CardTitle>Blog sections</CardTitle>
+                <CardDescription>Toggle which sections appear on your blog homepage.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {components.map((c) => (
+                  <div key={c.id} className="flex items-center justify-between">
+                    <Label htmlFor={`sect-${c.id}`} className="font-normal cursor-pointer">
+                      {COMPONENT_LABELS[c.name] ?? c.name}
+                    </Label>
+                    <Switch
+                      id={`sect-${c.id}`}
+                      checked={getVisible(c)}
+                      disabled={ALWAYS_ON.has(c.name)}
+                      onCheckedChange={(checked) =>
+                        setComponentVisibility((prev) => ({ ...prev, [c.id]: checked }))
+                      }
+                    />
+                  </div>
+                ))}
+
+                {/* Comments toggle — global setting, not a page component */}
+                <div className="flex items-center justify-between pt-2 border-t">
+                  <div className="flex flex-col gap-0.5">
+                    <Label htmlFor="comments-toggle" className="font-normal cursor-pointer">
+                      Comments on posts
+                    </Label>
+                    <span className="text-xs text-muted-foreground">
+                      Allow readers to comment on blog posts.
+                    </span>
+                  </div>
+                  <Switch
+                    id="comments-toggle"
+                    checked={(form.comments_enabled ?? '1') === '1'}
+                    onCheckedChange={(checked) => set('comments_enabled', checked ? '1' : '0')}
+                  />
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Hero Banner config */}
             {isHeroOn && (

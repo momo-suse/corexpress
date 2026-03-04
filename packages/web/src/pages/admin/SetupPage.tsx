@@ -14,7 +14,7 @@ import { updatePageComponent } from '@/api/pages'
 import { uploadImage } from '@/api/images'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from '@/hooks/useToast'
-import { Upload, ImageIcon, User, List, Share2, Sparkles, Globe } from 'lucide-react'
+import { Upload, ImageIcon, User, List, Share2, Sparkles, Globe, MessageCircle } from 'lucide-react'
 import type { PageComponent } from '@/types/api'
 
 interface HeroData {
@@ -51,6 +51,7 @@ export default function SetupPage() {
   const [heroEnabled, setHeroEnabled] = useState(false)
   const [profileEnabled, setProfileEnabled] = useState(false)
   const [socialEnabled, setSocialEnabled] = useState(false)
+  const [commentsEnabled, setCommentsEnabled] = useState(true)
 
   const [hero, setHero] = useState<HeroData>({ text: '', imageFile: null, imagePreview: null })
   const [profile, setProfile] = useState<ProfileData>({
@@ -198,7 +199,10 @@ export default function SetupPage() {
         }
       }
 
-      const settingsPayload: Record<string, string> = { setup_complete: '1' }
+      const settingsPayload: Record<string, string> = {
+        setup_complete: '1',
+        comments_enabled: commentsEnabled ? '1' : '0',
+      }
       if (logoImageId) settingsPayload.blog_logo_id = logoImageId
 
       if (heroEnabled) {
@@ -479,6 +483,22 @@ export default function SetupPage() {
               ))}
             </CardContent>
           )}
+        </Card>
+
+        {/* Comments */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <MessageCircle className="h-5 w-5 text-primary" />
+                <div>
+                  <CardTitle className="text-base">Comments on posts</CardTitle>
+                  <CardDescription>Allow readers to leave comments on your blog posts.</CardDescription>
+                </div>
+              </div>
+              <Switch checked={commentsEnabled} onCheckedChange={setCommentsEnabled} />
+            </div>
+          </CardHeader>
         </Card>
 
         <div className="flex justify-center pb-8">

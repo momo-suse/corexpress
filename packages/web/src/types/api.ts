@@ -62,6 +62,9 @@ export interface Settings {
   social_instagram: string
   social_youtube: string
   social_facebook: string
+  // Features
+  /** '1' = enabled (default), '0' = disabled */
+  comments_enabled: string
   [key: string]: string
 }
 
