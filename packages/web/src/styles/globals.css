@@ -155,3 +155,23 @@
   --ring: 243 75% 59%;             /* indigo focus ring */
   --radius: 0.5rem;
 }
+
+/* ─── Blog Style Collections ──────────────────────────────────────────────── */
+/* Applied to the root div of BlogHomePage and PostPage based on               */
+/* active_style_collection. Fully separate from the admin theme system above.  */
+
+/* Default: indigo accent, rounded cards, full-colour images */
+.blog-collection-default {
+  --blog-accent:      #4f46e5;  /* indigo-600 */
+  --blog-accent-soft: #eef2ff;  /* indigo-50  */
+  --blog-radius-card: 1rem;
+  --blog-img-filter:  none;
+}
+
+/* Classic: rose accent, sharp edges, grayscale images — editorial sidebar layout */
+.blog-collection-classic {
+  --blog-accent:      #e11d48;  /* rose-600 */
+  --blog-accent-soft: #fff1f2;  /* rose-50  */
+  --blog-radius-card: 0px;
+  --blog-img-filter:  grayscale(100%);
+}

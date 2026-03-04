@@ -44,7 +44,8 @@ export default function SocialLinks(_props: SocialLinksProps) {
 
   return (
     <div
-      className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-md border border-gray-200 dark:border-gray-700"
+      className="bg-white dark:bg-gray-900 p-6 shadow-md border border-gray-200 dark:border-gray-700"
+      style={{ borderRadius: 'var(--blog-radius-card)' }}
     >
       <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-5 pb-2 border-b border-gray-100 dark:border-gray-800">
         Conéctate

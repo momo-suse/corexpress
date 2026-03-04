@@ -9,6 +9,7 @@ import CommentForm from '@/components/blog/CommentForm'
 import AdminBar from '@/components/blog/AdminBar'
 import ProfileSection from '@/components/blog/ProfileSection'
 import SocialLinks from '@/components/blog/SocialLinks'
+import { ClassicPostContent } from '@/components/blog/ClassicLayout'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import { Link } from 'react-router-dom'
 import { Clock, ArrowRight } from 'lucide-react'
@@ -65,6 +66,7 @@ export default function PostPage() {
   const post = data.data
   const settings = (settingsData?.data ?? {}) as unknown as Record<string, string>
   const components: PageComponent[] = pageData?.data.components ?? []
+  const activeCollection = settings.active_style_collection ?? 'default'
 
   const isVisible = (name: string) =>
     components.find((c) => c.name === name)?.is_visible ?? false
@@ -83,8 +85,24 @@ export default function PostPage() {
     qc.invalidateQueries({ queryKey: ['comments'] })
   }
 
+  // Classic layout — completely different structure
+  if (activeCollection === 'classic') {
+    return (
+      <ClassicPostContent
+        post={post}
+        relatedPosts={recentPosts}
+        settings={settings}
+        user={!!user}
+        commentsEnabled={commentsEnabled}
+        profileVisible={profileVisible}
+        socialVisible={socialVisible}
+        onCommentSubmitted={handleCommentSubmitted}
+      />
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <div className={`blog-collection-${activeCollection} min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300`}>
       {/* Admin bar — only for authenticated users */}
       {user && <AdminBar />}
 
@@ -103,7 +121,10 @@ export default function PostPage() {
 
                 {/* Recent posts widget */}
                 {recentPosts.length > 0 && (
-                  <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-md border border-gray-200 dark:border-gray-700">
+                  <div
+                    className="bg-white dark:bg-gray-900 p-6 shadow-md border border-gray-200 dark:border-gray-700"
+                    style={{ borderRadius: 'var(--blog-radius-card)' }}
+                  >
                     <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-5 pb-2 border-b border-gray-100 dark:border-gray-800">
                       Últimos artículos
                     </h3>
@@ -118,15 +139,21 @@ export default function PostPage() {
                             <img
                               src={rp.featured_image_url}
                               alt={rp.title}
-                              className="w-16 h-16 rounded-xl object-cover flex-shrink-0 group-hover:opacity-80 transition-opacity ring-1 ring-gray-100 dark:ring-gray-800"
+                              className="w-16 h-16 object-cover flex-shrink-0 group-hover:opacity-80 transition-opacity ring-1 ring-gray-100 dark:ring-gray-800"
+                              style={{ borderRadius: 'calc(var(--blog-radius-card) * 0.6)', filter: 'var(--blog-img-filter)' }}
                             />
                           ) : (
-                            <div className="w-16 h-16 rounded-xl flex-shrink-0 bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center">
-                              <ArrowRight size={18} className="text-indigo-400" />
+                            <div
+                              className="w-16 h-16 flex-shrink-0 flex items-center justify-center"
+                              style={{ borderRadius: 'calc(var(--blog-radius-card) * 0.6)', background: 'var(--blog-accent-soft)' }}
+                            >
+                              <ArrowRight size={18} style={{ color: 'var(--blog-accent)' }} />
                             </div>
                           )}
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-bold text-sm text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 line-clamp-2 transition-colors leading-snug mb-1">
+                            <h4
+                              className="font-bold text-sm text-gray-900 dark:text-white line-clamp-2 transition-colors leading-snug mb-1 group-hover:[color:var(--blog-accent)]"
+                            >
                               {rp.title}
                             </h4>
                             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -154,17 +181,26 @@ export default function PostPage() {
           {/* ── Main article (right, 8/12) ── */}
           <div className={`${hasSidebar ? 'lg:col-span-8' : ''} order-1 lg:order-2`}>
             {/* Article */}
-            <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 p-4 md:p-6 mb-8">
+            <div
+              className="bg-white dark:bg-gray-900 shadow-md border border-gray-200 dark:border-gray-700 p-4 md:p-6 mb-8"
+              style={{ borderRadius: 'var(--blog-radius-card)' }}
+            >
               <PostDetail post={post} settings={settings} />
             </div>
 
             {/* Comments — only rendered when enabled */}
             {commentsEnabled && (
               <>
-                <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 p-4 md:p-6 mb-4">
+                <div
+                  className="bg-white dark:bg-gray-900 shadow-md border border-gray-200 dark:border-gray-700 p-4 md:p-6 mb-4"
+                  style={{ borderRadius: 'var(--blog-radius-card)' }}
+                >
                   <CommentList postId={post.id} />
                 </div>
-                <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 p-4 md:p-6">
+                <div
+                  className="bg-white dark:bg-gray-900 shadow-md border border-gray-200 dark:border-gray-700 p-4 md:p-6"
+                  style={{ borderRadius: 'var(--blog-radius-card)' }}
+                >
                   <CommentForm postId={post.id} onSubmitted={handleCommentSubmitted} />
                 </div>
               </>

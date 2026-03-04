@@ -4,13 +4,21 @@
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- ── Component definitions (static registry of all known component types) ──────
+-- type: 'component' = top-level section | 'sub-component' = child of a parent component
+-- parent_id: NULL for top-level; references the parent component row id for sub-components
+-- has_own_page: 1 = has a dedicated public route (e.g. /post/{slug})
 CREATE TABLE IF NOT EXISTS `component_definitions` (
-    `id`         INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name`       VARCHAR(100) NOT NULL COMMENT 'slug: hero, profile, post-list, etc.',
-    `label`      VARCHAR(255) NOT NULL COMMENT 'Human-readable label for admin UI',
-    `created_at` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `id`           INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name`         VARCHAR(100) NOT NULL COMMENT 'slug: hero, profile, post-list, etc.',
+    `label`        VARCHAR(255) NOT NULL COMMENT 'Human-readable label for admin UI',
+    `type`         ENUM('component','sub-component') NOT NULL DEFAULT 'component',
+    `parent_id`    INT UNSIGNED NULL,
+    `has_own_page` TINYINT(1)   NOT NULL DEFAULT 0,
+    `created_at`   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uq_component_definitions_name` (`name`)
+    UNIQUE KEY `uq_component_definitions_name` (`name`),
+    CONSTRAINT `fk_cd_parent` FOREIGN KEY (`parent_id`)
+        REFERENCES `component_definitions` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Style collections (theme packs — each is a named set of component styles) ─
@@ -71,20 +79,22 @@ CREATE TABLE IF NOT EXISTS `page_components` (
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- Component definitions (7 predefined types)
-INSERT INTO `component_definitions` (`name`, `label`) VALUES
-    ('hero',         'Hero Banner'),
-    ('profile',      'Profile'),
-    ('post-list',    'Post List'),
-    ('post-detail',  'Post Detail'),
-    ('comment-form', 'Comment Form'),
-    ('comment-list', 'Comment List'),
-    ('social-links', 'Social Links');
+-- type: 'component' = top-level | 'sub-component' = child of parent_id
+-- parent_id references the parent component row; NULL for top-level
+-- has_own_page: 1 = has a dedicated public route
+INSERT INTO `component_definitions` (`name`, `label`, `type`, `parent_id`, `has_own_page`) VALUES
+    ('hero',         'Hero Banner',  'component',     NULL, 0),
+    ('profile',      'Profile',      'component',     NULL, 0),
+    ('post-list',    'Post List',    'component',     NULL, 0),
+    ('post-detail',  'Post Detail',  'component',     NULL, 1),
+    ('comment-form', 'Comment Form', 'sub-component', 4,    0),
+    ('comment-list', 'Comment List', 'sub-component', 4,    0),
+    ('social-links', 'Social Links', 'component',     NULL, 0);
 
--- Style collections (3 built-in — default is the fallback)
+-- Style collections (2 built-in — default is the fallback)
 INSERT INTO `style_collections` (`name`, `label`, `is_default`) VALUES
     ('default', 'Default', 1),
-    ('minimal', 'Minimal', 0),
-    ('dark',    'Dark',    0);
+    ('classic', 'Classic', 0);
 
 -- Default collection styles (covers all 7 components)
 INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `styles_config`) VALUES
@@ -96,25 +106,15 @@ INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `sty
     (1, 6, '{"background":"#ffffff","textColor":"#111827","layout":"list"}'),
     (1, 7, '{"background":"#ffffff","textColor":"#6b7280","layout":"inline"}');
 
--- Minimal collection styles (all 7 components)
+-- Classic collection styles (all 7 components — editorial layout)
 INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `styles_config`) VALUES
-    (2, 1, '{"background":"#ffffff","textColor":"#374151","layout":"minimal"}'),
-    (2, 2, '{"background":"#ffffff","textColor":"#374151","layout":"minimal"}'),
-    (2, 3, '{"background":"#ffffff","textColor":"#374151","layout":"minimal"}'),
-    (2, 4, '{"background":"#ffffff","textColor":"#374151","layout":"minimal"}'),
-    (2, 5, '{"background":"#ffffff","textColor":"#374151","layout":"minimal"}'),
-    (2, 6, '{"background":"#ffffff","textColor":"#374151","layout":"minimal"}'),
-    (2, 7, '{"background":"#ffffff","textColor":"#374151","layout":"minimal"}');
-
--- Dark collection styles (all 7 components)
-INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `styles_config`) VALUES
-    (3, 1, '{"background":"#111827","textColor":"#f9fafb","layout":"full-width"}'),
-    (3, 2, '{"background":"#1f2937","textColor":"#f9fafb","layout":"centered"}'),
-    (3, 3, '{"background":"#1f2937","textColor":"#f9fafb","layout":"list"}'),
-    (3, 4, '{"background":"#1f2937","textColor":"#f9fafb","layout":"article"}'),
-    (3, 5, '{"background":"#111827","textColor":"#f9fafb","layout":"card"}'),
-    (3, 6, '{"background":"#1f2937","textColor":"#f9fafb","layout":"list"}'),
-    (3, 7, '{"background":"#1f2937","textColor":"#9ca3af","layout":"inline"}');
+    (2, 1, '{"background":"#fafafa","textColor":"#111827","layout":"editorial"}'),
+    (2, 2, '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
+    (2, 3, '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
+    (2, 4, '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
+    (2, 5, '{"background":"#fafafa","textColor":"#111827","layout":"editorial"}'),
+    (2, 6, '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
+    (2, 7, '{"background":"#ffffff","textColor":"#6b7280","layout":"editorial"}');
 
 -- Pages (home and blog)
 INSERT INTO `pages` (`slug`, `title`) VALUES

@@ -13,7 +13,8 @@ export default function ProfileSection({ settings }: ProfileSectionProps) {
 
   return (
     <div
-      className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-md border border-gray-200 dark:border-gray-700 relative overflow-hidden"
+      className="bg-white dark:bg-gray-900 p-6 shadow-md border border-gray-200 dark:border-gray-700 relative overflow-hidden"
+      style={{ borderRadius: 'var(--blog-radius-card)' }}
     >
       {/* Decorative corner accent */}
       <div className="absolute top-0 right-0 w-28 h-28 bg-indigo-50 dark:bg-indigo-900/10 rounded-bl-full -z-10" />

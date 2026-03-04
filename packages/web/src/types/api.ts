@@ -105,9 +105,16 @@ export interface PageComponent {
   id: number
   page_id: number
   component_definition_id: number
+  /** 'component' = top-level section; 'sub-component' = child of parent_id */
+  type: 'component' | 'sub-component'
+  /** id of the parent component; null for top-level components */
+  parent_id: number | null
+  /** true if this component has its own dedicated public route (e.g. /post/{slug}) */
+  has_own_page: boolean
   is_visible: boolean
   display_order: number
   name: string
+  label: string
   styles: Record<string, string>
 }
 

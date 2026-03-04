@@ -13,10 +13,21 @@ class ComponentDefinition extends Model
     public const UPDATED_AT = null;
 
     protected $table    = 'component_definitions';
-    protected $fillable = ['name', 'label'];
+    protected $fillable = ['name', 'label', 'type', 'parent_id', 'has_own_page'];
+
+    protected $casts = [
+        'parent_id'    => 'integer',
+        'has_own_page' => 'boolean',
+    ];
 
     public function styles(): HasMany
     {
         return $this->hasMany(ComponentStyle::class, 'component_definition_id');
+    }
+
+    /** Sub-components that belong to this component. */
+    public function subComponents(): HasMany
+    {
+        return $this->hasMany(self::class, 'parent_id');
     }
 }

@@ -52,13 +52,17 @@ class PageController extends Controller
 
         $components = $page->pageComponents->map(function (PageComponent $pc) use ($activeStyles, $defaultStyles): array {
             $defId  = $pc->component_definition_id;
+            $def    = $pc->componentDefinition;
             $styles = $activeStyles[$defId] ?? $defaultStyles[$defId] ?? [];
 
             return [
                 'id'                      => $pc->id,
                 'component_definition_id' => $defId,
-                'name'                    => $pc->componentDefinition?->name,
-                'label'                   => $pc->componentDefinition?->label,
+                'type'                    => $def?->type ?? 'component',
+                'parent_id'               => $def?->parent_id,
+                'has_own_page'            => (bool) ($def?->has_own_page ?? false),
+                'name'                    => $def?->name,
+                'label'                   => $def?->label,
                 'is_visible'              => $pc->is_visible,
                 'display_order'           => $pc->display_order,
                 'styles'                  => $styles,
@@ -123,14 +127,20 @@ class PageController extends Controller
             'id'         => $page->id,
             'slug'       => $page->slug,
             'title'      => $page->title,
-            'components' => $page->pageComponents->map(fn (PageComponent $pc) => [
-                'id'                      => $pc->id,
-                'component_definition_id' => $pc->component_definition_id,
-                'name'                    => $pc->componentDefinition?->name,
-                'label'                   => $pc->componentDefinition?->label,
-                'is_visible'              => $pc->is_visible,
-                'display_order'           => $pc->display_order,
-            ]),
+            'components' => $page->pageComponents->map(function (PageComponent $pc): array {
+                $def = $pc->componentDefinition;
+                return [
+                    'id'                      => $pc->id,
+                    'component_definition_id' => $pc->component_definition_id,
+                    'type'                    => $def?->type ?? 'component',
+                    'parent_id'               => $def?->parent_id,
+                    'has_own_page'            => (bool) ($def?->has_own_page ?? false),
+                    'name'                    => $def?->name,
+                    'label'                   => $def?->label,
+                    'is_visible'              => $pc->is_visible,
+                    'display_order'           => $pc->display_order,
+                ];
+            }),
         ];
     }
 }
