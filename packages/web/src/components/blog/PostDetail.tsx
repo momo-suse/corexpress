@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { Clock, ArrowLeft, Share2, Check, MapPin } from 'lucide-react'
 import type { Post } from '@/types/api'
 
+import { formatTimeAgo } from '@/lib/utils'
+
 interface PostDetailProps {
   post: Post
   settings?: Record<string, string>
@@ -22,9 +24,7 @@ function firstTag(tags: string | null): string | null {
 export default function PostDetail({ post, settings = {} }: PostDetailProps) {
   const [copied, setCopied] = useState(false)
 
-  const date = new Date(post.created_at).toLocaleDateString('es-MX', {
-    day: 'numeric', month: 'long', year: 'numeric',
-  })
+  const date = formatTimeAgo(post.created_at)
   const time = readingTime(post.content || '')
   const tag = firstTag(post.tags)
 
@@ -46,7 +46,7 @@ export default function PostDetail({ post, settings = {} }: PostDetailProps) {
         <div className="flex items-center justify-between mb-6">
           <Link
             to="/"
-            className="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition-colors group"
+            className="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 font-medium transition-colors group hover:[color:var(--blog-accent)]"
           >
             <ArrowLeft size={16} className="mr-1.5 group-hover:-translate-x-1 transition-transform" />
             Volver al inicio
@@ -59,8 +59,11 @@ export default function PostDetail({ post, settings = {} }: PostDetailProps) {
             className={`inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-full transition-all duration-200
               ${copied
                 ? 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400'
-                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:text-indigo-600 dark:hover:text-indigo-400'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'
               }`}
+            style={!copied ? { ['--hover-accent' as string]: 'var(--blog-accent)' } : undefined}
+            onMouseEnter={(e) => { if (!copied) { (e.currentTarget as HTMLElement).style.color = 'var(--blog-accent)' } }}
+            onMouseLeave={(e) => { if (!copied) { (e.currentTarget as HTMLElement).style.color = '' } }}
           >
             {copied ? <Check size={14} /> : <Share2 size={14} />}
             {copied ? '¡Copiado!' : 'Compartir'}
@@ -70,7 +73,10 @@ export default function PostDetail({ post, settings = {} }: PostDetailProps) {
         {/* Meta row: category + readtime + date */}
         <div className="flex items-center flex-wrap gap-3 mb-5">
           {tag && (
-            <span className="bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider py-1.5 px-3 rounded-full">
+            <span
+              className="text-xs font-bold uppercase tracking-wider py-1.5 px-3 rounded-full"
+              style={{ background: 'var(--blog-accent-soft)', color: 'var(--blog-accent)' }}
+            >
               {tag}
             </span>
           )}
@@ -99,14 +105,15 @@ export default function PostDetail({ post, settings = {} }: PostDetailProps) {
           <img
             src={post.featured_image_url}
             alt={post.title}
-            className="w-full h-auto rounded-2xl shadow-md object-cover max-h-[480px]"
+            className="w-full h-auto shadow-md object-cover max-h-[480px]"
+            style={{ borderRadius: 'var(--blog-radius-card)', filter: 'var(--blog-img-filter)' }}
           />
         </figure>
       )}
 
       {/* Body */}
       <div
-        className="prose prose-lg prose-neutral dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-indigo-600 dark:prose-a:text-indigo-400 prose-img:rounded-xl prose-img:shadow-md prose-blockquote:border-l-indigo-500 prose-blockquote:bg-indigo-50/50 dark:prose-blockquote:bg-indigo-900/20 prose-blockquote:rounded-r-lg prose-blockquote:py-2 mb-12"
+        className="prose prose-lg prose-neutral dark:prose-invert max-w-none prose-headings:font-bold prose-img:shadow-md prose-blockquote:rounded-r-lg prose-blockquote:py-2 mb-12 [&_a]:![color:var(--blog-accent)] [&_blockquote]:![border-left-color:var(--blog-accent)] [&_blockquote]:![background-color:var(--blog-accent-soft)]"
         dangerouslySetInnerHTML={{ __html: post.content }}
       />
 

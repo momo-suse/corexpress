@@ -9,6 +9,7 @@ import HeroSection from '@/components/blog/HeroSection'
 import ProfileSection from '@/components/blog/ProfileSection'
 import PostList from '@/components/blog/PostList'
 import SocialLinks from '@/components/blog/SocialLinks'
+import { ClassicBlogHome } from '@/components/blog/ClassicLayout'
 import { Linkedin, Instagram, Youtube, Facebook, BookOpen } from 'lucide-react'
 import type { PageComponent } from '@/types/api'
 
@@ -48,6 +49,7 @@ export default function BlogHomePage() {
   const settings = settingsData.data as unknown as Record<string, string>
   const blogName = settings.blog_name || 'Blog'
   const components: PageComponent[] = pageData?.data.components ?? []
+  const activeCollection = settings.active_style_collection ?? 'default'
 
   const isVisible = (name: string) =>
     components.find((c) => c.name === name)?.is_visible ?? false
@@ -61,13 +63,27 @@ export default function BlogHomePage() {
   const socialVisible = isVisible('social-links')
   const hasSidebar = profileVisible || socialVisible
 
+  // Classic layout — completely different structure
+  if (activeCollection === 'classic') {
+    return (
+      <ClassicBlogHome
+        settings={settings}
+        user={!!user}
+        profileVisible={profileVisible}
+        socialVisible={socialVisible}
+        postListVisible={postListVisible}
+        heroVisible={heroVisible}
+      />
+    )
+  }
+
   // Social links for footer
   const socialNetworks = Object.entries(SOCIAL_ICONS)
     .filter(([key]) => settings[key])
     .map(([key, Icon]) => ({ key, href: settings[key], Icon }))
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <div className={`blog-collection-${activeCollection} min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300`}>
       {/* Admin bar — only shown to authenticated users */}
       {user && <AdminBar />}
 
@@ -111,7 +127,7 @@ export default function BlogHomePage() {
               {settings.blog_logo_url ? (
                 <img src={settings.blog_logo_url} alt={blogName} className="h-6 w-6 rounded-full object-cover" />
               ) : (
-                <BookOpen size={20} className="text-indigo-600" />
+                <BookOpen size={20} style={{ color: 'var(--blog-accent)' }} />
               )}
               <span className="font-bold text-base tracking-tight">{blogName}</span>
             </div>
@@ -130,7 +146,10 @@ export default function BlogHomePage() {
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                    className="text-gray-400 transition-colors"
+                    style={{ ['--hover-color' as string]: 'var(--blog-accent)' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--blog-accent)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = '')}
                     aria-label={key}
                   >
                     <Icon size={20} />

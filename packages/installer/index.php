@@ -71,6 +71,10 @@ if (file_exists(CONFIG_PATH)) {
 session_name('corexpress_installer');
 session_start();
 
+// Prevent browser from caching pages that embed CSRF tokens
+header('Cache-Control: no-store, no-cache, must-revalidate');
+header('Pragma: no-cache');
+
 if (!isset($_SESSION['installer'])) {
     $_SESSION['installer'] = ['step' => -1];
 }
@@ -245,6 +249,7 @@ function handleInstallAjax(): void
             'blog_name'        => $blog['name'],
             'blog_description' => $blog['description'],
             'blog_theme'       => $blog['theme'],
+            'comments_enabled' => '1',
         ] as $key => $value) {
             $stmt->execute([':k' => $key, ':v' => $value]);
         }
@@ -454,9 +459,12 @@ function renderSettings(): void
     unset($_SESSION['installer']['errors'], $_SESSION['installer']['form']);
 
     $themes = [
-        'default' => ['label' => 'Default', 'accent' => '#000000', 'accentHover' => '#222222', 'bg' => '#ffffff', 'surface' => '#f9fafb', 'text' => '#111827', 'muted' => '#6b7280', 'border' => '#e5e7eb'],
-        'minimal' => ['label' => 'Minimal', 'accent' => '#374151', 'accentHover' => '#1f2937', 'bg' => '#fafafa', 'surface' => '#f3f4f6', 'text' => '#111827', 'muted' => '#6b7280', 'border' => '#d1d5db'],
-        'dark'    => ['label' => 'Dark',    'accent' => '#f9fafb', 'accentHover' => '#e5e7eb', 'bg' => '#111827', 'surface' => '#1f2937', 'text' => '#f9fafb', 'muted' => '#9ca3af', 'border' => '#374151'],
+        // White cards on gray-100 background, dark-gray primary button
+        'default' => ['label' => 'Default', 'accent' => '#111827', 'accentHover' => '#374151', 'bg' => '#ffffff', 'surface' => '#f3f4f6', 'text' => '#111827', 'muted' => '#6b7280', 'border' => '#e5e7eb'],
+        // Pure black & white, sharp edges, no rounded corners
+        'minimal' => ['label' => 'Minimal', 'accent' => '#000000', 'accentHover' => '#222222', 'bg' => '#ffffff', 'surface' => '#f5f5f5', 'text' => '#000000', 'muted' => '#666666', 'border' => '#000000'],
+        // Zinc-950 background, zinc-900 surface, indigo-600 accent
+        'dark'    => ['label' => 'Dark',    'accent' => '#4f46e5', 'accentHover' => '#4338ca', 'bg' => '#09090b', 'surface' => '#18181b', 'text' => '#fafafa', 'muted' => '#a1a1aa', 'border' => '#27272a'],
     ];
 
     renderLayout('Blog Settings', 3, function () use ($errors, $form, $csrf, $themes, $selectedTheme): void {
@@ -478,7 +486,7 @@ function renderSettings(): void
         echo '</div>';
 
         echo '<div class="field">';
-        echo '<label>Installer Theme</label>';
+        echo '<label>Installer Theme <span class="hint">(dashboard style)</span></label> ';
         echo '<div class="theme-grid">';
         foreach ($themes as $value => $theme) {
             $checked   = $value === $selectedTheme ? ' checked' : '';
@@ -995,12 +1003,14 @@ function renderLayout(string $pageTitle, int $currentStep, callable $body): void
         if (loader) loader.classList.add('active');
     });
 
-    // ── Submit spinner — hide Continue btn, show spinner in its place ─────────
+    // ── Submit spinner — disable + hide Continue btn, show spinner ────────────
     document.addEventListener('submit', function (e) {
         if (loader) loader.classList.add('active');
         const form = e.target;
         const btn  = form.querySelector('button[type="submit"]');
         if (!btn) return;
+        // Disable prevents double-submission if user clicks again before redirect
+        btn.disabled = true;
         btn.style.display = 'none';
         const spinner = document.createElement('div');
         spinner.className = 'btn-spinner';
@@ -1045,7 +1055,12 @@ function renderErrors(array $errors): void
 
 function advanceStep(int $completedStep): void
 {
-    session_regenerate_id(true);
+    // Do NOT call session_regenerate_id(true) here — it deletes the old session
+    // file immediately, which causes any concurrent request (double-click, browser
+    // prefetch, stale tab) still carrying the old cookie to get an empty session
+    // with no CSRF token, resulting in a false "Invalid CSRF token" error.
+    // The rotating CSRF token (regenerated on every page render) is sufficient
+    // protection for a single-admin, self-destructing installer.
     if (($current = $_SESSION['installer']['step'] ?? -1) < $completedStep) {
         $_SESSION['installer']['step'] = $completedStep;
     }
@@ -1053,6 +1068,9 @@ function advanceStep(int $completedStep): void
 
 function redirect(string $url): never
 {
+    // Write the session to disk BEFORE sending the Location header so the
+    // next request always finds the updated session (CSRF token, step counter).
+    session_write_close();
     header('Location: ' . $url);
     exit;
 }

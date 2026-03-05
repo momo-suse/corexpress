@@ -2,10 +2,9 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
-import { useComments, useMutateComment } from '@/hooks/useComments'
+import { useComments, useMutateComment, useClearSpamComments } from '@/hooks/useComments'
 import { toast } from '@/hooks/useToast'
 import { Trash2, CheckCircle, AlertTriangle } from 'lucide-react'
 import type { Comment } from '@/types/api'
@@ -22,14 +21,24 @@ const STATUS_VARIANT: Record<Comment['status'], 'default' | 'secondary' | 'destr
   spam: 'destructive',
 }
 
+const TABS: { label: string; value: string }[] = [
+  { label: 'All', value: 'all' },
+  { label: 'Pending', value: 'pending' },
+  { label: 'Approved', value: 'approved' },
+  { label: 'Spam', value: 'spam' },
+]
+
 export default function CommentsPage() {
   const [statusFilter, setStatusFilter] = useState<string>('pending')
   const [page, setPage] = useState(1)
-  const { data, isLoading } = useComments({ status: statusFilter, page })
+  const queryParams = statusFilter === 'all' ? { page } : { status: statusFilter, page }
+  const { data, isLoading } = useComments(queryParams)
   const { update, remove } = useMutateComment()
+  const clearSpam = useClearSpamComments()
 
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [deletingId, setDeletingId] = useState<number | null>(null)
+  const [confirmSpamOpen, setConfirmSpamOpen] = useState(false)
 
   async function handleStatus(id: number, status: Comment['status']) {
     try {
@@ -58,20 +67,48 @@ export default function CommentsPage() {
     }
   }
 
+  async function handleClearSpam() {
+    setConfirmSpamOpen(false)
+    try {
+      await clearSpam.mutateAsync()
+      toast({ title: 'All spam comments deleted.' })
+    } catch {
+      toast({ title: 'Failed to clear spam.', variant: 'destructive' })
+    }
+  }
+
   return (
     <div className="p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Comments</h1>
-        <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1) }}>
-          <SelectTrigger className="w-36">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="approved">Approved</SelectItem>
-            <SelectItem value="spam">Spam</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          <h1 className="text-2xl font-bold">Comments</h1>
+          <div className="flex gap-1 p-1 rounded-lg bg-muted">
+            {TABS.map((tab) => (
+              <button
+                key={tab.value}
+                onClick={() => { setStatusFilter(tab.value); setPage(1) }}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                  statusFilter === tab.value
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        {statusFilter === 'spam' && (
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => setConfirmSpamOpen(true)}
+            disabled={clearSpam.isPending}
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Empty Spam
+          </Button>
+        )}
       </div>
 
       {isLoading && <LoadingSpinner className="py-12" />}
@@ -160,7 +197,7 @@ export default function CommentsPage() {
         </>
       )}
 
-      {/* Delete confirmation */}
+      {/* Delete comment confirmation */}
       <ConfirmDialog
         open={confirmOpen}
         title="Delete comment"
@@ -168,6 +205,16 @@ export default function CommentsPage() {
         confirmLabel="Delete"
         onConfirm={handleDelete}
         onCancel={() => { setConfirmOpen(false); setDeletingId(null) }}
+      />
+
+      {/* Empty spam confirmation */}
+      <ConfirmDialog
+        open={confirmSpamOpen}
+        title="Empty spam folder"
+        description="All spam comments will be permanently deleted. This action cannot be undone."
+        confirmLabel="Delete all spam"
+        onConfirm={handleClearSpam}
+        onCancel={() => setConfirmSpamOpen(false)}
       />
     </div>
   )

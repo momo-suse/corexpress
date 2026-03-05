@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getComments, updateComment, deleteComment } from '@/api/comments'
+import { getComments, updateComment, deleteComment, clearSpamComments } from '@/api/comments'
 import type { Comment } from '@/types/api'
 
 export function useComments(params?: { post_id?: number; status?: string; page?: number }) {
@@ -24,4 +24,12 @@ export function useMutateComment() {
   })
 
   return { update, remove }
+}
+
+export function useClearSpamComments() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: clearSpamComments,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['comments'] }),
+  })
 }

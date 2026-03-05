@@ -58,42 +58,52 @@
 
 /* ─── Admin themes ────────────────────────────────────────────────────── */
 
+/* Default: white cards/sidebar on a subtle gray-50 background */
 .theme-default {
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
-  --card: 0 0% 100%;
-  --card-foreground: 222.2 84% 4.9%;
+  --background: 220 14% 96%;       /* gray-100-ish page bg */
+  --foreground: 221 39% 11%;       /* gray-900 */
+  --card: 0 0% 100%;               /* white cards & sidebar */
+  --card-foreground: 221 39% 11%;
   --popover: 0 0% 100%;
-  --popover-foreground: 222.2 84% 4.9%;
-  --border: 214.3 31.8% 91.4%;
-  --input: 214.3 31.8% 91.4%;
-  --muted: 210 40% 96.1%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-  --primary: 222.2 47.4% 11.2%;
+  --popover-foreground: 221 39% 11%;
+  --border: 220 13% 91%;           /* gray-200 */
+  --input: 220 13% 91%;
+  --muted: 220 14% 96%;            /* gray-100 */
+  --muted-foreground: 220 9% 46%;  /* gray-500 */
+  --primary: 221 39% 11%;          /* gray-900 */
   --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96.1%;
-  --secondary-foreground: 222.2 47.4% 11.2%;
-  --accent: 210 40% 96.1%;
-  --accent-foreground: 222.2 47.4% 11.2%;
+  --secondary: 220 14% 96%;
+  --secondary-foreground: 221 39% 11%;
+  --accent: 220 14% 96%;
+  --accent-foreground: 221 39% 11%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --ring: 221 39% 11%;
+  --radius: 0.5rem;
 }
 
+/* Minimal: pure black & white, zero border-radius, sharp edges */
 .theme-minimal {
-  --background: 0 0% 98%;
-  --foreground: 0 0% 10%;
+  --background: 0 0% 100%;         /* pure white */
+  --foreground: 0 0% 0%;           /* pure black */
   --card: 0 0% 100%;
-  --card-foreground: 0 0% 10%;
+  --card-foreground: 0 0% 0%;
   --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 10%;
-  --border: 0 0% 88%;
-  --input: 0 0% 88%;
-  --muted: 0 0% 94%;
-  --muted-foreground: 0 0% 45%;
-  --primary: 0 0% 12%;
-  --primary-foreground: 0 0% 98%;
-  --secondary: 0 0% 94%;
-  --secondary-foreground: 0 0% 12%;
-  --accent: 0 0% 94%;
-  --accent-foreground: 0 0% 12%;
+  --popover-foreground: 0 0% 0%;
+  --border: 0 0% 0%;               /* pure black borders */
+  --input: 0 0% 0%;
+  --muted: 0 0% 96%;               /* near-white hover bg */
+  --muted-foreground: 0 0% 40%;    /* medium gray text */
+  --primary: 0 0% 0%;              /* black button */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 96%;
+  --secondary-foreground: 0 0% 0%;
+  --accent: 0 0% 96%;
+  --accent-foreground: 0 0% 0%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 100%;
+  --ring: 0 0% 0%;
+  --radius: 0rem;                  /* no rounded corners — sharp edges */
 }
 
 /* ─── Tiptap ProseMirror ─────────────────────────────────────────────────── */
@@ -122,23 +132,46 @@
   padding: 0 1px;
 }
 
-/* ─── Admin themes ────────────────────────────────────────────────────── */
-
+/* Dark: zinc palette + indigo accent (matching example.html) */
 .theme-dark {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-  --card: 217.2 32.6% 10%;
-  --card-foreground: 210 40% 98%;
-  --popover: 217.2 32.6% 10%;
-  --popover-foreground: 210 40% 98%;
-  --border: 217.2 32.6% 17.5%;
-  --input: 217.2 32.6% 17.5%;
-  --muted: 217.2 32.6% 17.5%;
-  --muted-foreground: 215 20.2% 65.1%;
-  --primary: 210 40% 98%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-  --secondary: 217.2 32.6% 17.5%;
-  --secondary-foreground: 210 40% 98%;
-  --accent: 217.2 32.6% 17.5%;
-  --accent-foreground: 210 40% 98%;
+  --background: 240 10% 3.9%;      /* zinc-950 — near-black page bg */
+  --foreground: 0 0% 98%;           /* zinc-50 — near-white text */
+  --card: 240 5.9% 11.0%;          /* zinc-900 — cards & sidebar */
+  --card-foreground: 0 0% 98%;
+  --popover: 240 5.9% 11.0%;       /* zinc-900 */
+  --popover-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.1%;        /* zinc-800 */
+  --input: 240 3.7% 15.1%;
+  --muted: 240 3.7% 15.1%;         /* zinc-800 */
+  --muted-foreground: 240 5.0% 64.9%; /* zinc-400 */
+  --primary: 243 75% 59%;          /* indigo-600 — accent buttons & active nav */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 3.7% 15.1%;     /* zinc-800 */
+  --secondary-foreground: 0 0% 98%;
+  --accent: 240 3.7% 15.1%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --ring: 243 75% 59%;             /* indigo focus ring */
+  --radius: 0.5rem;
+}
+
+/* ─── Blog Style Collections ──────────────────────────────────────────────── */
+/* Applied to the root div of BlogHomePage and PostPage based on               */
+/* active_style_collection. Fully separate from the admin theme system above.  */
+
+/* Default: indigo accent, rounded cards, full-colour images */
+.blog-collection-default {
+  --blog-accent:      #4f46e5;  /* indigo-600 */
+  --blog-accent-soft: #eef2ff;  /* indigo-50  */
+  --blog-radius-card: 1rem;
+  --blog-img-filter:  none;
+}
+
+/* Classic: rose accent, sharp edges, grayscale images — editorial sidebar layout */
+.blog-collection-classic {
+  --blog-accent:      #e11d48;  /* rose-600 */
+  --blog-accent-soft: #fff1f2;  /* rose-50  */
+  --blog-radius-card: 0px;
+  --blog-img-filter:  grayscale(100%);
 }
