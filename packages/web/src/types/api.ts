@@ -57,6 +57,23 @@ export interface Settings {
   profile_description: string
   profile_image_id: string
   profile_image_url: string
+  profile_cover_id: string
+  profile_cover_url: string
+  profile_title: string
+  /** '1' = show availability badge */
+  profile_available: string
+  /** JSON array: [{role,company,period,description,tags:[]}] */
+  profile_experience: string
+  /** JSON array: [{name,skills:[]}] */
+  profile_skills: string
+  /** JSON array: [{url,title,description}] */
+  profile_gallery: string
+  /** JSON array: [{degree,institution,period}] */
+  profile_education: string
+  /** JSON array: [{name,url?}] */
+  profile_certifications: string
+  /** JSON array: [{name,role,text,linkedin?}] */
+  profile_testimonials: string
   // Social links
   social_linkedin: string
   social_instagram: string

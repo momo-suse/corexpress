@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 
 interface ProfileSectionProps {
   styles?: Record<string, string>
@@ -51,6 +52,15 @@ export default function ProfileSection({ settings }: ProfileSectionProps) {
             dangerouslySetInnerHTML={{ __html: description }}
           />
         )}
+
+        <Link
+          to="/about"
+          className="mt-1 text-xs font-medium text-muted-foreground transition-colors"
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--blog-accent)' }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '' }}
+        >
+          Ver perfil completo →
+        </Link>
       </div>
     </div>
   )

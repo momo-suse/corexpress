@@ -21,6 +21,12 @@ import { Linkedin, Instagram, Youtube, Facebook } from 'lucide-react'
 import AdminBar from '@/components/blog/AdminBar'
 import CommentList from '@/components/blog/CommentList'
 import CommentForm from '@/components/blog/CommentForm'
+import AboutGallery from '@/components/blog/AboutGallery'
+import AboutExperience from '@/components/blog/AboutExperience'
+import AboutSkills from '@/components/blog/AboutSkills'
+import AboutEducation from '@/components/blog/AboutEducation'
+import AboutTestimonials from '@/components/blog/AboutTestimonials'
+import SocialLinks from '@/components/blog/SocialLinks'
 import { usePosts } from '@/hooks/usePosts'
 import type { Post } from '@/types/api'
 
@@ -43,6 +49,14 @@ function firstTag(tags: string | null | undefined): string | null {
   if (!tags) return null
   const t = tags.split(',')[0]?.trim()
   return t || null
+}
+
+function parseJSON<T>(value: string | undefined, fallback: T): T {
+  try {
+    return JSON.parse(value ?? '[]') as T
+  } catch {
+    return fallback
+  }
 }
 
 // ── Social icon map ───────────────────────────────────────────────────────────
@@ -596,6 +610,152 @@ export function ClassicPostContent({
               <CommentForm postId={post.id} onSubmitted={onCommentSubmitted} />
             </div>
           )}
+        </div>
+      </main>
+    </div>
+  )
+}
+
+// ── ClassicAboutContent ───────────────────────────────────────────────────────
+
+export interface ClassicAboutContentProps {
+  settings: Record<string, string>
+  user: boolean
+  galleryVisible: boolean
+  experienceVisible: boolean
+  skillsVisible: boolean
+  educationVisible: boolean
+  testimonialsVisible: boolean
+  socialVisible: boolean
+}
+
+export function ClassicAboutContent({
+  settings,
+  user,
+  galleryVisible,
+  experienceVisible,
+  skillsVisible,
+  educationVisible,
+  testimonialsVisible,
+  socialVisible,
+}: ClassicAboutContentProps) {
+  const [mobileOpen, setMobileOpen] = useState(false)
+
+  const name        = settings.profile_name     || 'About Me'
+  const title       = settings.profile_title    || ''
+  const imageUrl    = settings.profile_image_url || ''
+  const available   = settings.profile_available === '1'
+  const summary     = settings.profile_summary  || ''
+  const description = settings.profile_description || ''
+
+  const gallery        = parseJSON<{ url: string; title: string; description: string }[]>(settings.profile_gallery, [])
+  const experience     = parseJSON<{ role: string; company: string; period: string; description: string; tags: string[] }[]>(settings.profile_experience, [])
+  const skills         = parseJSON<{ name: string; skills: string[] }[]>(settings.profile_skills, [])
+  const education      = parseJSON<{ degree: string; institution: string; period: string }[]>(settings.profile_education, [])
+  const certifications = parseJSON<{ name: string; url?: string }[]>(settings.profile_certifications, [])
+  const testimonials   = parseJSON<{ name: string; role: string; text: string; avatar?: string; linkedin?: string }[]>(settings.profile_testimonials, [])
+
+  return (
+    <div className="blog-collection-classic min-h-screen bg-[#FAFAFA] dark:bg-[#0a0a0a] text-gray-900 dark:text-white">
+      {user && <AdminBar />}
+
+      <ClassicMobileHeader
+        settings={settings}
+        onMenuToggle={() => setMobileOpen(true)}
+      />
+      <ClassicSidebar
+        settings={settings}
+        isHome={false}
+        profileVisible={false}
+        socialVisible={false}
+        mobileOpen={mobileOpen}
+        onMobileClose={() => setMobileOpen(false)}
+      />
+
+      <main className={`lg:ml-72 min-h-screen ${user ? 'pt-9' : ''}`}>
+        <div className="max-w-4xl mx-auto px-6 py-12 lg:px-16 lg:py-24">
+
+          {/* Editorial hero — centered, serif, no cover banner */}
+          <header className="mb-16 text-center">
+            <div className="mb-8">
+              <Link
+                to="/"
+                className="inline-flex items-center gap-1.5 text-sm font-sans font-medium text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              >
+                <ArrowLeft size={15} />
+                Inicio
+              </Link>
+            </div>
+
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt={name}
+                className="w-32 h-32 mx-auto rounded-full object-cover grayscale border-4 border-white dark:border-gray-900 shadow-lg mb-6"
+              />
+            ) : (
+              <div
+                className="w-32 h-32 mx-auto rounded-full flex items-center justify-center text-3xl font-bold text-white shadow-lg mb-6"
+                style={{ background: 'var(--blog-accent)' }}
+              >
+                {name.charAt(0).toUpperCase()}
+              </div>
+            )}
+
+            <h1 className="font-serif text-4xl md:text-5xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight mb-3">
+              {name}
+            </h1>
+
+            {title && (
+              <p className="font-serif text-lg font-light italic" style={{ color: 'var(--blog-accent)' }}>
+                {title}
+              </p>
+            )}
+
+            {available && (
+              <span className="inline-flex items-center gap-1.5 mt-3 text-xs font-semibold text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2.5 py-1 rounded-full">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                Disponible
+              </span>
+            )}
+          </header>
+
+          {/* Summary / bio */}
+          {(summary || description) && (
+            <section className="mb-16 border-t border-gray-200 dark:border-gray-800 pt-12">
+              <h3 className="font-sans font-bold text-sm tracking-widest uppercase text-gray-900 dark:text-white mb-8">
+                Sobre Mí
+              </h3>
+
+              {summary && (
+                <p className="font-serif text-xl md:text-2xl text-gray-600 dark:text-gray-300 leading-relaxed font-light mb-6">
+                  {summary}
+                </p>
+              )}
+
+              {description && (
+                <div
+                  className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-serif font-light [&_a]:![color:var(--blog-accent)]"
+                  dangerouslySetInnerHTML={{ __html: description }}
+                />
+              )}
+            </section>
+          )}
+
+          {/* Toggleable sub-components */}
+          {galleryVisible && <AboutGallery data={gallery} />}
+          {experienceVisible && <AboutExperience data={experience} />}
+          {skillsVisible && <AboutSkills data={skills} />}
+          {educationVisible && <AboutEducation education={education} certifications={certifications} />}
+          {testimonialsVisible && <AboutTestimonials data={testimonials} />}
+
+          {/* Social links */}
+          {socialVisible && (
+            <div className="mt-10 pt-10 border-t border-gray-200 dark:border-gray-800">
+              <SocialLinks />
+            </div>
+          )}
+
         </div>
       </main>
     </div>

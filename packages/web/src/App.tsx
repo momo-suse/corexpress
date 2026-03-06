@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 // Blog pages
 import BlogHomePage from '@/pages/blog/BlogHomePage'
 import PostPage from '@/pages/blog/PostPage'
+import AboutPage from '@/pages/blog/AboutPage'
 
 // Admin pages
 import LoginPage from '@/pages/admin/LoginPage'
@@ -34,6 +35,7 @@ export default function App() {
           {/* Public blog */}
           <Route path="/" element={<BlogHomePage />} />
           <Route path="/post/:slug" element={<PostPage />} />
+          <Route path="/about" element={<AboutPage />} />
 
           {/* Admin auth */}
           <Route path="/cx-admin/login" element={<LoginPage />} />

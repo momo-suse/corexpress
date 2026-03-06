@@ -7,3 +7,11 @@ export function useBlogPage() {
     queryFn: () => getPage('home'),
   })
 }
+
+export function useAboutPage() {
+  return useQuery({
+    queryKey: ['pages', 'about'],
+    queryFn: () => getPage('about'),
+    retry: false,
+  })
+}
