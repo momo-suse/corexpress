@@ -27,8 +27,10 @@ import AboutSkills from '@/components/blog/AboutSkills'
 import AboutEducation from '@/components/blog/AboutEducation'
 import AboutTestimonials from '@/components/blog/AboutTestimonials'
 import SocialLinks from '@/components/blog/SocialLinks'
+import SearchBar from '@/components/blog/SearchBar'
+import TagCloud from '@/components/blog/TagCloud'
 import { usePosts } from '@/hooks/usePosts'
-import type { Post } from '@/types/api'
+import type { Post, TagItem } from '@/types/api'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -73,19 +75,37 @@ const SOCIAL_ICON_MAP: Record<string, typeof Linkedin> = {
 interface ClassicSidebarProps {
   settings: Record<string, string>
   isHome: boolean
+  isAbout?: boolean
   profileVisible: boolean
   socialVisible: boolean
   mobileOpen: boolean
   onMobileClose: () => void
+  searchVisible?: boolean
+  searchStyles?: Record<string, string>
+  searchQuery?: string
+  onSearch?: (q: string) => void
+  tagCloudVisible?: boolean
+  tags?: TagItem[]
+  activeTag?: string
+  onTagSelect?: (tag: string) => void
 }
 
 function ClassicSidebar({
   settings,
   isHome,
+  isAbout = false,
   profileVisible,
   socialVisible,
   mobileOpen,
   onMobileClose,
+  searchVisible = false,
+  searchStyles = {},
+  searchQuery = '',
+  onSearch,
+  tagCloudVisible = false,
+  tags = [],
+  activeTag = '',
+  onTagSelect,
 }: ClassicSidebarProps) {
   const blogName = settings.blog_name || 'Blog'
   const blogLogo = settings.blog_logo_url
@@ -139,6 +159,26 @@ function ClassicSidebar({
             Inicio
           </span>
         </Link>
+        <Link
+          to="/about"
+          onClick={onMobileClose}
+          className="text-left font-sans font-medium text-sm tracking-widest uppercase transition-colors flex items-center gap-4"
+          style={{ color: isAbout ? 'var(--blog-accent)' : undefined }}
+          onMouseEnter={(e) => {
+            if (!isAbout) (e.currentTarget as HTMLElement).style.color = '#111827'
+          }}
+          onMouseLeave={(e) => {
+            if (!isAbout) (e.currentTarget as HTMLElement).style.color = ''
+          }}
+        >
+          <span
+            className="w-8 h-[1px] shrink-0 bg-current transition-colors"
+            style={{ background: isAbout ? 'var(--blog-accent)' : 'transparent' }}
+          />
+          <span className={isAbout ? '' : 'text-gray-500 dark:text-gray-400'}>
+            Sobre mí
+          </span>
+        </Link>
       </nav>
 
       {/* Profile mini card */}
@@ -164,8 +204,22 @@ function ClassicSidebar({
         </div>
       )}
 
+      {/* Search & Tags */}
+      {((searchVisible && onSearch) || (tagCloudVisible && tags.length > 0 && onTagSelect)) && (
+        <div className={profileVisible ? 'mt-8' : 'mt-auto mb-8'}>
+          {searchVisible && onSearch && (
+            <div className={tagCloudVisible && tags.length > 0 ? 'mb-4' : ''}>
+              <SearchBar styles={searchStyles} onSearch={onSearch} initialQuery={searchQuery} variant="editorial" />
+            </div>
+          )}
+          {tagCloudVisible && tags.length > 0 && onTagSelect && (
+            <TagCloud bare tags={tags} activeTag={activeTag} onTagSelect={onTagSelect} />
+          )}
+        </div>
+      )}
+
       {/* Social + copyright */}
-      <div className={`${profileVisible ? 'mt-12' : 'mt-auto'} pt-8 border-t border-gray-100 dark:border-gray-800/50`}>
+      <div className={`${(profileVisible || searchVisible || tagCloudVisible) ? 'mt-12' : 'mt-auto'} pt-8 border-t border-gray-100 dark:border-gray-800/50`}>
         {socialVisible && socialLinks.length > 0 && (
           <div className="flex gap-4 mb-6">
             {socialLinks.map(({ href, Icon, key }) => (
@@ -266,6 +320,14 @@ export interface ClassicBlogHomeProps {
   socialVisible: boolean
   postListVisible: boolean
   heroVisible: boolean
+  searchVisible?: boolean
+  searchStyles?: Record<string, string>
+  searchQuery?: string
+  onSearch?: (q: string) => void
+  tagCloudVisible?: boolean
+  tags?: TagItem[]
+  activeTag?: string
+  onTagSelect?: (tag: string) => void
 }
 
 export function ClassicBlogHome({
@@ -275,14 +337,23 @@ export function ClassicBlogHome({
   socialVisible,
   postListVisible,
   heroVisible,
+  searchVisible = false,
+  searchStyles = {},
+  searchQuery = '',
+  onSearch,
+  tagCloudVisible = false,
+  tags = [],
+  activeTag = '',
+  onTagSelect,
 }: ClassicBlogHomeProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
 
   // Fetch posts internally — React Query caches across components
-  const { data: postsData } = usePosts(1)
+  const { data: postsData } = usePosts(1, false, searchQuery, activeTag)
   const posts: Post[] = postsData?.data ?? []
-  const featuredPost = posts[0] ?? null
-  const listPosts = posts.slice(1)
+  const isFiltered = !!searchQuery || !!activeTag
+  const featuredPost = isFiltered ? null : (posts[0] ?? null)
+  const listPosts = isFiltered ? posts : posts.slice(1)
 
   return (
     <div className="blog-collection-classic min-h-screen bg-[#FAFAFA] dark:bg-[#0a0a0a] text-gray-900 dark:text-white">
@@ -299,6 +370,14 @@ export function ClassicBlogHome({
         socialVisible={socialVisible}
         mobileOpen={mobileOpen}
         onMobileClose={() => setMobileOpen(false)}
+        searchVisible={searchVisible}
+        searchStyles={searchStyles}
+        searchQuery={searchQuery}
+        onSearch={onSearch}
+        tagCloudVisible={tagCloudVisible}
+        tags={tags}
+        activeTag={activeTag}
+        onTagSelect={onTagSelect}
       />
 
       <main className="lg:ml-72 min-h-screen">
@@ -423,7 +502,11 @@ export function ClassicBlogHome({
 
               {posts.length === 0 && (
                 <p className="font-sans text-gray-500 text-center py-16">
-                  No hay publicaciones aún.
+                  {activeTag
+                    ? `No hay posts con el tag "#${activeTag}".`
+                    : searchQuery
+                    ? `No se encontraron resultados para "${searchQuery}".`
+                    : 'No hay publicaciones aún.'}
                 </p>
               )}
             </>
@@ -666,6 +749,7 @@ export function ClassicAboutContent({
       <ClassicSidebar
         settings={settings}
         isHome={false}
+        isAbout={true}
         profileVisible={false}
         socialVisible={false}
         mobileOpen={mobileOpen}

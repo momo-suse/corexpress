@@ -82,6 +82,8 @@ export interface Settings {
   // Features
   /** '1' = enabled (default), '0' = disabled */
   comments_enabled: string
+  /** Numeric string — max tags shown in Tag Cloud widget (default "6") */
+  tags_max_count: string
   [key: string]: string
 }
 
@@ -154,4 +156,9 @@ export interface PaginatedResponse<T> {
 
 export interface ApiResponse<T> {
   data: T
+}
+
+export interface TagItem {
+  tag: string
+  count: number
 }

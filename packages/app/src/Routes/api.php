@@ -56,6 +56,9 @@ $app->group('/api/v1', function (\Slim\Routing\RouteCollectorProxy $group) use (
 
     // ── Posts ──────────────────────────────────────────────────────────────────
 
+    // Public: tag aggregation (top N tags by frequency across all published posts)
+    $group->get('/tags', [PostController::class, 'tags']);
+
     // Public: paginated list of published posts
     $group->get('/posts', [PostController::class, 'index']);
 

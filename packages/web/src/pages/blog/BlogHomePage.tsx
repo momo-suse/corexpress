@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useBlogPage } from '@/hooks/useBlogPage'
+import { useTags } from '@/hooks/useTags'
 import { getSettings } from '@/api/settings'
 import { useAuthStore } from '@/store/auth'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
@@ -9,6 +11,8 @@ import HeroSection from '@/components/blog/HeroSection'
 import ProfileSection from '@/components/blog/ProfileSection'
 import PostList from '@/components/blog/PostList'
 import SocialLinks from '@/components/blog/SocialLinks'
+import SearchBar from '@/components/blog/SearchBar'
+import TagCloud from '@/components/blog/TagCloud'
 import { ClassicBlogHome } from '@/components/blog/ClassicLayout'
 import { Linkedin, Instagram, Youtube, Facebook, BookOpen } from 'lucide-react'
 import type { PageComponent } from '@/types/api'
@@ -22,6 +26,8 @@ const SOCIAL_ICONS: Record<string, typeof Linkedin> = {
 
 export default function BlogHomePage() {
   const user = useAuthStore((s) => s.user)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [activeTag, setActiveTag] = useState('')
 
   const { data: settingsData, isLoading: settingsLoading, isError: settingsError } = useQuery({
     queryKey: ['settings'],
@@ -29,6 +35,10 @@ export default function BlogHomePage() {
     retry: false,
   })
   const { data: pageData, isLoading: pageLoading, isError: pageError } = useBlogPage()
+
+  // Must be called before any conditional returns (Rules of Hooks)
+  const tagsLimit = parseInt((settingsData?.data as Record<string, string> | undefined)?.tags_max_count ?? '6', 10)
+  const { data: tagsData } = useTags(tagsLimit)
 
   if (settingsLoading) return <LoadingSpinner className="min-h-screen" size="lg" />
   if (settingsError) return <Navigate to="/setup" replace />
@@ -50,6 +60,7 @@ export default function BlogHomePage() {
   const blogName = settings.blog_name || 'Blog'
   const components: PageComponent[] = pageData?.data.components ?? []
   const activeCollection = settings.active_style_collection ?? 'default'
+  const tags = tagsData?.data ?? []
 
   const isVisible = (name: string) =>
     components.find((c) => c.name === name)?.is_visible ?? false
@@ -61,7 +72,9 @@ export default function BlogHomePage() {
   const postListVisible = isVisible('post-list')
   const profileVisible = isVisible('profile')
   const socialVisible = isVisible('social-links')
-  const hasSidebar = profileVisible || socialVisible
+  const searchVisible = isVisible('search')
+  const tagCloudVisible = isVisible('tag-cloud')
+  const hasSidebar = profileVisible || socialVisible || searchVisible || tagCloudVisible
 
   // Classic layout — completely different structure
   if (activeCollection === 'classic') {
@@ -73,6 +86,14 @@ export default function BlogHomePage() {
         socialVisible={socialVisible}
         postListVisible={postListVisible}
         heroVisible={heroVisible}
+        searchVisible={searchVisible}
+        searchStyles={getStyles('search')}
+        searchQuery={searchQuery}
+        onSearch={setSearchQuery}
+        tagCloudVisible={tagCloudVisible}
+        tags={tags}
+        activeTag={activeTag}
+        onTagSelect={setActiveTag}
       />
     )
   }
@@ -98,7 +119,7 @@ export default function BlogHomePage() {
           {/* Post list column */}
           {postListVisible && (
             <div className={hasSidebar ? 'lg:col-span-8' : 'lg:col-span-12'}>
-              <PostList styles={getStyles('post-list')} settings={settings} />
+              <PostList styles={getStyles('post-list')} settings={settings} searchQuery={searchQuery} activeTag={activeTag} />
             </div>
           )}
 
@@ -108,6 +129,24 @@ export default function BlogHomePage() {
               <div className="sticky top-20 space-y-8">
                 {profileVisible && (
                   <ProfileSection styles={getStyles('profile')} settings={settings} />
+                )}
+                {(searchVisible || (tagCloudVisible && tags.length > 0)) && (
+                  <div
+                    className="bg-white dark:bg-gray-900 p-6 shadow-md border border-gray-200 dark:border-gray-700"
+                    style={{ borderRadius: 'var(--blog-radius-card)' }}
+                  >
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-5 pb-2 border-b border-gray-100 dark:border-gray-800">
+                      Explorar
+                    </h3>
+                    {searchVisible && (
+                      <div className={tagCloudVisible && tags.length > 0 ? 'mb-5' : ''}>
+                        <SearchBar variant="editorial" styles={getStyles('search')} onSearch={setSearchQuery} initialQuery={searchQuery} />
+                      </div>
+                    )}
+                    {tagCloudVisible && tags.length > 0 && (
+                      <TagCloud bare tags={tags} activeTag={activeTag} onTagSelect={setActiveTag} styles={getStyles('tag-cloud')} />
+                    )}
+                  </div>
                 )}
                 {socialVisible && (
                   <SocialLinks styles={getStyles('social-links')} settings={settings} />

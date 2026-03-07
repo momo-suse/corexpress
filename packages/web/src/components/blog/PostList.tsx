@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import PostCard, { FeaturedPostCard } from './PostCard'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
@@ -8,11 +8,18 @@ import { applyComponentStyles } from '@/lib/utils'
 interface PostListProps {
   styles: Record<string, string>
   settings?: Record<string, string>
+  searchQuery?: string
+  activeTag?: string
 }
 
-export default function PostList({ styles }: PostListProps) {
+export default function PostList({ styles, searchQuery = '', activeTag = '' }: PostListProps) {
   const [page, setPage] = useState(1)
-  const { data, isLoading, isError } = usePosts(page)
+
+  useEffect(() => {
+    setPage(1)
+  }, [searchQuery, activeTag])
+
+  const { data, isLoading, isError } = usePosts(page, false, searchQuery, activeTag)
 
   if (isLoading) return <LoadingSpinner className="py-16" />
 
@@ -32,8 +39,8 @@ export default function PostList({ styles }: PostListProps) {
 
   return (
     <div style={applyComponentStyles(styles)}>
-      {/* Destacado — only on first page */}
-      {isFirstPage && featured && (
+      {/* Destacado — only on first page, not during search or tag filter */}
+      {isFirstPage && !searchQuery && !activeTag && featured && (
         <section className="mb-14">
           <div className="flex items-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight whitespace-nowrap">Destacado</h2>
@@ -43,19 +50,25 @@ export default function PostList({ styles }: PostListProps) {
         </section>
       )}
 
-      {/* Últimos artículos */}
-      {(rest.length > 0 || !isFirstPage) && (
+      {/* Últimos artículos / search results */}
+      {(posts.length > 0 || !isFirstPage) && (
         <section>
           <div className="flex items-center mb-8">
             <h2 className="text-2xl font-bold tracking-tight whitespace-nowrap">
-              {isFirstPage ? 'Últimos artículos' : 'Artículos'}
+              {activeTag
+                ? `Posts con tag: #${activeTag}`
+                : searchQuery
+                ? `Resultados para "${searchQuery}"`
+                : isFirstPage
+                ? 'Últimos artículos'
+                : 'Artículos'}
             </h2>
             <div className="ml-4 h-px bg-gray-200 dark:bg-gray-800 flex-grow" />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-            {/* On page > 1, show all posts in grid */}
-            {(isFirstPage ? rest : posts).map((post) => (
+            {/* During search/tag filter or page > 1, show all posts in grid; on page 1 no filter, skip featured */}
+            {(isFirstPage && !searchQuery && !activeTag ? rest : posts).map((post) => (
               <PostCard key={post.id} post={post} />
             ))}
           </div>
@@ -89,7 +102,13 @@ export default function PostList({ styles }: PostListProps) {
       )}
 
       {posts.length === 0 && isFirstPage && (
-        <p className="text-center text-muted-foreground py-16">Aún no hay posts publicados.</p>
+        <p className="text-center text-muted-foreground py-16">
+          {activeTag
+            ? `No hay posts con el tag "#${activeTag}".`
+            : searchQuery
+            ? `No se encontraron resultados para "${searchQuery}".`
+            : 'Aún no hay posts publicados.'}
+        </p>
       )}
     </div>
   )

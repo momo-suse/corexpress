@@ -11,6 +11,8 @@ import {
   GraduationCap,
   Quote,
   Images,
+  Search,
+  Tag,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -35,13 +37,15 @@ import type { PageComponent, Settings } from '@/types/api'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-type Tab = 'hero' | 'profile' | 'social' | 'comments'
+type Tab = 'hero' | 'profile' | 'social' | 'comments' | 'search' | 'tags'
 
 const TABS: { id: Tab; label: string; Icon: React.ComponentType<{ className?: string }> }[] = [
   { id: 'hero',     label: 'Hero Banner',    Icon: ImageIcon },
   { id: 'profile',  label: 'Profile & About', Icon: User },
   { id: 'social',   label: 'Social Links',   Icon: Share2 },
   { id: 'comments', label: 'Comments',       Icon: MessageSquare },
+  { id: 'search',   label: 'Buscador',       Icon: Search },
+  { id: 'tags',     label: 'Tags',           Icon: Tag },
 ]
 
 function parseJSON<T>(value: string | undefined, fallback: T): T {
@@ -683,6 +687,44 @@ export default function BlogPage() {
             </div>
 
           </>
+        )}
+
+        {activeTab === 'search' && (
+          <SectionCard
+            title="Buscador"
+            description="Muestra un campo de búsqueda que filtra publicaciones por título, resumen, contenido o tags."
+            visible={homeVisible('search')}
+            onToggle={(v) => toggleHome('search', v)}
+            Icon={Search}
+          >
+            <p className="text-sm text-muted-foreground">
+              La búsqueda filtra las publicaciones directamente en el servidor. Actívalo para que los visitantes puedan buscar en tu blog.
+            </p>
+          </SectionCard>
+        )}
+
+        {activeTab === 'tags' && (
+          <SectionCard
+            title="Tag Cloud"
+            description="Muestra los tags más utilizados del blog para filtrar publicaciones."
+            visible={homeVisible('tag-cloud')}
+            onToggle={(v) => toggleHome('tag-cloud', v)}
+            Icon={Tag}
+          >
+            <div className="space-y-3">
+              <Label htmlFor="tags-max-count">Número de tags a mostrar</Label>
+              <Input
+                id="tags-max-count"
+                type="number"
+                min={1}
+                max={20}
+                value={form.tags_max_count ?? '6'}
+                onChange={(e) => setField('tags_max_count' as keyof Settings, e.target.value)}
+                className="w-24"
+              />
+              <p className="text-xs text-muted-foreground">Mínimo 1, máximo 20. Ordenados por popularidad.</p>
+            </div>
+          </SectionCard>
         )}
 
       </div>

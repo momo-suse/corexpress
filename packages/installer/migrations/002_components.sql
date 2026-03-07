@@ -94,14 +94,16 @@ INSERT INTO `component_definitions` (`name`, `label`, `type`, `parent_id`, `has_
     ('about-experience',   'Experience',   'sub-component', 2,    0),
     ('about-skills',       'Skills',       'sub-component', 2,    0),
     ('about-education',    'Education',    'sub-component', 2,    0),
-    ('about-testimonials', 'Testimonials', 'sub-component', 2,    0);
+    ('about-testimonials', 'Testimonials', 'sub-component', 2,    0),
+    ('search',             'Search',       'component',     NULL, 0),
+    ('tag-cloud',          'Tag Cloud',    'component',     NULL, 0);
 
 -- Style collections (2 built-in — default is the fallback)
 INSERT INTO `style_collections` (`name`, `label`, `is_default`) VALUES
     ('default', 'Default', 1),
     ('classic', 'Classic', 0);
 
--- Default collection styles (covers all 12 components)
+-- Default collection styles (covers all 14 components)
 INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `styles_config`) VALUES
     (1, 1,  '{"background":"#f8f9fa","textColor":"#111827","layout":"full-width"}'),
     (1, 2,  '{"background":"#ffffff","textColor":"#111827","layout":"centered"}'),
@@ -114,9 +116,11 @@ INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `sty
     (1, 9,  '{"background":"#ffffff","textColor":"#111827","layout":"card"}'),
     (1, 10, '{"background":"#f8f9fa","textColor":"#111827","layout":"grid"}'),
     (1, 11, '{"background":"#ffffff","textColor":"#111827","layout":"two-col"}'),
-    (1, 12, '{"background":"#ffffff","textColor":"#111827","layout":"carousel"}');
+    (1, 12, '{"background":"#ffffff","textColor":"#111827","layout":"carousel"}'),
+    (1, 13, '{"background":"#ffffff","textColor":"#111827","layout":"inline","buttonStyle":"filled"}'),
+    (1, 14, '{"background":"#ffffff","textColor":"#111827","layout":"cloud"}');
 
--- Classic collection styles (all 12 components — editorial layout)
+-- Classic collection styles (all 14 components — editorial layout)
 INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `styles_config`) VALUES
     (2, 1,  '{"background":"#fafafa","textColor":"#111827","layout":"editorial"}'),
     (2, 2,  '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
@@ -129,7 +133,9 @@ INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `sty
     (2, 9,  '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
     (2, 10, '{"background":"#f8f9fa","textColor":"#111827","layout":"editorial"}'),
     (2, 11, '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
-    (2, 12, '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}');
+    (2, 12, '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
+    (2, 13, '{"background":"#ffffff","textColor":"#111827","layout":"inline","buttonStyle":"outline"}'),
+    (2, 14, '{"background":"#ffffff","textColor":"#111827","layout":"cloud"}');
 
 -- Pages (home, blog, about)
 INSERT INTO `pages` (`slug`, `title`) VALUES
@@ -137,12 +143,14 @@ INSERT INTO `pages` (`slug`, `title`) VALUES
     ('blog',  'Blog'),
     ('about', 'About');
 
--- Home page components (page_id=1): hero, profile, post-list visible; social-links hidden
+-- Home page components (page_id=1): hero, profile, post-list visible; social-links, search, tag-cloud hidden
 INSERT INTO `page_components` (`page_id`, `component_definition_id`, `is_visible`, `display_order`) VALUES
     (1, 1, 1, 1),
     (1, 2, 1, 2),
     (1, 3, 1, 3),
-    (1, 7, 0, 4);
+    (1, 7,  0, 4),
+    (1, 13, 0, 5),
+    (1, 14, 0, 6);
 
 -- Blog page components (page_id=2): post-list, post-detail, comment-list, comment-form visible
 INSERT INTO `page_components` (`page_id`, `component_definition_id`, `is_visible`, `display_order`) VALUES
@@ -160,7 +168,8 @@ INSERT INTO `page_components` (`page_id`, `component_definition_id`, `is_visible
     (3, 12, 1, 5),
     (3, 7,  1, 6);
 
--- Active style collection setting
+-- Active style collection setting + tags max count
 INSERT INTO `settings` (`key`, `value`) VALUES
-    ('active_style_collection', 'default')
+    ('active_style_collection', 'default'),
+    ('tags_max_count', '6')
 ON DUPLICATE KEY UPDATE `value` = VALUES(`value`);

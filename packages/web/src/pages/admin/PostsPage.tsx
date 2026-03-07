@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -7,14 +7,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import PostEditor from '@/components/admin/PostEditor'
+import ChipInput from '@/components/admin/about/ChipInput'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import { usePosts, useMutatePost } from '@/hooks/usePosts'
+import { useTags } from '@/hooks/useTags'
 import { uploadImage } from '@/api/images'
 import { toast } from '@/hooks/useToast'
 import { Pencil, Trash2, Plus, Upload, X } from 'lucide-react'
 import type { Post } from '@/types/api'
-import { useRef } from 'react'
 
 interface PostForm {
   title: string
@@ -41,6 +42,8 @@ export default function PostsPage() {
   const [page, setPage] = useState(1)
   const { data, isLoading } = usePosts(page, true)
   const { create, update, remove } = useMutatePost()
+  const { data: tagsData } = useTags(6)
+  const popularTags = tagsData?.data ?? []
 
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState<Post | null>(null)
@@ -298,13 +301,44 @@ export default function PostsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="post-tags">Tags</Label>
-                <Input
-                  id="post-tags"
-                  value={form.tags}
-                  onChange={(e) => setForm((f) => ({ ...f, tags: e.target.value }))}
+                <Label>Tags</Label>
+                <ChipInput
+                  value={form.tags.split(',').map((t) => t.trim()).filter(Boolean)}
+                  onChange={(chips) => setForm((f) => ({ ...f, tags: chips.join(', ') }))}
                   placeholder="php, design, tutorial"
                 />
+                {popularTags.length > 0 && (
+                  <div className="space-y-1.5">
+                    <p className="text-xs text-muted-foreground">Tags populares</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {popularTags.map(({ tag }) => {
+                        const currentChips = form.tags.split(',').map((t) => t.trim()).filter(Boolean)
+                        const isAdded = currentChips.includes(tag)
+                        return (
+                          <button
+                            key={tag}
+                            type="button"
+                            onClick={() => {
+                              if (!isAdded) {
+                                setForm((f) => ({
+                                  ...f,
+                                  tags: [...currentChips, tag].join(', '),
+                                }))
+                              }
+                            }}
+                            className={`text-xs px-2.5 py-0.5 rounded-full cursor-pointer transition-colors ${
+                              isAdded
+                                ? 'bg-primary/10 text-primary cursor-default'
+                                : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                            }`}
+                          >
+                            {tag}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
