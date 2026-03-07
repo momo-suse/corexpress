@@ -15,3 +15,11 @@ export function useAboutPage() {
     retry: false,
   })
 }
+
+export function usePostDetailPage() {
+  return useQuery({
+    queryKey: ['pages', 'blog'],
+    queryFn: () => getPage('blog'),
+    retry: false,
+  })
+}

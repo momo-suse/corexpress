@@ -9,7 +9,6 @@ interface ProfileSectionProps {
 export default function ProfileSection({ settings }: ProfileSectionProps) {
   const name = settings.profile_name || 'About me'
   const summary = settings.profile_summary || ''
-  const description = settings.profile_description || ''
   const imageUrl = settings.profile_image_url || ''
 
   return (
@@ -44,13 +43,6 @@ export default function ProfileSection({ settings }: ProfileSectionProps) {
 
         {summary && (
           <p className="text-muted-foreground text-sm leading-relaxed mb-4">{summary}</p>
-        )}
-
-        {description && (
-          <div
-            className="text-sm leading-relaxed text-muted-foreground prose prose-sm max-w-none mb-4"
-            dangerouslySetInnerHTML={{ __html: description }}
-          />
         )}
 
         <Link

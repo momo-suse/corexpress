@@ -8,11 +8,13 @@ import AboutPage from '@/pages/blog/AboutPage'
 
 // Admin pages
 import LoginPage from '@/pages/admin/LoginPage'
+import ResetPasswordPage from '@/pages/admin/ResetPasswordPage'
 import DashboardPage from '@/pages/admin/DashboardPage'
 import SetupPage from '@/pages/admin/SetupPage'
 import SettingsPage from '@/pages/admin/SettingsPage'
 import CommentsPage from '@/pages/admin/CommentsPage'
 import StylesPage from '@/pages/admin/StylesPage'
+import BlogPage from '@/pages/admin/BlogPage'
 
 // Shared
 import ProtectedRoute from '@/components/shared/ProtectedRoute'
@@ -37,8 +39,9 @@ export default function App() {
           <Route path="/post/:slug" element={<PostPage />} />
           <Route path="/about" element={<AboutPage />} />
 
-          {/* Admin auth */}
+          {/* Admin auth — public */}
           <Route path="/cx-admin/login" element={<LoginPage />} />
+          <Route path="/cx-admin/reset-password" element={<ResetPasswordPage />} />
 
           {/* Protected admin */}
           <Route element={<ProtectedRoute />}>
@@ -48,6 +51,7 @@ export default function App() {
             {/* Admin dashboard with sidebar layout */}
             <Route path="/cx-admin" element={<AdminLayout />}>
               <Route index element={<DashboardPage />} />
+              <Route path="blog" element={<BlogPage />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="comments" element={<CommentsPage />} />
               <Route path="styles" element={<StylesPage />} />

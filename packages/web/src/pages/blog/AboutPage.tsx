@@ -45,9 +45,7 @@ export default function AboutPage() {
   // If the about page doesn't exist in DB yet (containers not rebuilt),
   // fall back to showing all sections so data added via Settings is visible.
   const isVisible = (name: string) =>
-    components.length === 0
-      ? true
-      : (components.find((c) => c.name === name)?.is_visible ?? false)
+    components.find((c) => c.name === name)?.is_visible ?? true
 
   const galleryVisible      = isVisible('about-gallery')
   const experienceVisible   = isVisible('about-experience')

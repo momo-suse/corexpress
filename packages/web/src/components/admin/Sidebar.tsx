@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, MessageSquare, Settings, LogOut, Globe, Palette } from 'lucide-react'
+import { LayoutDashboard, MessageSquare, Settings, LogOut, Globe, Palette, Rss } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { logout } from '@/api/auth'
 import { useComments } from '@/hooks/useComments'
@@ -45,6 +45,11 @@ export default function Sidebar() {
               {pendingCount}
             </span>
           )}
+        </NavLink>
+
+        <NavLink to="/cx-admin/blog" className={navLink}>
+          <Rss className="h-4 w-4 shrink-0" />
+          <span>Blog</span>
         </NavLink>
 
         <NavLink to="/cx-admin/styles" className={navLink}>

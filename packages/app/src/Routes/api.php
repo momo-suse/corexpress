@@ -33,12 +33,24 @@ $app->group('/api/v1', function (\Slim\Routing\RouteCollectorProxy $group) use (
     // Public: authenticate with email + password
     $group->post('/auth/login', [AuthController::class, 'login']);
 
+    // Public: request a password reset email
+    $group->post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
+
+    // Public + CSRF: consume reset token and set new password
+    $group->post('/auth/reset-password', [AuthController::class, 'resetPassword'])
+          ->add($csrfMiddleware);
+
     // Authenticated: current user info
     $group->get('/auth/me', [AuthController::class, 'me'])
           ->add($authMiddleware);
 
     // Authenticated + CSRF: destroy session
     $group->post('/auth/logout', [AuthController::class, 'logout'])
+          ->add($csrfMiddleware)
+          ->add($authMiddleware);
+
+    // Authenticated + CSRF: change password (requires current password)
+    $group->post('/auth/change-password', [AuthController::class, 'changePassword'])
           ->add($csrfMiddleware)
           ->add($authMiddleware);
 

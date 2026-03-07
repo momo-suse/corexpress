@@ -37,3 +37,19 @@ export async function logout(): Promise<void> {
   await api.post('/auth/logout')
   useAuthStore.getState().clearAuth()
 }
+
+export async function forgotPassword(email: string): Promise<{ email_sent: boolean }> {
+  return api.post<{ message: string; email_sent: boolean }>('/auth/forgot-password', { email })
+}
+
+export async function resetPassword(token: string, password: string, passwordConfirm: string): Promise<void> {
+  await api.post('/auth/reset-password', { token, password, password_confirm: passwordConfirm })
+}
+
+export async function changePassword(currentPassword: string, newPassword: string, newPasswordConfirm: string): Promise<void> {
+  await api.post('/auth/change-password', {
+    current_password:     currentPassword,
+    new_password:         newPassword,
+    new_password_confirm: newPasswordConfirm,
+  })
+}

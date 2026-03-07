@@ -91,7 +91,7 @@
   --popover: 0 0% 100%;
   --popover-foreground: 0 0% 0%;
   --border: 0 0% 0%;               /* pure black borders */
-  --input: 0 0% 0%;
+  --input: 0 0% 0%;               /* pure black borders for inputs */
   --muted: 0 0% 96%;               /* near-white hover bg */
   --muted-foreground: 0 0% 40%;    /* medium gray text */
   --primary: 0 0% 0%;              /* black button */
@@ -104,6 +104,13 @@
   --destructive-foreground: 0 0% 100%;
   --ring: 0 0% 0%;
   --radius: 0rem;                  /* no rounded corners — sharp edges */
+}
+
+/* Minimal theme: Switch unchecked track should be light gray (not black) so it's
+   visually distinct from the checked (black) state. Scoped here to avoid
+   changing --input, which is used for pure-black input borders in this theme. */
+.theme-minimal [role="switch"][data-state="unchecked"] {
+  background-color: hsl(0 0% 75%);
 }
 
 /* ─── Tiptap ProseMirror ─────────────────────────────────────────────────── */

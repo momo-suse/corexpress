@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class User extends Model
 {
     protected $table    = 'users';
-    protected $fillable = ['email', 'password_hash'];
-    protected $hidden   = ['password_hash'];
+    protected $fillable = ['email', 'password_hash', 'reset_token_hash', 'reset_token_expires'];
+    protected $hidden   = ['password_hash', 'reset_token_hash'];
 
     public function posts(): HasMany
     {
