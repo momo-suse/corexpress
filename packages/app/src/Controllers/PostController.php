@@ -28,9 +28,30 @@ class PostController extends Controller
         $isAdmin = !empty($_SESSION['user_id']);
         $showAll = $isAdmin && ($params['all'] ?? '') === '1';
 
+        $search = trim((string) ($params['search'] ?? ''));
+
         $query = $showAll
             ?Post::orderBy('created_at', 'desc')
             : Post::published()->orderBy('created_at', 'desc');
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $term = '%' . $search . '%';
+                $q->where('title',   'LIKE', $term)
+                  ->orWhere('excerpt', 'LIKE', $term)
+                  ->orWhere('content', 'LIKE', $term)
+                  ->orWhere('tags',    'LIKE', $term);
+            });
+        }
+
+        $tag = trim((string) ($params['tag'] ?? ''));
+        if ($tag !== '') {
+            $tagNorm = strtolower($tag);
+            $query->whereRaw(
+                "LOWER(CONCAT(',', REPLACE(tags, ', ', ','), ',')) LIKE ?",
+                ["%,{$tagNorm},%"]
+            );
+        }
 
         $total = $query->count();
         $posts = (clone $query)
@@ -201,6 +222,37 @@ class PostController extends Controller
         $post->delete();
 
         return $response->withStatus(204);
+    }
+
+    /**
+     * GET /api/v1/tags
+     * Returns the most-used tags across all published posts, sorted by frequency.
+     */
+    public function tags(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    {
+        $params = $request->getQueryParams();
+        $limit  = min(20, max(1, (int) ($params['limit'] ?? 6)));
+
+        $tagStrings = Post::published()->whereNotNull('tags')->pluck('tags');
+
+        $counts = [];
+        foreach ($tagStrings as $raw) {
+            foreach (array_map('trim', explode(',', strtolower((string) $raw))) as $t) {
+                if ($t !== '') {
+                    $counts[$t] = ($counts[$t] ?? 0) + 1;
+                }
+            }
+        }
+        arsort($counts);
+
+        $slice = array_slice($counts, 0, $limit, true);
+        $data  = array_values(array_map(
+            static fn (string $tag, int $count) => ['tag' => $tag, 'count' => $count],
+            array_keys($slice),
+            $slice
+        ));
+
+        return $this->json($response, ['data' => $data]);
     }
 
     // ── Private helpers ────────────────────────────────────────────────────

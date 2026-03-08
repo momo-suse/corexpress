@@ -22,8 +22,13 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
-          query: ['@tanstack/react-query'],
-          editor: ['@tiptap/react', '@tiptap/starter-kit'],
+          query:  ['@tanstack/react-query'],
+          editor: ['@tiptap/react', '@tiptap/starter-kit', '@tiptap/extension-link',
+                   '@tiptap/extension-image', '@tiptap/extension-text-align',
+                   '@tiptap/extension-highlight', '@tiptap/extensions'],
+          icons:  ['lucide-react'],
+          i18n:   ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
+          state:  ['zustand'],
         },
       },
     },

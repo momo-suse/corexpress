@@ -1,0 +1,545 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "loading": "Loading…",
+    "error": "Error",
+    "confirm": "Confirm",
+    "close": "Close",
+    "search": "Search",
+    "yes": "Yes",
+    "no": "No",
+    "optional": "optional",
+    "required": "required",
+    "saving": "Saving…",
+    "previous": "Previous",
+    "next": "Next",
+    "change": "Change",
+    "upload": "Upload"
+  },
+  "admin": {
+    "login": {
+      "title": "Sign in to your panel",
+      "titleForgot": "Recover your access",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
+      "forgotPassword": "Forgot your password?",
+      "forgotDescription": "Enter your email and we'll send you a link to reset your password (valid for 10 minutes).",
+      "sendLink": "Send link",
+      "sending": "Sending…",
+      "emailSentTitle": "Check your email",
+      "emailSentText": "If that email is registered, you'll receive a link shortly.",
+      "emailProblem": "Problem sending email",
+      "emailProblemDetail": "The link was generated but we couldn't send it. Check the server mail configuration.",
+      "backToLogin": "← Back to sign in",
+      "invalidCredentials": "Invalid email or password.",
+      "unexpectedError": "Unexpected error. Please try again.",
+      "tooManyRequests": "Too many requests. Wait a few minutes.",
+      "sendError": "Error sending email. Please try again."
+    },
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "comments": "Comments",
+      "blog": "Blog",
+      "styles": "Styles",
+      "settings": "Settings",
+      "viewBlog": "View blog",
+      "signOut": "Sign out"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "totalPosts": "Total Posts",
+      "published": "Published",
+      "pendingComments": "Pending Comments",
+      "yourPosts": "Your Posts",
+      "createPost": "Create New Post",
+      "editPost": "Edit Post",
+      "titleCol": "Title",
+      "statusCol": "Status",
+      "commentsCol": "Comments",
+      "actionsCol": "Actions",
+      "noPostsYet": "No posts yet. Start writing!",
+      "saveDraft": "Save Draft",
+      "publish": "Publish",
+      "tags": "Tags",
+      "excerpt": "Excerpt",
+      "featuredImage": "Featured Image",
+      "content": "Content",
+      "mapEmbedUrl": "Map Embed URL",
+      "moderation": "Moderation",
+      "noCommentsOnPost": "No comments on this post yet.",
+      "approve": "Approve",
+      "spam": "Spam",
+      "reject": "Reject",
+      "statusPublished": "Published",
+      "statusDraft": "Draft",
+      "statusPending": "Pending",
+      "statusApproved": "Approved",
+      "statusSpam": "Spam",
+      "popularTags": "Popular tags",
+      "titleRequired": "Title is required.",
+      "postUpdated": "Post updated.",
+      "postCreated": "Post created.",
+      "postDeleted": "Post deleted.",
+      "commentApproved": "Comment approved.",
+      "commentSpam": "Comment marked as spam.",
+      "imageUploadFailed": "Failed to upload image.",
+      "deletePostTitle": "Delete Post",
+      "deletePostDescription": "This action cannot be undone. The post and all its comments will be permanently deleted.",
+      "deleteCommentTitle": "Delete Comment",
+      "deleteCommentDescription": "This comment will be permanently deleted.",
+      "cancel": "Cancel",
+      "backToDashboard": "Back to dashboard",
+      "newPost": "New Post",
+      "disabledEnableSettings": "Disabled — Enable in Settings →",
+      "quickActionPending": "Quick Action: Pending",
+      "viewComments": "View comments",
+      "titlePlaceholder": "Post title",
+      "tagsPlaceholder": "php, design, tutorial",
+      "excerptPlaceholder": "Short description shown in post list",
+      "featuredImageHint": "optional — shown as thumbnail in post list",
+      "uploadFeaturedImage": "Click to upload a featured image",
+      "mapEmbedUrlHint": "In Google Maps: Share → Embed a map → copy the src URL from the iframe code.",
+      "viewingPost": "Viewing:",
+      "failedToDelete": "Failed to delete.",
+      "failedToSave": "Failed to save post.",
+      "failedToApprove": "Failed to approve comment.",
+      "failedToUpdate": "Failed to update comment.",
+      "commentDeleted": "Comment deleted."
+    },
+    "comments": {
+      "title": "Comments",
+      "tabAll": "All",
+      "tabPending": "Pending",
+      "tabApproved": "Approved",
+      "tabSpam": "Spam",
+      "emptySpam": "Empty Spam",
+      "colAuthor": "Author",
+      "colComment": "Comment",
+      "colStatus": "Status",
+      "colDate": "Date",
+      "approve": "Approve",
+      "markAsSpam": "Mark as spam",
+      "delete": "Delete",
+      "statusPending": "Pending",
+      "statusApproved": "Approved",
+      "statusSpam": "Spam",
+      "noComments": "No {{status}} comments.",
+      "deleteTitle": "Delete comment",
+      "deleteDescription": "This comment will be permanently deleted.",
+      "deleteLabel": "Delete",
+      "emptySpamTitle": "Empty spam folder",
+      "emptySpamDescription": "All spam comments will be permanently deleted. This action cannot be undone.",
+      "deleteAllSpam": "Delete all spam",
+      "markedAs": "Comment marked as {{status}}.",
+      "updateFailed": "Failed to update comment.",
+      "deleted": "Comment deleted.",
+      "deleteFailed": "Failed to delete comment.",
+      "allSpamDeleted": "All spam comments deleted.",
+      "clearSpamFailed": "Failed to clear spam."
+    },
+    "settings": {
+      "title": "Settings",
+      "subtitle": "General configuration for your blog and dashboard.",
+      "saveChanges": "Save changes",
+      "saved": "Settings saved.",
+      "saveFailed": "Failed to save settings.",
+      "general": {
+        "title": "General",
+        "subtitle": "Blog identity and logo",
+        "blogName": "Blog name",
+        "blogNamePlaceholder": "My Blog",
+        "description": "Description",
+        "descriptionPlaceholder": "A short description of your blog",
+        "logo": "Blog logo",
+        "logoHint": "(square — 128 × 128 px recommended)",
+        "logoInfo": "Shown in the blog header and browser tab. Use a square PNG or WebP for best results."
+      },
+      "theme": {
+        "title": "Admin theme",
+        "subtitle": "Visual style of the dashboard (does not affect the public blog)"
+      },
+      "locale": {
+        "title": "Language",
+        "subtitle": "Language displayed to blog visitors"
+      },
+      "security": {
+        "title": "Security",
+        "subtitle": "Change your account password",
+        "currentPwd": "Current password",
+        "newPwd": "New password",
+        "newPwdHint": "Minimum 8 characters.",
+        "newPwdConfirm": "Confirm new password",
+        "change": "Change password",
+        "changing": "Changing…",
+        "changed": "Password updated.",
+        "tooShort": "Password must be at least 8 characters.",
+        "noMatch": "New passwords do not match.",
+        "error": "Error changing password."
+      }
+    },
+    "setup": {
+      "title": "Set up your blog",
+      "subtitle": "Configure which sections appear on your homepage and fill in the details.",
+      "saveGo": "Save & go to dashboard",
+      "saved": "Setup saved!",
+      "sessionExpired": "Your session has expired. Please sign in again.",
+      "csrfError": "Could not verify session security. Reload the page.",
+      "heroTextRequired": "Hero text is required.",
+      "profileNameRequired": "Name is required.",
+      "profileSummaryRequired": "Summary is required.",
+      "socialRequired": "At least one social link is required.",
+      "logo": {
+        "title": "Blog Logo",
+        "subtitle": "Shown at the top of your blog and used as favicon.",
+        "label": "Logo image",
+        "hint": "(square recommended, e.g. 128 × 128 px)",
+        "upload": "Click to upload your logo",
+        "formats": "JPEG, PNG, GIF, WebP — max 10 MB"
+      },
+      "postList": {
+        "title": "Post List",
+        "subtitle": "Your blog posts will always be displayed."
+      },
+      "hero": {
+        "title": "Hero Banner",
+        "subtitle": "A large banner image with text overlay.",
+        "bannerImage": "Banner image",
+        "bannerHint": "(1200 × 630 px recommended)",
+        "uploadBanner": "Click to upload a banner image",
+        "displayText": "Display text",
+        "placeholder": "Welcome to my blog"
+      },
+      "profile": {
+        "title": "Profile / About",
+        "subtitle": "Show your profile information on the blog.",
+        "image": "Profile image",
+        "imageHint": "(1080 × 1080 px recommended)",
+        "uploadImage": "Click to upload a profile image",
+        "name": "Name",
+        "namePlaceholder": "Your name",
+        "summary": "Summary",
+        "summaryPlaceholder": "A short bio or tagline",
+        "description": "Description"
+      },
+      "social": {
+        "title": "Social Links",
+        "subtitle": "Display your social media profiles on the blog."
+      },
+      "comments": {
+        "title": "Comments on posts",
+        "subtitle": "Allow readers to leave comments on your blog posts."
+      }
+    },
+    "blog": {
+      "title": "Blog",
+      "subtitle": "Configure the public blog sections and content.",
+      "saveChanges": "Save changes",
+      "saved": "Blog settings saved.",
+      "saveFailed": "Failed to save.",
+      "bannerRequired": "Banner text is required when Hero Banner is active.",
+      "tabs": {
+        "hero": "Hero Banner",
+        "profile": "Profile & About",
+        "social": "Social Links",
+        "comments": "Comments",
+        "search": "Search",
+        "tags": "Tags"
+      },
+      "hero": {
+        "description": "The hero banner is the first thing visitors see at the top of the home page.",
+        "cardTitle": "Hero Banner",
+        "cardSubtitle": "Show or hide the banner on the home page",
+        "bannerImage": "Banner image",
+        "bannerHint": "(1200 × 630 px recommended)",
+        "bannerText": "Banner text",
+        "bannerPlaceholder": "Welcome to my blog",
+        "bannerOverlayInfo": "Overlay text displayed on the banner image."
+      },
+      "profile": {
+        "description": "Configure your profile card (shown on home) and the content of each About page section.",
+        "cardTitle": "Profile card",
+        "cardSubtitle": "The profile widget shown on the home page",
+        "photo": "Photo",
+        "photoHint": "(1:1)",
+        "name": "Name",
+        "namePlaceholder": "Your name",
+        "jobTitle": "Professional title",
+        "jobTitlePlaceholder": "Full-stack Developer",
+        "summary": "Summary",
+        "summaryPlaceholder": "A short bio or tagline",
+        "availabilityLabel": "Show availability badge",
+        "availabilityHint": "Green \"Available\" badge on profile",
+        "extendedDescription": "Extended description",
+        "coverImage": "Cover image",
+        "coverHint": "(About page banner — 1500 × 500 px)",
+        "activateHint": "Activate the Profile card to edit About page sections",
+        "aboutSections": "About page sections"
+      },
+      "aboutSubsections": {
+        "noData": "Add content to enable this section",
+        "gallery": {
+          "title": "Gallery",
+          "subtitle": "Project or photo carousel shown on /about"
+        },
+        "experience": {
+          "title": "Experience",
+          "subtitle": "Professional roles, companies, and tech tags"
+        },
+        "skills": {
+          "title": "Skills",
+          "subtitle": "Technical skills grouped by category"
+        },
+        "education": {
+          "title": "Education & Certifications",
+          "subtitle": "Academic background and professional certifications"
+        },
+        "testimonials": {
+          "title": "Testimonials",
+          "subtitle": "Recommendations from colleagues and clients"
+        },
+        "social": {
+          "title": "Social Links",
+          "subtitle": "Social network icons shown at the bottom of /about",
+          "editHint": "To edit the social link URLs, go to the Social Links tab."
+        }
+      },
+      "educationLabel": "Education",
+      "certificationsLabel": "Certifications",
+      "social": {
+        "description": "Social network links displayed on the blog. Toggle to show or hide the section.",
+        "cardTitle": "Social Links",
+        "cardSubtitle": "Show or hide the social links section on the home page"
+      },
+      "comments": {
+        "description": "Control whether comments appear on individual post pages.",
+        "globalTitle": "Comments globally enabled",
+        "globalSubtitle": "Master switch — disabling hides all comment sections"
+      },
+      "search": {
+        "cardTitle": "Search",
+        "cardSubtitle": "Shows a search field that filters posts by title, summary, content, or tags.",
+        "info": "Search filters posts directly on the server. Enable it so visitors can search your blog."
+      },
+      "tags": {
+        "cardTitle": "Tag Cloud",
+        "cardSubtitle": "Shows the most used tags on the blog to filter posts.",
+        "countLabel": "Number of tags to display",
+        "countHint": "Minimum 1, maximum 20. Ordered by popularity."
+      }
+    },
+    "styles": {
+      "title": "Blog Style",
+      "subtitle": "Select the visual style of the public blog.",
+      "info": "The style is applied to the blog your readers see at /. The dashboard style is not affected.",
+      "noStyles": "No styles available.",
+      "active": "Active",
+      "updated": "Blog style updated to \"{{name}}\".",
+      "updateError": "Error updating style.",
+      "descriptions": {
+        "default": "Rounded cards, color images and indigo accent. Modern and friendly design.",
+        "classic": "Editorial layout with fixed sidebar, serif typography, grayscale images, and pink accent."
+      }
+    },
+    "editor": {
+      "placeholder": "Start writing your post…",
+      "heading1": "Heading 1",
+      "heading2": "Heading 2",
+      "heading3": "Heading 3",
+      "bold": "Bold",
+      "italic": "Italic",
+      "strikethrough": "Strikethrough",
+      "inlineCode": "Inline code",
+      "highlight": "Highlight text",
+      "bulletList": "Bullet list",
+      "orderedList": "Numbered list",
+      "blockquote": "Blockquote",
+      "alignLeft": "Align left",
+      "alignCenter": "Align center",
+      "alignRight": "Align right",
+      "justify": "Justify",
+      "insertLink": "Insert / edit link",
+      "insertImage": "Insert image",
+      "undo": "Undo",
+      "redo": "Redo",
+      "insertLinkTitle": "Insert link",
+      "linkUrl": "URL",
+      "linkPlaceholder": "https://example.com",
+      "linkHint": "Leave empty to remove the link.",
+      "apply": "Apply"
+    },
+    "imageUpload": {
+      "title": "Insert image",
+      "uploadTab": "Upload file",
+      "urlTab": "From URL",
+      "clickToSelect": "Click to select an image",
+      "fileTypes": "JPEG, PNG, GIF, WebP — max 10 MB",
+      "urlLabel": "Image URL",
+      "urlPlaceholder": "https://example.com/image.jpg",
+      "uploading": "Uploading…",
+      "uploadInsert": "Upload & insert",
+      "insert": "Insert",
+      "uploadFailed": "Upload failed"
+    },
+    "about": {
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "delete": "Delete",
+      "deleteGroup": "Delete group",
+      "chipPlaceholder": "React, TypeScript… (Enter or comma to add)",
+      "experience": {
+        "itemTitle": "Experience {{n}}",
+        "roleLabel": "Role / Position",
+        "companyLabel": "Company",
+        "periodLabel": "Period",
+        "descriptionLabel": "Description",
+        "tagsLabel": "Technologies / Tags",
+        "rolePlaceholder": "Lead Frontend Developer",
+        "companyPlaceholder": "Tech Solutions Global",
+        "periodPlaceholder": "2020 – Present",
+        "descriptionPlaceholder": "Key achievements and responsibilities…",
+        "add": "Add experience"
+      },
+      "skills": {
+        "groupPlaceholder": "Group name (e.g. Frontend)",
+        "skillsLabel": "Skills",
+        "add": "Add group"
+      },
+      "education": {
+        "degreePlaceholder": "Degree / Program",
+        "institutionPlaceholder": "Institution",
+        "periodPlaceholder": "2018 – 2022",
+        "add": "Add education"
+      },
+      "certifications": {
+        "namePlaceholder": "Certification name",
+        "urlPlaceholder": "https:// (optional)",
+        "add": "Add certification"
+      },
+      "testimonials": {
+        "itemTitle": "Testimonial {{n}}",
+        "nameLabel": "Name",
+        "namePlaceholder": "Laura Martínez",
+        "roleLabel": "Role / Position",
+        "rolePlaceholder": "Product Owner at ACME",
+        "textLabel": "Testimonial text",
+        "textPlaceholder": "Write what they said about working with you…",
+        "linkedinLabel": "LinkedIn URL",
+        "linkedinPlaceholder": "https://linkedin.com/in/…",
+        "uploadAvatar": "Upload avatar",
+        "add": "Add testimonial"
+      },
+      "gallery": {
+        "uploadImage": "Upload image",
+        "imageLabel": "Image",
+        "imageAlt": "Gallery thumbnail",
+        "titleLabel": "Title",
+        "titlePlaceholder": "Project or photo title",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Brief description…",
+        "add": "Add image"
+      }
+    }
+  },
+  "blog": {
+    "nav": {
+      "home": "Home",
+      "about": "About me",
+      "closeMenu": "Close menu",
+      "openMenu": "Open menu"
+    },
+    "adminBar": {
+      "admin": "Admin"
+    },
+    "search": {
+      "title": "Search",
+      "placeholder": "Search posts…",
+      "ariaLabel": "Search posts",
+      "button": "Search"
+    },
+    "tags": {
+      "title": "Tags",
+      "explore": "Explore",
+      "popular": "Popular tags",
+      "active": "Posts tagged:"
+    },
+    "posts": {
+      "featured": "Featured",
+      "latest": "Latest articles",
+      "articles": "Articles",
+      "taggedWith": "Posts tagged: #{{tag}}",
+      "resultsFor": "Results for \"{{query}}\"",
+      "noResults": "No posts published yet.",
+      "noTag": "No posts with tag \"#{{tag}}\".",
+      "noSearch": "No results found for \"{{query}}\".",
+      "noMore": "No more articles.",
+      "loadMore": "Load more articles",
+      "previous": "← Previous",
+      "readArticle": "Read article",
+      "readMore": "Read more",
+      "error": "Error loading posts.",
+      "recentPosts": "Recent Posts"
+    },
+    "comments": {
+      "count_one": "{{count}} Comment",
+      "count_other": "{{count}} Comments",
+      "none": "No comments yet. Be the first!",
+      "leave": "Leave a comment",
+      "name": "Name",
+      "namePlaceholder": "Your name",
+      "email": "Email",
+      "emailNote": "(not published)",
+      "emailPlaceholder": "you@email.com",
+      "content": "Comment",
+      "contentPlaceholder": "Write your comment here…",
+      "submit": "Submit comment",
+      "submitting": "Submitting…",
+      "submitError": "Could not submit comment.",
+      "successTitle": "Comment submitted!",
+      "successText": "Your comment is pending approval. Thank you!"
+    },
+    "about": {
+      "sectionTitle": "About Me",
+      "experience": "Professional Experience",
+      "skills": "Technical Skills",
+      "training": "Training",
+      "education": "Education",
+      "certifications": "Certifications",
+      "testimonials": "Recommendations",
+      "testimonialPrev": "Previous",
+      "testimonialNext": "Next",
+      "testimonialItem": "Testimonial {{index}}",
+      "available": "Available",
+      "viewProfile": "View full profile →",
+      "aboutMe": "About me",
+      "galleryTitle": "Projects Gallery",
+      "galleryImage": "Image {{n}}"
+    },
+    "post": {
+      "back": "Back to home",
+      "keepReading": "Keep Reading",
+      "readingTime": "min read",
+      "share": "Share article",
+      "copied": "Copied!",
+      "copyLink": "Copy article link",
+      "location": "Location",
+      "notFound": "Post not found."
+    },
+    "footer": {
+      "rights": "All rights reserved."
+    },
+    "hero": {
+      "bannerAlt": "Hero banner",
+      "welcome": "Welcome to my blog"
+    },
+    "socialLinks": {
+      "connect": "Connect"
+    },
+    "errorLoading": "Error loading blog."
+  }
+}

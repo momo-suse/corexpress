@@ -43,6 +43,8 @@ export interface Settings {
   /** DB key: blog_theme — set by installer */
   blog_theme: 'default' | 'minimal' | 'dark'
   active_style_collection: string
+  /** UI language for blog visitors */
+  app_locale: string
   setup_complete: string
   // Blog logo
   blog_logo_id: string
@@ -57,6 +59,23 @@ export interface Settings {
   profile_description: string
   profile_image_id: string
   profile_image_url: string
+  profile_cover_id: string
+  profile_cover_url: string
+  profile_title: string
+  /** '1' = show availability badge */
+  profile_available: string
+  /** JSON array: [{role,company,period,description,tags:[]}] */
+  profile_experience: string
+  /** JSON array: [{name,skills:[]}] */
+  profile_skills: string
+  /** JSON array: [{url,title,description}] */
+  profile_gallery: string
+  /** JSON array: [{degree,institution,period}] */
+  profile_education: string
+  /** JSON array: [{name,url?}] */
+  profile_certifications: string
+  /** JSON array: [{name,role,text,linkedin?}] */
+  profile_testimonials: string
   // Social links
   social_linkedin: string
   social_instagram: string
@@ -65,6 +84,8 @@ export interface Settings {
   // Features
   /** '1' = enabled (default), '0' = disabled */
   comments_enabled: string
+  /** Numeric string — max tags shown in Tag Cloud widget (default "6") */
+  tags_max_count: string
   [key: string]: string
 }
 
@@ -137,4 +158,9 @@ export interface PaginatedResponse<T> {
 
 export interface ApiResponse<T> {
   data: T
+}
+
+export interface TagItem {
+  tag: string
+  count: number
 }

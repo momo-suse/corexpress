@@ -58,9 +58,9 @@
 
 /* ─── Admin themes ────────────────────────────────────────────────────── */
 
-/* Default: white cards/sidebar on a subtle gray-50 background */
+/* Default: pure white background, white cards (separated by border/shadow) */
 .theme-default {
-  --background: 220 14% 96%;       /* gray-100-ish page bg */
+  --background: 0 0% 100%;         /* white page bg */
   --foreground: 221 39% 11%;       /* gray-900 */
   --card: 0 0% 100%;               /* white cards & sidebar */
   --card-foreground: 221 39% 11%;
@@ -82,16 +82,16 @@
   --radius: 0.5rem;
 }
 
-/* Minimal: pure black & white, zero border-radius, sharp edges */
+/* Minimal: near-black text, light gray background, zero border-radius, sharp edges */
 .theme-minimal {
-  --background: 0 0% 100%;         /* pure white */
+  --background: 0 0% 94%;          /* gray-100 — light gray page bg */
   --foreground: 0 0% 0%;           /* pure black */
-  --card: 0 0% 100%;
+  --card: 0 0% 100%;               /* white cards over gray bg */
   --card-foreground: 0 0% 0%;
   --popover: 0 0% 100%;
   --popover-foreground: 0 0% 0%;
   --border: 0 0% 0%;               /* pure black borders */
-  --input: 0 0% 0%;
+  --input: 0 0% 0%;               /* pure black borders for inputs */
   --muted: 0 0% 96%;               /* near-white hover bg */
   --muted-foreground: 0 0% 40%;    /* medium gray text */
   --primary: 0 0% 0%;              /* black button */
@@ -104,6 +104,28 @@
   --destructive-foreground: 0 0% 100%;
   --ring: 0 0% 0%;
   --radius: 0rem;                  /* no rounded corners — sharp edges */
+}
+
+/* Minimal theme: Switch unchecked track should be light gray (not black) so it's
+   visually distinct from the checked (black) state. Scoped here to avoid
+   changing --input, which is used for pure-black input borders in this theme. */
+.theme-minimal [role="switch"][data-state="unchecked"] {
+  background-color: hsl(0 0% 75%);
+}
+
+/* Minimal theme: force sharp corners on every element — bypasses hardcoded Tailwind rounded-* classes */
+.theme-minimal * {
+  border-radius: 0 !important;
+}
+
+/* ─── Admin theme fonts ───────────────────────────────────────────────────── */
+/* Default inherits system-ui (unchanged). Minimal = console mono. Dark = friendly sans. */
+.theme-minimal {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+}
+.theme-dark {
+  font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+  font-size: 15px;  /* Nunito reads slightly small — bump 1px above default 14px */
 }
 
 /* ─── Tiptap ProseMirror ─────────────────────────────────────────────────── */
@@ -144,16 +166,53 @@
   --input: 240 3.7% 15.1%;
   --muted: 240 3.7% 15.1%;         /* zinc-800 */
   --muted-foreground: 240 5.0% 64.9%; /* zinc-400 */
-  --primary: 243 75% 59%;          /* indigo-600 — accent buttons & active nav */
-  --primary-foreground: 0 0% 100%;
+  --primary: 240 5% 64.9%;         /* zinc-400 — light gray buttons & active nav */
+  --primary-foreground: 240 10% 3.9%; /* zinc-950 — dark text on gray button */
   --secondary: 240 3.7% 15.1%;     /* zinc-800 */
   --secondary-foreground: 0 0% 98%;
   --accent: 240 3.7% 15.1%;
   --accent-foreground: 0 0% 98%;
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 0 0% 98%;
-  --ring: 243 75% 59%;             /* indigo focus ring */
+  --ring: 240 5% 64.9%;            /* zinc-400 — light gray focus ring */
   --radius: 0.5rem;
+}
+
+/* ─── Tiptap editor — dark theme overrides ───────────────────────────────── */
+/* Tailwind Typography (prose) hardcodes dark text; override it for .theme-dark */
+.theme-dark .ProseMirror {
+  color: hsl(0 0% 90%);            /* zinc-100 — soft white body text */
+}
+.theme-dark .ProseMirror h1,
+.theme-dark .ProseMirror h2,
+.theme-dark .ProseMirror h3,
+.theme-dark .ProseMirror h4 {
+  color: hsl(0 0% 98%);            /* near-white headings */
+}
+.theme-dark .ProseMirror strong {
+  color: hsl(0 0% 98%);
+}
+.theme-dark .ProseMirror a {
+  color: hsl(240 5% 80%);          /* zinc-300 — light gray links */
+}
+.theme-dark .ProseMirror code {
+  color: hsl(240 5% 85%);          /* zinc-200 */
+  background-color: hsl(240 5.9% 16%);
+}
+.theme-dark .ProseMirror pre {
+  background-color: hsl(240 5.9% 8%);
+  color: hsl(0 0% 90%);
+}
+.theme-dark .ProseMirror blockquote {
+  color: hsl(240 5% 64.9%);        /* zinc-400 — muted quote text */
+  border-left-color: hsl(240 3.7% 25%);
+}
+.theme-dark .ProseMirror mark {
+  background-color: hsl(43 74% 30%);
+  color: hsl(0 0% 98%);
+}
+.theme-dark .ProseMirror p.is-editor-empty:first-child::before {
+  color: hsl(240 5% 45%);          /* placeholder text — dimmed */
 }
 
 /* ─── Blog Style Collections ──────────────────────────────────────────────── */

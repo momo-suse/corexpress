@@ -1,10 +1,12 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, MessageSquare, Settings, LogOut, Globe, Palette } from 'lucide-react'
+import { LayoutDashboard, MessageSquare, Settings, LogOut, Globe, Palette, Rss } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { logout } from '@/api/auth'
 import { useComments } from '@/hooks/useComments'
+import { useTranslation } from 'react-i18next'
 
 export default function Sidebar() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { data: pendingData } = useComments({ status: 'pending' })
   const pendingCount = pendingData?.meta.total ?? 0
@@ -34,12 +36,12 @@ export default function Sidebar() {
       <nav className="flex-1 py-4 px-3 space-y-1">
         <NavLink to="/cx-admin" end className={navLink}>
           <LayoutDashboard className="h-4 w-4 shrink-0" />
-          <span>Dashboard</span>
+          <span>{t('admin.sidebar.dashboard')}</span>
         </NavLink>
 
         <NavLink to="/cx-admin/comments" className={navLink}>
           <MessageSquare className="h-4 w-4 shrink-0" />
-          <span className="flex-1">Comments</span>
+          <span className="flex-1">{t('admin.sidebar.comments')}</span>
           {pendingCount > 0 && (
             <span className="ml-auto min-w-[1.25rem] h-5 flex items-center justify-center px-1.5 text-[10px] font-semibold bg-red-500 text-white rounded-full leading-none">
               {pendingCount}
@@ -47,14 +49,19 @@ export default function Sidebar() {
           )}
         </NavLink>
 
+        <NavLink to="/cx-admin/blog" className={navLink}>
+          <Rss className="h-4 w-4 shrink-0" />
+          <span>{t('admin.sidebar.blog')}</span>
+        </NavLink>
+
         <NavLink to="/cx-admin/styles" className={navLink}>
           <Palette className="h-4 w-4 shrink-0" />
-          <span>Styles</span>
+          <span>{t('admin.sidebar.styles')}</span>
         </NavLink>
 
         <NavLink to="/cx-admin/settings" className={navLink}>
           <Settings className="h-4 w-4 shrink-0" />
-          <span>Settings</span>
+          <span>{t('admin.sidebar.settings')}</span>
         </NavLink>
       </nav>
 
@@ -64,14 +71,14 @@ export default function Sidebar() {
           className="flex w-full items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
         >
           <Globe className="h-4 w-4 shrink-0" />
-          View blog
+          {t('admin.sidebar.viewBlog')}
         </a>
         <button
           onClick={handleLogout}
           className="flex w-full items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
         >
           <LogOut className="h-4 w-4 shrink-0" />
-          Sign out
+          {t('admin.sidebar.signOut')}
         </button>
       </div>
     </aside>

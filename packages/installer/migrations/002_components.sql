@@ -83,50 +83,74 @@ CREATE TABLE IF NOT EXISTS `page_components` (
 -- parent_id references the parent component row; NULL for top-level
 -- has_own_page: 1 = has a dedicated public route
 INSERT INTO `component_definitions` (`name`, `label`, `type`, `parent_id`, `has_own_page`) VALUES
-    ('hero',         'Hero Banner',  'component',     NULL, 0),
-    ('profile',      'Profile',      'component',     NULL, 0),
-    ('post-list',    'Post List',    'component',     NULL, 0),
-    ('post-detail',  'Post Detail',  'component',     NULL, 1),
-    ('comment-form', 'Comment Form', 'sub-component', 4,    0),
-    ('comment-list', 'Comment List', 'sub-component', 4,    0),
-    ('social-links', 'Social Links', 'component',     NULL, 0);
+    ('hero',               'Hero Banner',  'component',     NULL, 0),
+    ('profile',            'Profile',      'component',     NULL, 1),
+    ('post-list',          'Post List',    'component',     NULL, 0),
+    ('post-detail',        'Post Detail',  'component',     NULL, 1),
+    ('comment-form',       'Comment Form', 'sub-component', 4,    0),
+    ('comment-list',       'Comment List', 'sub-component', 4,    0),
+    ('social-links',       'Social Links', 'component',     NULL, 0),
+    ('about-gallery',      'Gallery',      'sub-component', 2,    0),
+    ('about-experience',   'Experience',   'sub-component', 2,    0),
+    ('about-skills',       'Skills',       'sub-component', 2,    0),
+    ('about-education',    'Education',    'sub-component', 2,    0),
+    ('about-testimonials', 'Testimonials', 'sub-component', 2,    0),
+    ('search',             'Search',       'component',     NULL, 0),
+    ('tag-cloud',          'Tag Cloud',    'component',     NULL, 0);
 
 -- Style collections (2 built-in — default is the fallback)
 INSERT INTO `style_collections` (`name`, `label`, `is_default`) VALUES
     ('default', 'Default', 1),
     ('classic', 'Classic', 0);
 
--- Default collection styles (covers all 7 components)
+-- Default collection styles (covers all 14 components)
 INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `styles_config`) VALUES
-    (1, 1, '{"background":"#f8f9fa","textColor":"#111827","layout":"full-width"}'),
-    (1, 2, '{"background":"#ffffff","textColor":"#111827","layout":"centered"}'),
-    (1, 3, '{"background":"#ffffff","textColor":"#111827","layout":"list"}'),
-    (1, 4, '{"background":"#ffffff","textColor":"#111827","layout":"article"}'),
-    (1, 5, '{"background":"#f8f9fa","textColor":"#111827","layout":"card"}'),
-    (1, 6, '{"background":"#ffffff","textColor":"#111827","layout":"list"}'),
-    (1, 7, '{"background":"#ffffff","textColor":"#6b7280","layout":"inline"}');
+    (1, 1,  '{"background":"#f8f9fa","textColor":"#111827","layout":"full-width"}'),
+    (1, 2,  '{"background":"#ffffff","textColor":"#111827","layout":"centered"}'),
+    (1, 3,  '{"background":"#ffffff","textColor":"#111827","layout":"list"}'),
+    (1, 4,  '{"background":"#ffffff","textColor":"#111827","layout":"article"}'),
+    (1, 5,  '{"background":"#f8f9fa","textColor":"#111827","layout":"card"}'),
+    (1, 6,  '{"background":"#ffffff","textColor":"#111827","layout":"list"}'),
+    (1, 7,  '{"background":"#ffffff","textColor":"#6b7280","layout":"inline"}'),
+    (1, 8,  '{"background":"#ffffff","textColor":"#111827","layout":"carousel"}'),
+    (1, 9,  '{"background":"#ffffff","textColor":"#111827","layout":"card"}'),
+    (1, 10, '{"background":"#f8f9fa","textColor":"#111827","layout":"grid"}'),
+    (1, 11, '{"background":"#ffffff","textColor":"#111827","layout":"two-col"}'),
+    (1, 12, '{"background":"#ffffff","textColor":"#111827","layout":"carousel"}'),
+    (1, 13, '{"background":"#ffffff","textColor":"#111827","layout":"inline","buttonStyle":"filled"}'),
+    (1, 14, '{"background":"#ffffff","textColor":"#111827","layout":"cloud"}');
 
--- Classic collection styles (all 7 components — editorial layout)
+-- Classic collection styles (all 14 components — editorial layout)
 INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `styles_config`) VALUES
-    (2, 1, '{"background":"#fafafa","textColor":"#111827","layout":"editorial"}'),
-    (2, 2, '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
-    (2, 3, '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
-    (2, 4, '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
-    (2, 5, '{"background":"#fafafa","textColor":"#111827","layout":"editorial"}'),
-    (2, 6, '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
-    (2, 7, '{"background":"#ffffff","textColor":"#6b7280","layout":"editorial"}');
+    (2, 1,  '{"background":"#fafafa","textColor":"#111827","layout":"editorial"}'),
+    (2, 2,  '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
+    (2, 3,  '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
+    (2, 4,  '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
+    (2, 5,  '{"background":"#fafafa","textColor":"#111827","layout":"editorial"}'),
+    (2, 6,  '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
+    (2, 7,  '{"background":"#ffffff","textColor":"#6b7280","layout":"editorial"}'),
+    (2, 8,  '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
+    (2, 9,  '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
+    (2, 10, '{"background":"#f8f9fa","textColor":"#111827","layout":"editorial"}'),
+    (2, 11, '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
+    (2, 12, '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
+    (2, 13, '{"background":"#ffffff","textColor":"#111827","layout":"inline","buttonStyle":"outline"}'),
+    (2, 14, '{"background":"#ffffff","textColor":"#111827","layout":"cloud"}');
 
--- Pages (home and blog)
+-- Pages (home, blog, about)
 INSERT INTO `pages` (`slug`, `title`) VALUES
-    ('home', 'Home'),
-    ('blog', 'Blog');
+    ('home',  'Home'),
+    ('blog',  'Blog'),
+    ('about', 'About');
 
--- Home page components (page_id=1): hero, profile, post-list visible; social-links hidden
+-- Home page components (page_id=1): hero, profile, post-list visible; social-links, search, tag-cloud hidden
 INSERT INTO `page_components` (`page_id`, `component_definition_id`, `is_visible`, `display_order`) VALUES
     (1, 1, 1, 1),
     (1, 2, 1, 2),
     (1, 3, 1, 3),
-    (1, 7, 0, 4);
+    (1, 7,  0, 4),
+    (1, 13, 0, 5),
+    (1, 14, 0, 6);
 
 -- Blog page components (page_id=2): post-list, post-detail, comment-list, comment-form visible
 INSERT INTO `page_components` (`page_id`, `component_definition_id`, `is_visible`, `display_order`) VALUES
@@ -135,7 +159,18 @@ INSERT INTO `page_components` (`page_id`, `component_definition_id`, `is_visible
     (2, 6, 1, 3),
     (2, 5, 1, 4);
 
--- Active style collection setting
+-- About page components (page_id=3): sub-components visible by default; social-links visible
+INSERT INTO `page_components` (`page_id`, `component_definition_id`, `is_visible`, `display_order`) VALUES
+    (3, 8,  1, 1),
+    (3, 9,  1, 2),
+    (3, 10, 1, 3),
+    (3, 11, 1, 4),
+    (3, 12, 1, 5),
+    (3, 7,  1, 6);
+
+-- Active style collection setting + tags max count + locale
 INSERT INTO `settings` (`key`, `value`) VALUES
-    ('active_style_collection', 'default')
+    ('active_style_collection', 'default'),
+    ('tags_max_count', '6'),
+    ('app_locale', 'en')
 ON DUPLICATE KEY UPDATE `value` = VALUES(`value`);

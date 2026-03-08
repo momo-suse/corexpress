@@ -1,4 +1,5 @@
 import { useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import { usePost, usePosts } from '@/hooks/usePosts'
 import { getSettings } from '@/api/settings'
@@ -17,8 +18,9 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '@/store/auth'
 import type { PageComponent } from '@/types/api'
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('es-MX', {
+function formatDate(dateStr: string, locale: string): string {
+  const localeMap: Record<string, string> = { en: 'en-US', es: 'es-MX', ja: 'ja-JP' }
+  return new Date(dateStr).toLocaleDateString(localeMap[locale] ?? locale, {
     day: 'numeric', month: 'long', year: 'numeric',
   })
 }
@@ -29,6 +31,7 @@ function readingTime(content: string): string {
 }
 
 export default function PostPage() {
+  const { t, i18n } = useTranslation()
   const { slug } = useParams<{ slug: string }>()
   const qc = useQueryClient()
   const { data, isLoading, isError } = usePost(slug ?? '')
@@ -42,6 +45,8 @@ export default function PostPage() {
   })
   const { data: pageData } = useBlogPage()
 
+  const settings = (settingsData?.data ?? {}) as unknown as Record<string, string>
+
   // Recent posts for sidebar (max 4, exclude current)
   const { data: recentData } = usePosts(1)
 
@@ -52,19 +57,18 @@ export default function PostPage() {
   if (isError || !data?.data) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-gray-50 dark:bg-gray-950">
-        <p className="text-muted-foreground text-lg">Post no encontrado.</p>
+        <p className="text-muted-foreground text-lg">{t('blog.post.notFound')}</p>
         <Link
           to="/"
           className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline"
         >
-          ← Volver al inicio
+          ← {t('blog.post.back')}
         </Link>
       </div>
     )
   }
 
   const post = data.data
-  const settings = (settingsData?.data ?? {}) as unknown as Record<string, string>
   const components: PageComponent[] = pageData?.data.components ?? []
   const activeCollection = settings.active_style_collection ?? 'default'
 
@@ -126,7 +130,7 @@ export default function PostPage() {
                     style={{ borderRadius: 'var(--blog-radius-card)' }}
                   >
                     <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-5 pb-2 border-b border-gray-100 dark:border-gray-800">
-                      Últimos artículos
+                      {t('blog.posts.recentPosts')}
                     </h3>
                     <div className="flex flex-col gap-5">
                       {recentPosts.map((rp) => (
@@ -160,7 +164,7 @@ export default function PostPage() {
                               <Clock size={11} />
                               <span>{readingTime(rp.content || rp.excerpt || '')}</span>
                               <span>·</span>
-                              <span>{formatDate(rp.created_at)}</span>
+                              <span>{formatDate(rp.created_at, i18n.language)}</span>
                             </div>
                           </div>
                         </Link>

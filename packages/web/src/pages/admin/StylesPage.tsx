@@ -4,18 +4,12 @@ import { useSettings, useMutateSettings } from '@/hooks/useSettings'
 import { getStyleCollections } from '@/api/styleCollections'
 import { toast } from '@/hooks/useToast'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-
-// ── Static descriptions per collection name ───────────────────────────────
-const DESCRIPTIONS: Record<string, string> = {
-  default:
-    'Tarjetas redondeadas, imágenes a color y acento índigo. Diseño moderno y amigable.',
-  classic:
-    'Layout editorial con sidebar fijo, tipografía serif, imágenes en escala de grises y acento rosa.',
-}
+import { useTranslation } from 'react-i18next'
 
 // ── Mini preview — applies actual CSS vars via blog-collection-* class ─────
 
 function CollectionPreview({ name }: { name: string }) {
+  const { t } = useTranslation()
   const isClassic = name === 'classic'
 
   return (
@@ -70,7 +64,7 @@ function CollectionPreview({ name }: { name: string }) {
                 className="text-[10px] font-semibold flex items-center gap-1"
                 style={{ color: 'var(--blog-accent)' }}
               >
-                Leer artículo →
+                {t('blog.posts.readArticle')} →
               </span>
             </>
           )}
@@ -83,6 +77,7 @@ function CollectionPreview({ name }: { name: string }) {
 // ── Page ──────────────────────────────────────────────────────────────────
 
 export default function StylesPage() {
+  const { t } = useTranslation()
   const { data: settingsData, isLoading: settingsLoading } = useSettings()
   const { data: collectionsData, isLoading: collectionsLoading } = useQuery({
     queryKey: ['style-collections'],
@@ -99,9 +94,9 @@ export default function StylesPage() {
     if (name === activeCollection || isPending) return
     try {
       await mutateAsync({ active_style_collection: name } as never)
-      toast({ title: `Estilo del blog actualizado a "${name}".` })
+      toast({ title: t('admin.styles.updated', { name }) })
     } catch {
-      toast({ title: 'Error al actualizar el estilo.', variant: 'destructive' })
+      toast({ title: t('admin.styles.updateError'), variant: 'destructive' })
     }
   }
 
@@ -112,9 +107,9 @@ export default function StylesPage() {
 
       {/* ── Header ──────────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-10 px-8 py-4 flex items-center justify-between border-b bg-card/95 backdrop-blur-sm shrink-0">
-        <h1 className="text-2xl font-semibold tracking-tight">Blog Style</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{t('admin.styles.title')}</h1>
         <p className="text-sm text-muted-foreground hidden sm:block">
-          Selecciona el estilo visual del blog público.
+          {t('admin.styles.subtitle')}
         </p>
       </header>
 
@@ -122,12 +117,11 @@ export default function StylesPage() {
       <div className="p-8 max-w-5xl mx-auto w-full">
 
         <p className="text-sm text-muted-foreground mb-8">
-          El estilo se aplica al blog que ven tus lectores en{' '}
-          <strong className="font-medium text-foreground">/</strong>. El estilo del dashboard no se ve afectado.
+          {t('admin.styles.info')}
         </p>
 
         {collections.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No hay estilos disponibles.</p>
+          <p className="text-sm text-muted-foreground">{t('admin.styles.noStyles')}</p>
         ) : (
           <div className={`grid grid-cols-1 gap-5 ${collections.length === 1 ? 'sm:grid-cols-1 max-w-xs' : 'sm:grid-cols-2 lg:grid-cols-3'}`}>
             {collections.map((col) => {
@@ -149,7 +143,7 @@ export default function StylesPage() {
                   {isActive && (
                     <div className="absolute top-3 right-3 z-10 flex items-center gap-1 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full shadow">
                       <Check className="h-2.5 w-2.5" />
-                      Activo
+                      {t('admin.styles.active')}
                     </div>
                   )}
 
@@ -171,7 +165,7 @@ export default function StylesPage() {
                       {col.label}
                     </p>
                     <p className="text-xs text-muted-foreground leading-relaxed">
-                      {DESCRIPTIONS[col.name] ?? ''}
+                      {t(`admin.styles.descriptions.${col.name}`, { defaultValue: '' })}
                     </p>
                   </div>
                 </button>

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
@@ -34,6 +35,7 @@ interface PostEditorProps {
 }
 
 export default function PostEditor({ content, onChange, className, postId }: PostEditorProps) {
+  const { t } = useTranslation()
   const [linkDialogOpen, setLinkDialogOpen] = useState(false)
   const [linkValue, setLinkValue] = useState('')
   const [imageDialogOpen, setImageDialogOpen] = useState(false)
@@ -52,7 +54,7 @@ export default function PostEditor({ content, onChange, className, postId }: Pos
       }),
       Image.configure({ inline: false, allowBase64: false }),
       // v3: Placeholder moved to @tiptap/extensions consolidated package
-      Placeholder.configure({ placeholder: 'Start writing your post…' }),
+      Placeholder.configure({ placeholder: t('admin.editor.placeholder') }),
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
       Highlight,
     ],
@@ -101,15 +103,15 @@ export default function PostEditor({ content, onChange, className, postId }: Pos
         onKeyDown={(e) => e.stopPropagation()}
       >
         {/* Headings */}
-        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('heading', { level: 1 }))} title="Heading 1"
+        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('heading', { level: 1 }))} title={t('admin.editor.heading1')}
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}>
           <Heading1 className="h-4 w-4" />
         </Button>
-        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('heading', { level: 2 }))} title="Heading 2"
+        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('heading', { level: 2 }))} title={t('admin.editor.heading2')}
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
           <Heading2 className="h-4 w-4" />
         </Button>
-        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('heading', { level: 3 }))} title="Heading 3"
+        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('heading', { level: 3 }))} title={t('admin.editor.heading3')}
           onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
           <Heading3 className="h-4 w-4" />
         </Button>
@@ -117,23 +119,23 @@ export default function PostEditor({ content, onChange, className, postId }: Pos
         <Sep />
 
         {/* Inline marks */}
-        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('bold'))} title="Bold"
+        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('bold'))} title={t('admin.editor.bold')}
           onClick={() => editor.chain().focus().toggleBold().run()}>
           <Bold className="h-4 w-4" />
         </Button>
-        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('italic'))} title="Italic"
+        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('italic'))} title={t('admin.editor.italic')}
           onClick={() => editor.chain().focus().toggleItalic().run()}>
           <Italic className="h-4 w-4" />
         </Button>
-        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('strike'))} title="Strikethrough"
+        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('strike'))} title={t('admin.editor.strikethrough')}
           onClick={() => editor.chain().focus().toggleStrike().run()}>
           <Strikethrough className="h-4 w-4" />
         </Button>
-        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('code'))} title="Inline code"
+        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('code'))} title={t('admin.editor.inlineCode')}
           onClick={() => editor.chain().focus().toggleCode().run()}>
           <Code className="h-4 w-4" />
         </Button>
-        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('highlight'))} title="Highlight text"
+        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('highlight'))} title={t('admin.editor.highlight')}
           onClick={() => editor.chain().focus().toggleHighlight().run()}>
           <Highlighter className="h-4 w-4" />
         </Button>
@@ -141,15 +143,15 @@ export default function PostEditor({ content, onChange, className, postId }: Pos
         <Sep />
 
         {/* Blocks */}
-        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('bulletList'))} title="Bullet list"
+        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('bulletList'))} title={t('admin.editor.bulletList')}
           onClick={() => editor.chain().focus().toggleBulletList().run()}>
           <List className="h-4 w-4" />
         </Button>
-        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('orderedList'))} title="Numbered list"
+        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('orderedList'))} title={t('admin.editor.orderedList')}
           onClick={() => editor.chain().focus().toggleOrderedList().run()}>
           <ListOrdered className="h-4 w-4" />
         </Button>
-        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('blockquote'))} title="Blockquote"
+        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('blockquote'))} title={t('admin.editor.blockquote')}
           onClick={() => editor.chain().focus().toggleBlockquote().run()}>
           <Quote className="h-4 w-4" />
         </Button>
@@ -157,19 +159,19 @@ export default function PostEditor({ content, onChange, className, postId }: Pos
         <Sep />
 
         {/* Text alignment */}
-        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive({ textAlign: 'left' }))} title="Align left"
+        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive({ textAlign: 'left' }))} title={t('admin.editor.alignLeft')}
           onClick={() => editor.chain().focus().setTextAlign('left').run()}>
           <AlignLeft className="h-4 w-4" />
         </Button>
-        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive({ textAlign: 'center' }))} title="Align center"
+        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive({ textAlign: 'center' }))} title={t('admin.editor.alignCenter')}
           onClick={() => editor.chain().focus().setTextAlign('center').run()}>
           <AlignCenter className="h-4 w-4" />
         </Button>
-        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive({ textAlign: 'right' }))} title="Align right"
+        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive({ textAlign: 'right' }))} title={t('admin.editor.alignRight')}
           onClick={() => editor.chain().focus().setTextAlign('right').run()}>
           <AlignRight className="h-4 w-4" />
         </Button>
-        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive({ textAlign: 'justify' }))} title="Justify"
+        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive({ textAlign: 'justify' }))} title={t('admin.editor.justify')}
           onClick={() => editor.chain().focus().setTextAlign('justify').run()}>
           <AlignJustify className="h-4 w-4" />
         </Button>
@@ -177,11 +179,11 @@ export default function PostEditor({ content, onChange, className, postId }: Pos
         <Sep />
 
         {/* Link & Image */}
-        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('link'))} title="Insert / edit link"
+        <Button type="button" variant="ghost" size="icon" className={tb(editor.isActive('link'))} title={t('admin.editor.insertLink')}
           onClick={openLinkDialog}>
           <Link2 className="h-4 w-4" />
         </Button>
-        <Button type="button" variant="ghost" size="icon" className={tb(false)} title="Insert image"
+        <Button type="button" variant="ghost" size="icon" className={tb(false)} title={t('admin.editor.insertImage')}
           onClick={() => setImageDialogOpen(true)}>
           <ImageIcon className="h-4 w-4" />
         </Button>
@@ -189,12 +191,12 @@ export default function PostEditor({ content, onChange, className, postId }: Pos
         <Sep />
 
         {/* History */}
-        <Button type="button" variant="ghost" size="icon" className={tb(false)} title="Undo"
+        <Button type="button" variant="ghost" size="icon" className={tb(false)} title={t('admin.editor.undo')}
           disabled={!editor.can().undo()}
           onClick={() => editor.chain().focus().undo().run()}>
           <Undo className="h-4 w-4" />
         </Button>
-        <Button type="button" variant="ghost" size="icon" className={tb(false)} title="Redo"
+        <Button type="button" variant="ghost" size="icon" className={tb(false)} title={t('admin.editor.redo')}
           disabled={!editor.can().redo()}
           onClick={() => editor.chain().focus().redo().run()}>
           <Redo className="h-4 w-4" />
@@ -223,25 +225,25 @@ export default function PostEditor({ content, onChange, className, postId }: Pos
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Link2 className="h-5 w-5" />
-              Insert link
+              {t('admin.editor.insertLinkTitle')}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-2">
-            <Label htmlFor="link-url">URL</Label>
+            <Label htmlFor="link-url">{t('admin.editor.linkUrl')}</Label>
             <Input
               id="link-url"
               type="url"
-              placeholder="https://example.com"
+              placeholder={t('admin.editor.linkPlaceholder')}
               value={linkValue}
               onChange={(e) => setLinkValue(e.target.value)}
               onKeyDown={(e) => { e.stopPropagation(); if (e.key === 'Enter') applyLink() }}
               autoFocus
             />
-            <p className="text-xs text-muted-foreground">Leave empty to remove the link.</p>
+            <p className="text-xs text-muted-foreground">{t('admin.editor.linkHint')}</p>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setLinkDialogOpen(false)}>Cancel</Button>
-            <Button onClick={applyLink}>Apply</Button>
+            <Button variant="outline" onClick={() => setLinkDialogOpen(false)}>{t('common.cancel')}</Button>
+            <Button onClick={applyLink}>{t('admin.editor.apply')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

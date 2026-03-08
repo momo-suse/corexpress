@@ -33,6 +33,13 @@ $app->group('/api/v1', function (\Slim\Routing\RouteCollectorProxy $group) use (
     // Public: authenticate with email + password
     $group->post('/auth/login', [AuthController::class, 'login']);
 
+    // Public: request a password reset email
+    $group->post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
+
+    // Public + CSRF: consume reset token and set new password
+    $group->post('/auth/reset-password', [AuthController::class, 'resetPassword'])
+          ->add($csrfMiddleware);
+
     // Authenticated: current user info
     $group->get('/auth/me', [AuthController::class, 'me'])
           ->add($authMiddleware);
@@ -42,7 +49,15 @@ $app->group('/api/v1', function (\Slim\Routing\RouteCollectorProxy $group) use (
           ->add($csrfMiddleware)
           ->add($authMiddleware);
 
+    // Authenticated + CSRF: change password (requires current password)
+    $group->post('/auth/change-password', [AuthController::class, 'changePassword'])
+          ->add($csrfMiddleware)
+          ->add($authMiddleware);
+
     // ── Posts ──────────────────────────────────────────────────────────────────
+
+    // Public: tag aggregation (top N tags by frequency across all published posts)
+    $group->get('/tags', [PostController::class, 'tags']);
 
     // Public: paginated list of published posts
     $group->get('/posts', [PostController::class, 'index']);

@@ -47,6 +47,15 @@ class SettingController extends Controller
             $settings['blog_logo_url'] = '';
         }
 
+        // Resolve profile cover URL
+        if (!empty($settings['profile_cover_id']) && is_numeric($settings['profile_cover_id'])) {
+            $img = Image::find((int)$settings['profile_cover_id']);
+            $settings['profile_cover_url'] = $img !== null ? '/img/' . $img->filename : '';
+        }
+        else {
+            $settings['profile_cover_url'] = $settings['profile_cover_url'] ?? '';
+        }
+
         return $this->json($response, ['data' => $settings]);
     }
 

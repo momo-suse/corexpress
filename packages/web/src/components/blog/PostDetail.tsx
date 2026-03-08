@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Clock, ArrowLeft, Share2, Check, MapPin } from 'lucide-react'
 import type { Post } from '@/types/api'
-
+import { useTranslation } from 'react-i18next'
 import { formatTimeAgo } from '@/lib/utils'
 
 interface PostDetailProps {
@@ -22,6 +22,7 @@ function firstTag(tags: string | null): string | null {
 }
 
 export default function PostDetail({ post, settings = {} }: PostDetailProps) {
+  const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
 
   const date = formatTimeAgo(post.created_at)
@@ -49,13 +50,13 @@ export default function PostDetail({ post, settings = {} }: PostDetailProps) {
             className="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 font-medium transition-colors group hover:[color:var(--blog-accent)]"
           >
             <ArrowLeft size={16} className="mr-1.5 group-hover:-translate-x-1 transition-transform" />
-            Volver al inicio
+            {t('blog.post.back')}
           </Link>
 
           {/* Share button — copies current URL */}
           <button
             onClick={handleShare}
-            title="Copiar enlace del artículo"
+            title={t('blog.post.copyLink')}
             className={`inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-full transition-all duration-200
               ${copied
                 ? 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400'
@@ -66,7 +67,7 @@ export default function PostDetail({ post, settings = {} }: PostDetailProps) {
             onMouseLeave={(e) => { if (!copied) { (e.currentTarget as HTMLElement).style.color = '' } }}
           >
             {copied ? <Check size={14} /> : <Share2 size={14} />}
-            {copied ? '¡Copiado!' : 'Compartir'}
+            {copied ? t('blog.post.copied') : t('blog.post.share')}
           </button>
         </div>
 
@@ -123,7 +124,7 @@ export default function PostDetail({ post, settings = {} }: PostDetailProps) {
           <div className="flex items-center gap-2 mb-4">
             <MapPin size={16} className="text-indigo-500" />
             <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
-              Location
+              {t('blog.post.location')}
             </h3>
           </div>
           <iframe

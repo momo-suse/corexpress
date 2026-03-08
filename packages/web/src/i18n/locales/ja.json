@@ -1,0 +1,545 @@
+{
+  "common": {
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "back": "戻る",
+    "loading": "読み込み中…",
+    "error": "エラー",
+    "confirm": "確認",
+    "close": "閉じる",
+    "search": "検索",
+    "yes": "はい",
+    "no": "いいえ",
+    "optional": "任意",
+    "required": "必須",
+    "saving": "保存中…",
+    "previous": "前へ",
+    "next": "次へ",
+    "change": "変更",
+    "upload": "アップロード"
+  },
+  "admin": {
+    "login": {
+      "title": "パネルにサインイン",
+      "titleForgot": "アクセスを回復する",
+      "email": "メールアドレス",
+      "password": "パスワード",
+      "submit": "サインイン",
+      "submitting": "サインイン中…",
+      "forgotPassword": "パスワードをお忘れですか？",
+      "forgotDescription": "メールアドレスを入力してください。パスワードリセット用のリンクをお送りします（有効期限：10分）。",
+      "sendLink": "リンクを送信",
+      "sending": "送信中…",
+      "emailSentTitle": "メールをご確認ください",
+      "emailSentText": "そのメールアドレスが登録されている場合、まもなくリンクが届きます。",
+      "emailProblem": "メール送信に問題が発生しました",
+      "emailProblemDetail": "リンクは生成されましたが、送信できませんでした。サーバーのメール設定を確認してください。",
+      "backToLogin": "← サインインに戻る",
+      "invalidCredentials": "メールアドレスまたはパスワードが正しくありません。",
+      "unexpectedError": "予期しないエラーが発生しました。もう一度お試しください。",
+      "tooManyRequests": "リクエストが多すぎます。しばらくお待ちください。",
+      "sendError": "メール送信エラー。もう一度お試しください。"
+    },
+    "sidebar": {
+      "dashboard": "ダッシュボード",
+      "comments": "コメント",
+      "blog": "ブログ",
+      "styles": "スタイル",
+      "settings": "設定",
+      "viewBlog": "ブログを見る",
+      "signOut": "サインアウト"
+    },
+    "dashboard": {
+      "title": "ダッシュボード",
+      "totalPosts": "総投稿数",
+      "published": "公開済み",
+      "pendingComments": "承認待ちコメント",
+      "yourPosts": "あなたの投稿",
+      "createPost": "新規投稿",
+      "editPost": "投稿を編集",
+      "titleCol": "タイトル",
+      "statusCol": "ステータス",
+      "commentsCol": "コメント",
+      "actionsCol": "操作",
+      "noPostsYet": "まだ投稿がありません。書き始めましょう！",
+      "saveDraft": "下書き保存",
+      "publish": "公開",
+      "tags": "タグ",
+      "excerpt": "抜粋",
+      "featuredImage": "アイキャッチ画像",
+      "content": "本文",
+      "mapEmbedUrl": "マップ埋め込みURL",
+      "moderation": "モデレーション",
+      "noCommentsOnPost": "この投稿にはまだコメントがありません。",
+      "approve": "承認",
+      "spam": "スパム",
+      "reject": "却下",
+      "statusPublished": "公開済み",
+      "statusDraft": "下書き",
+      "statusPending": "承認待ち",
+      "statusApproved": "承認済み",
+      "statusSpam": "スパム",
+      "popularTags": "人気のタグ",
+      "titleRequired": "タイトルは必須です。",
+      "postUpdated": "投稿を更新しました。",
+      "postCreated": "投稿を作成しました。",
+      "postDeleted": "投稿を削除しました。",
+      "commentApproved": "コメントを承認しました。",
+      "commentSpam": "コメントをスパムとしてマークしました。",
+      "imageUploadFailed": "画像のアップロードに失敗しました。",
+      "deletePostTitle": "投稿を削除",
+      "deletePostDescription": "この操作は元に戻せません。投稿とすべてのコメントが完全に削除されます。",
+      "deleteCommentTitle": "コメントを削除",
+      "deleteCommentDescription": "このコメントは完全に削除されます。",
+      "cancel": "キャンセル",
+      "backToDashboard": "ダッシュボードに戻る",
+      "newPost": "新規投稿",
+      "disabledEnableSettings": "無効 — 設定で有効化 →",
+      "quickActionPending": "クイックアクション：承認待ち",
+      "viewComments": "コメントを見る",
+      "titlePlaceholder": "投稿タイトル",
+      "tagsPlaceholder": "php, デザイン, チュートリアル",
+      "excerptPlaceholder": "一覧に表示される短い説明",
+      "featuredImageHint": "任意 — 投稿一覧でサムネイルとして表示",
+      "uploadFeaturedImage": "クリックしてアイキャッチ画像をアップロード",
+      "mapEmbedUrlHint": "Google マップ: 共有 → 地図を埋め込む → iframeコードのsrc URLをコピー。",
+      "viewingPost": "表示中：",
+      "failedToDelete": "削除に失敗しました。",
+      "failedToSave": "投稿の保存に失敗しました。",
+      "failedToApprove": "コメントの承認に失敗しました。",
+      "failedToUpdate": "コメントの更新に失敗しました。",
+      "commentDeleted": "コメントを削除しました。"
+    },
+    "comments": {
+      "title": "コメント",
+      "tabAll": "すべて",
+      "tabPending": "承認待ち",
+      "tabApproved": "承認済み",
+      "tabSpam": "スパム",
+      "emptySpam": "スパムを空にする",
+      "colAuthor": "投稿者",
+      "colComment": "コメント",
+      "colStatus": "ステータス",
+      "colDate": "日付",
+      "approve": "承認",
+      "markAsSpam": "スパムとしてマーク",
+      "delete": "削除",
+      "statusPending": "承認待ち",
+      "statusApproved": "承認済み",
+      "statusSpam": "スパム",
+      "noComments": "{{status}}コメントはありません。",
+      "deleteTitle": "コメントを削除",
+      "deleteDescription": "このコメントは完全に削除されます。",
+      "deleteLabel": "削除",
+      "emptySpamTitle": "スパムフォルダを空にする",
+      "emptySpamDescription": "すべてのスパムコメントが完全に削除されます。この操作は元に戻せません。",
+      "deleteAllSpam": "すべてのスパムを削除",
+      "markedAs": "コメントを{{status}}としてマークしました。",
+      "updateFailed": "コメントの更新に失敗しました。",
+      "deleted": "コメントを削除しました。",
+      "deleteFailed": "コメントの削除に失敗しました。",
+      "allSpamDeleted": "すべてのスパムコメントを削除しました。",
+      "clearSpamFailed": "スパムのクリアに失敗しました。"
+    },
+    "settings": {
+      "title": "設定",
+      "subtitle": "ブログとダッシュボードの全般設定。",
+      "saveChanges": "変更を保存",
+      "saved": "設定を保存しました。",
+      "saveFailed": "設定の保存に失敗しました。",
+      "general": {
+        "title": "全般",
+        "subtitle": "ブログのアイデンティティとロゴ",
+        "blogName": "ブログ名",
+        "blogNamePlaceholder": "マイブログ",
+        "description": "説明",
+        "descriptionPlaceholder": "ブログの簡単な説明",
+        "logo": "ブログロゴ",
+        "logoHint": "（正方形 — 128 × 128 px 推奨）",
+        "logoInfo": "ブログのヘッダーとブラウザタブに表示されます。最良の結果を得るには正方形のPNGまたはWebPを使用してください。"
+      },
+      "theme": {
+        "title": "管理画面テーマ",
+        "subtitle": "ダッシュボードの外観（公開ブログには影響しません）"
+      },
+      "locale": {
+        "title": "言語",
+        "subtitle": "ブログ訪問者に表示される言語"
+      },
+      "security": {
+        "title": "セキュリティ",
+        "subtitle": "アカウントのパスワードを変更",
+        "currentPwd": "現在のパスワード",
+        "newPwd": "新しいパスワード",
+        "newPwdHint": "最低8文字。",
+        "newPwdConfirm": "新しいパスワードを確認",
+        "change": "パスワードを変更",
+        "changing": "変更中…",
+        "changed": "パスワードを更新しました。",
+        "tooShort": "パスワードは8文字以上である必要があります。",
+        "noMatch": "新しいパスワードが一致しません。",
+        "error": "パスワードの変更中にエラーが発生しました。"
+      }
+    },
+    "setup": {
+      "title": "ブログを設定する",
+      "subtitle": "ホームページに表示するセクションを選択し、詳細を入力してください。",
+      "saveGo": "保存してダッシュボードへ",
+      "saved": "設定を保存しました！",
+      "sessionExpired": "セッションが期限切れです。再度サインインしてください。",
+      "csrfError": "セッションのセキュリティを確認できませんでした。ページを再読み込みしてください。",
+      "heroTextRequired": "バナーのテキストは必須です。",
+      "profileNameRequired": "名前は必須です。",
+      "profileSummaryRequired": "概要は必須です。",
+      "socialRequired": "少なくとも1つのソーシャルリンクが必要です。",
+      "logo": {
+        "title": "ブログロゴ",
+        "subtitle": "ブログの上部とファビコンとして表示されます。",
+        "label": "ロゴ画像",
+        "hint": "（正方形推奨、例：128 × 128 px）",
+        "upload": "クリックしてロゴをアップロード",
+        "formats": "JPEG、PNG、GIF、WebP — 最大10 MB"
+      },
+      "postList": {
+        "title": "投稿一覧",
+        "subtitle": "ブログの投稿は常に表示されます。"
+      },
+      "hero": {
+        "title": "ヒーローバナー",
+        "subtitle": "テキストオーバーレイ付きの大きなバナー画像。",
+        "bannerImage": "バナー画像",
+        "bannerHint": "（1200 × 630 px 推奨）",
+        "uploadBanner": "クリックしてバナー画像をアップロード",
+        "displayText": "表示テキスト",
+        "placeholder": "ブログへようこそ"
+      },
+      "profile": {
+        "title": "プロフィール / 自己紹介",
+        "subtitle": "ブログにプロフィール情報を表示します。",
+        "image": "プロフィール画像",
+        "imageHint": "（1080 × 1080 px 推奨）",
+        "uploadImage": "クリックしてプロフィール画像をアップロード",
+        "name": "名前",
+        "namePlaceholder": "あなたの名前",
+        "summary": "概要",
+        "summaryPlaceholder": "短い自己紹介またはキャッチフレーズ",
+        "description": "説明"
+      },
+      "social": {
+        "title": "ソーシャルリンク",
+        "subtitle": "ブログにソーシャルメディアプロフィールを表示します。"
+      },
+      "comments": {
+        "title": "投稿へのコメント",
+        "subtitle": "読者がブログ投稿にコメントを残すことを許可します。"
+      }
+    },
+    "blog": {
+      "title": "ブログ",
+      "subtitle": "公開ブログのセクションとコンテンツを設定します。",
+      "saveChanges": "変更を保存",
+      "saved": "ブログ設定を保存しました。",
+      "saveFailed": "保存に失敗しました。",
+      "bannerRequired": "ヒーローバナーが有効な場合、バナーテキストは必須です。",
+      "tabs": {
+        "hero": "ヒーローバナー",
+        "profile": "プロフィールと自己紹介",
+        "social": "ソーシャルリンク",
+        "comments": "コメント",
+        "search": "検索",
+        "tags": "タグ"
+      },
+      "hero": {
+        "description": "ヒーローバナーは訪問者がホームページで最初に目にするものです。",
+        "cardTitle": "ヒーローバナー",
+        "cardSubtitle": "ホームページのバナーを表示または非表示にする",
+        "bannerImage": "バナー画像",
+        "bannerHint": "（1200 × 630 px 推奨）",
+        "bannerText": "バナーテキスト",
+        "bannerPlaceholder": "ブログへようこそ",
+        "bannerOverlayInfo": "バナー画像に重ねて表示されるテキスト。"
+      },
+      "profile": {
+        "description": "プロフィールカード（ホームに表示）と自己紹介ページの各セクションを設定します。",
+        "cardTitle": "プロフィールカード",
+        "cardSubtitle": "ホームページに表示されるプロフィールウィジェット",
+        "photo": "写真",
+        "photoHint": "（1:1）",
+        "name": "名前",
+        "namePlaceholder": "あなたの名前",
+        "jobTitle": "職種",
+        "jobTitlePlaceholder": "フルスタック開発者",
+        "summary": "概要",
+        "summaryPlaceholder": "短い自己紹介またはキャッチフレーズ",
+        "availabilityLabel": "在職中バッジを表示",
+        "availabilityHint": "プロフィールに緑の「対応可能」バッジを表示",
+        "extendedDescription": "詳細説明",
+        "coverImage": "カバー画像",
+        "coverHint": "（自己紹介ページのバナー — 1500 × 500 px）",
+        "activateHint": "自己紹介ページのセクションを編集するには、プロフィールカードを有効にしてください",
+        "aboutSections": "自己紹介ページのセクション"
+      },
+      "aboutSubsections": {
+        "noData": "コンテンツを追加してセクションを有効化",
+        "gallery": {
+          "title": "ギャラリー",
+          "subtitle": "/aboutに表示するプロジェクトや写真のカルーセル"
+        },
+        "experience": {
+          "title": "経験",
+          "subtitle": "職歴、会社、技術タグ"
+        },
+        "skills": {
+          "title": "スキル",
+          "subtitle": "カテゴリ別に分類された技術スキル"
+        },
+        "education": {
+          "title": "学歴・資格",
+          "subtitle": "学歴と専門資格"
+        },
+        "testimonials": {
+          "title": "推薦文",
+          "subtitle": "同僚やクライアントからの推薦"
+        },
+        "social": {
+          "title": "ソーシャルリンク",
+          "subtitle": "/aboutの下部に表示されるソーシャルメディアアイコン",
+          "editHint": "ソーシャルリンクのURLを編集するには、「ソーシャルリンク」タブに移動してください。"
+        }
+      },
+      "educationLabel": "学歴",
+      "certificationsLabel": "資格",
+      "social": {
+        "description": "ブログに表示されるソーシャルリンク。セクションの表示・非表示を切り替えます。",
+        "cardTitle": "ソーシャルリンク",
+        "cardSubtitle": "ホームページのソーシャルリンクセクションを表示または非表示にする"
+      },
+      "comments": {
+        "description": "個別の投稿ページにコメントを表示するかどうかを制御します。",
+        "globalTitle": "コメントをグローバルに有効化",
+        "globalSubtitle": "マスタースイッチ — 無効にするとすべてのコメントセクションが非表示になります"
+      },
+      "search": {
+        "cardTitle": "検索",
+        "cardSubtitle": "タイトル、概要、本文、タグで投稿をフィルタリングする検索フィールドを表示します。",
+        "info": "検索はサーバー上で直接投稿をフィルタリングします。訪問者がブログを検索できるように有効にしてください。"
+      },
+      "tags": {
+        "cardTitle": "タグクラウド",
+        "cardSubtitle": "投稿をフィルタリングするためにブログで最もよく使用されるタグを表示します。",
+        "countLabel": "表示するタグの数",
+        "countHint": "最小1、最大20。人気順で表示されます。"
+      }
+    },
+    "styles": {
+      "title": "ブログスタイル",
+      "subtitle": "公開ブログのビジュアルスタイルを選択してください。",
+      "info": "スタイルは/で読者が見るブログに適用されます。ダッシュボードのスタイルは影響を受けません。",
+      "noStyles": "利用可能なスタイルがありません。",
+      "active": "アクティブ",
+      "updated": "ブログスタイルを「{{name}}」に更新しました。",
+      "updateError": "スタイルの更新中にエラーが発生しました。",
+      "descriptions": {
+        "default": "角丸カード、カラー画像、インディゴアクセント。モダンでフレンドリーなデザイン。",
+        "classic": "固定サイドバー、セリフ体、グレースケール画像、ピンクアクセントのエディトリアルレイアウト。"
+      }
+    },
+    "editor": {
+      "placeholder": "投稿を書き始めましょう…",
+      "heading1": "見出し1",
+      "heading2": "見出し2",
+      "heading3": "見出し3",
+      "bold": "太字",
+      "italic": "斜体",
+      "strikethrough": "取り消し線",
+      "inlineCode": "インラインコード",
+      "highlight": "ハイライト",
+      "bulletList": "箇条書き",
+      "orderedList": "番号付きリスト",
+      "blockquote": "引用",
+      "alignLeft": "左揃え",
+      "alignCenter": "中央揃え",
+      "alignRight": "右揃え",
+      "justify": "両端揃え",
+      "insertLink": "リンクを挿入 / 編集",
+      "insertImage": "画像を挿入",
+      "undo": "元に戻す",
+      "redo": "やり直す",
+      "insertLinkTitle": "リンクを挿入",
+      "linkUrl": "URL",
+      "linkPlaceholder": "https://example.com",
+      "linkHint": "空にするとリンクが削除されます。",
+      "apply": "適用"
+    },
+    "imageUpload": {
+      "title": "画像を挿入",
+      "uploadTab": "ファイルをアップロード",
+      "urlTab": "URLから",
+      "clickToSelect": "クリックして画像を選択",
+      "fileTypes": "JPEG、PNG、GIF、WebP — 最大10 MB",
+      "urlLabel": "画像URL",
+      "urlPlaceholder": "https://example.com/image.jpg",
+      "uploading": "アップロード中…",
+      "uploadInsert": "アップロードして挿入",
+      "insert": "挿入",
+      "uploadFailed": "アップロードに失敗しました"
+    },
+    "about": {
+      "moveUp": "上に移動",
+      "moveDown": "下に移動",
+      "delete": "削除",
+      "deleteGroup": "グループを削除",
+      "chipPlaceholder": "React、TypeScript…（Enterまたはカンマで追加）",
+      "experience": {
+        "itemTitle": "職歴 {{n}}",
+        "roleLabel": "役職 / ポジション",
+        "companyLabel": "会社名",
+        "periodLabel": "期間",
+        "descriptionLabel": "説明",
+        "tagsLabel": "技術 / タグ",
+        "rolePlaceholder": "リードフロントエンドエンジニア",
+        "companyPlaceholder": "テックソリューションズ株式会社",
+        "periodPlaceholder": "2020年 – 現在",
+        "descriptionPlaceholder": "主な実績と担当業務…",
+        "add": "職歴を追加"
+      },
+      "skills": {
+        "groupPlaceholder": "グループ名（例：フロントエンド）",
+        "skillsLabel": "スキル",
+        "add": "グループを追加"
+      },
+      "education": {
+        "degreePlaceholder": "学位 / プログラム",
+        "institutionPlaceholder": "学校名",
+        "periodPlaceholder": "2018年 – 2022年",
+        "add": "学歴を追加"
+      },
+      "certifications": {
+        "namePlaceholder": "資格名",
+        "urlPlaceholder": "https://（任意）",
+        "add": "資格を追加"
+      },
+      "testimonials": {
+        "itemTitle": "推薦文 {{n}}",
+        "nameLabel": "名前",
+        "namePlaceholder": "ローラ・マルティネス",
+        "roleLabel": "役職 / ポジション",
+        "rolePlaceholder": "ACMEプロダクトオーナー",
+        "textLabel": "推薦文",
+        "textPlaceholder": "あなたとの仕事について書いてもらったこと…",
+        "linkedinLabel": "LinkedIn URL",
+        "linkedinPlaceholder": "https://linkedin.com/in/…",
+        "uploadAvatar": "アバターをアップロード",
+        "add": "推薦文を追加"
+      },
+      "gallery": {
+        "uploadImage": "画像をアップロード",
+        "imageLabel": "画像",
+        "imageAlt": "ギャラリーサムネイル",
+        "titleLabel": "タイトル",
+        "titlePlaceholder": "プロジェクトまたは写真のタイトル",
+        "descriptionLabel": "説明",
+        "descriptionPlaceholder": "短い説明…",
+        "add": "画像を追加"
+      }
+    }
+  },
+  "blog": {
+    "nav": {
+      "home": "ホーム",
+      "about": "自己紹介",
+      "closeMenu": "メニューを閉じる",
+      "openMenu": "メニューを開く"
+    },
+    "adminBar": {
+      "admin": "管理"
+    },
+    "search": {
+      "title": "検索",
+      "placeholder": "投稿を検索…",
+      "ariaLabel": "投稿を検索",
+      "button": "検索"
+    },
+    "tags": {
+      "title": "タグ",
+      "explore": "探索",
+      "popular": "人気のタグ",
+      "active": "タグ:"
+    },
+    "posts": {
+      "featured": "注目",
+      "latest": "最新の記事",
+      "articles": "記事",
+      "taggedWith": "タグ「#{{tag}}」の投稿",
+      "resultsFor": "「{{query}}」の検索結果",
+      "noResults": "まだ投稿が公開されていません。",
+      "noTag": "タグ「#{{tag}}」の投稿はありません。",
+      "noSearch": "「{{query}}」の検索結果は見つかりませんでした。",
+      "noMore": "これ以上の記事はありません。",
+      "loadMore": "さらに記事を読み込む",
+      "previous": "← 前へ",
+      "readArticle": "記事を読む",
+      "readMore": "続きを読む",
+      "error": "投稿の読み込みエラー。",
+      "recentPosts": "最近の投稿"
+    },
+    "comments": {
+      "count_one": "{{count}}件のコメント",
+      "count_other": "{{count}}件のコメント",
+      "none": "まだコメントがありません。最初にコメントしましょう！",
+      "leave": "コメントを残す",
+      "name": "名前",
+      "namePlaceholder": "あなたの名前",
+      "email": "メールアドレス",
+      "emailNote": "（公開されません）",
+      "emailPlaceholder": "you@email.com",
+      "content": "コメント",
+      "contentPlaceholder": "ここにコメントを書いてください…",
+      "submit": "コメントを送信",
+      "submitting": "送信中…",
+      "submitError": "コメントを送信できませんでした。",
+      "successTitle": "コメントを送信しました！",
+      "successText": "コメントは承認待ちです。ありがとうございます！"
+    },
+    "about": {
+      "sectionTitle": "自己紹介",
+      "experience": "職務経歴",
+      "skills": "技術スキル",
+      "training": "学歴・資格",
+      "education": "学歴",
+      "certifications": "資格",
+      "testimonials": "推薦文",
+      "testimonialPrev": "前へ",
+      "testimonialNext": "次へ",
+      "testimonialItem": "推薦文 {{index}}",
+      "available": "対応可能",
+      "viewProfile": "プロフィール全文を見る →",
+      "aboutMe": "自己紹介",
+      "galleryTitle": "プロジェクトギャラリー",
+      "galleryImage": "画像 {{n}}"
+    },
+    "post": {
+      "back": "ホームへ戻る",
+      "keepReading": "関連記事",
+      "readingTime": "分で読める",
+      "share": "記事をシェア",
+      "copied": "コピーしました！",
+      "copyLink": "記事のリンクをコピー",
+      "location": "場所",
+      "notFound": "投稿が見つかりません。"
+    },
+    "footer": {
+      "rights": "全著作権所有。"
+    },
+    "hero": {
+      "bannerAlt": "ヒーローバナー",
+      "welcome": "ブログへようこそ"
+    },
+    "socialLinks": {
+      "connect": "つながる"
+    },
+    "errorLoading": "ブログの読み込みエラー。"
+  }
+}

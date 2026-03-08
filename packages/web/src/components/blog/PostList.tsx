@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
+import { useTranslation } from 'react-i18next'
 import PostCard, { FeaturedPostCard } from './PostCard'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import { usePosts } from '@/hooks/usePosts'
@@ -8,18 +9,26 @@ import { applyComponentStyles } from '@/lib/utils'
 interface PostListProps {
   styles: Record<string, string>
   settings?: Record<string, string>
+  searchQuery?: string
+  activeTag?: string
 }
 
-export default function PostList({ styles }: PostListProps) {
+export default function PostList({ styles, searchQuery = '', activeTag = '' }: PostListProps) {
+  const { t } = useTranslation()
   const [page, setPage] = useState(1)
-  const { data, isLoading, isError } = usePosts(page)
+
+  useEffect(() => {
+    setPage(1)
+  }, [searchQuery, activeTag])
+
+  const { data, isLoading, isError } = usePosts(page, false, searchQuery, activeTag)
 
   if (isLoading) return <LoadingSpinner className="py-16" />
 
   if (isError) {
     return (
       <p className="text-center text-muted-foreground py-16">
-        Error al cargar los posts.
+        {t('blog.posts.error')}
       </p>
     )
   }
@@ -32,36 +41,42 @@ export default function PostList({ styles }: PostListProps) {
 
   return (
     <div style={applyComponentStyles(styles)}>
-      {/* Destacado — only on first page */}
-      {isFirstPage && featured && (
+      {/* Destacado — only on first page, not during search or tag filter */}
+      {isFirstPage && !searchQuery && !activeTag && featured && (
         <section className="mb-14">
           <div className="flex items-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold tracking-tight whitespace-nowrap">Destacado</h2>
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight whitespace-nowrap">{t('blog.posts.featured')}</h2>
             <div className="ml-4 h-px bg-gray-200 dark:bg-gray-800 flex-grow" />
           </div>
           <FeaturedPostCard post={featured} />
         </section>
       )}
 
-      {/* Últimos artículos */}
-      {(rest.length > 0 || !isFirstPage) && (
+      {/* Últimos artículos / search results */}
+      {(posts.length > 0 || !isFirstPage) && (
         <section>
           <div className="flex items-center mb-8">
             <h2 className="text-2xl font-bold tracking-tight whitespace-nowrap">
-              {isFirstPage ? 'Últimos artículos' : 'Artículos'}
+              {activeTag
+                ? t('blog.posts.taggedWith', { tag: activeTag })
+                : searchQuery
+                ? t('blog.posts.resultsFor', { query: searchQuery })
+                : isFirstPage
+                ? t('blog.posts.latest')
+                : t('blog.posts.articles')}
             </h2>
             <div className="ml-4 h-px bg-gray-200 dark:bg-gray-800 flex-grow" />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-            {/* On page > 1, show all posts in grid */}
-            {(isFirstPage ? rest : posts).map((post) => (
+            {/* During search/tag filter or page > 1, show all posts in grid; on page 1 no filter, skip featured */}
+            {(isFirstPage && !searchQuery && !activeTag ? rest : posts).map((post) => (
               <PostCard key={post.id} post={post} />
             ))}
           </div>
 
           {(data?.data.length ?? 0) === 0 && (
-            <p className="text-center text-muted-foreground py-12">No hay más artículos.</p>
+            <p className="text-center text-muted-foreground py-12">{t('blog.posts.noMore')}</p>
           )}
 
           {/* Pagination */}
@@ -72,7 +87,7 @@ export default function PostList({ styles }: PostListProps) {
                 className="rounded-full px-6"
                 onClick={() => setPage((p) => p - 1)}
               >
-                ← Anteriores
+                {t('blog.posts.previous')}
               </Button>
             )}
             {hasMore && (
@@ -81,7 +96,7 @@ export default function PostList({ styles }: PostListProps) {
                 className="rounded-full px-6 hover:border-indigo-300 hover:text-indigo-600 dark:hover:border-indigo-700 dark:hover:text-indigo-400 transition-all"
                 onClick={() => setPage((p) => p + 1)}
               >
-                Cargar más artículos
+                {t('blog.posts.loadMore')}
               </Button>
             )}
           </div>
@@ -89,7 +104,13 @@ export default function PostList({ styles }: PostListProps) {
       )}
 
       {posts.length === 0 && isFirstPage && (
-        <p className="text-center text-muted-foreground py-16">Aún no hay posts publicados.</p>
+        <p className="text-center text-muted-foreground py-16">
+          {activeTag
+            ? t('blog.posts.noTag', { tag: activeTag })
+            : searchQuery
+            ? t('blog.posts.noSearch', { query: searchQuery })
+            : t('blog.posts.noResults')}
+        </p>
       )}
     </div>
   )
