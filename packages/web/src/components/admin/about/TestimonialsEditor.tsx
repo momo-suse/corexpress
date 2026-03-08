@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Trash2, Plus, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -41,6 +42,7 @@ function AvatarCell({
   items: TestimonialItem[]
   onChange: (items: TestimonialItem[]) => void
 }) {
+  const { t } = useTranslation()
   const fileRef = useRef<HTMLInputElement>(null)
   const src = item.previewAvatar ?? item.avatar
 
@@ -83,7 +85,7 @@ function AvatarCell({
           type="button"
           onClick={() => fileRef.current?.click()}
           className="w-12 h-12 rounded-full border-2 border-dashed border-border flex items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors"
-          aria-label="Upload avatar"
+          aria-label={t('admin.about.testimonials.uploadAvatar')}
         >
           <Upload className="h-4 w-4" />
         </button>
@@ -100,6 +102,7 @@ function AvatarCell({
 }
 
 export default function TestimonialsEditor({ items, onChange }: TestimonialsEditorProps) {
+  const { t } = useTranslation()
   return (
     <div className="space-y-3">
       {items.map((item, i) => (
@@ -107,13 +110,13 @@ export default function TestimonialsEditor({ items, onChange }: TestimonialsEdit
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-2.5 bg-muted/50 border-b border-border">
             <span className="text-sm font-medium text-foreground truncate">
-              {item.name || `Testimonial ${i + 1}`}
+              {item.name || t('admin.about.testimonials.itemTitle', { n: i + 1 })}
             </span>
             <button
               type="button"
               onClick={() => onChange(items.filter((_, j) => j !== i))}
               className="p-1 text-muted-foreground hover:text-destructive transition-colors shrink-0 ml-2"
-              aria-label="Delete"
+              aria-label={t('admin.about.delete')}
             >
               <Trash2 className="h-4 w-4" />
             </button>
@@ -125,42 +128,42 @@ export default function TestimonialsEditor({ items, onChange }: TestimonialsEdit
               <AvatarCell item={item} index={i} items={items} onChange={onChange} />
               <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Name</Label>
+                  <Label className="text-xs">{t('admin.about.testimonials.nameLabel')}</Label>
                   <Input
                     value={item.name}
                     onChange={(e) => onChange(set(items, i, 'name', e.target.value))}
-                    placeholder="Laura Martínez"
+                    placeholder={t('admin.about.testimonials.namePlaceholder')}
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Role / Position</Label>
+                  <Label className="text-xs">{t('admin.about.testimonials.roleLabel')}</Label>
                   <Input
                     value={item.role}
                     onChange={(e) => onChange(set(items, i, 'role', e.target.value))}
-                    placeholder="Product Owner at ACME"
+                    placeholder={t('admin.about.testimonials.rolePlaceholder')}
                   />
                 </div>
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs">Testimonial text</Label>
+              <Label className="text-xs">{t('admin.about.testimonials.textLabel')}</Label>
               <Textarea
                 rows={3}
                 value={item.text}
                 onChange={(e) => onChange(set(items, i, 'text', e.target.value))}
-                placeholder="Write what they said about working with you…"
+                placeholder={t('admin.about.testimonials.textPlaceholder')}
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs">LinkedIn URL <span className="text-muted-foreground font-normal">(optional)</span></Label>
+              <Label className="text-xs">{t('admin.about.testimonials.linkedinLabel')} <span className="text-muted-foreground font-normal">({t('common.optional')})</span></Label>
               <Input
                 value={item.linkedin ?? ''}
                 onChange={(e) =>
                   onChange(set(items, i, 'linkedin', e.target.value || undefined))
                 }
-                placeholder="https://linkedin.com/in/…"
+                placeholder={t('admin.about.testimonials.linkedinPlaceholder')}
                 type="url"
               />
             </div>
@@ -178,7 +181,7 @@ export default function TestimonialsEditor({ items, onChange }: TestimonialsEdit
         className="w-full"
       >
         <Plus className="h-4 w-4 mr-1.5" />
-        Add testimonial
+        {t('admin.about.testimonials.add')}
       </Button>
     </div>
   )

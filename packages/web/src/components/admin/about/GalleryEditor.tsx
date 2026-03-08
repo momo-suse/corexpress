@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Trash2, Plus, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -39,6 +40,7 @@ function ImageCell({
   items: GalleryItem[]
   onChange: (items: GalleryItem[]) => void
 }) {
+  const { t } = useTranslation()
   const fileRef = useRef<HTMLInputElement>(null)
   const src = item.previewUrl ?? item.url
 
@@ -65,7 +67,7 @@ function ImageCell({
         <div className="relative group w-16 h-16">
           <img
             src={src}
-            alt="Gallery thumbnail"
+            alt={t('admin.about.gallery.imageAlt')}
             className="w-16 h-16 object-cover rounded border border-border"
           />
           <div
@@ -80,10 +82,10 @@ function ImageCell({
           type="button"
           onClick={() => fileRef.current?.click()}
           className="w-16 h-16 rounded border-2 border-dashed border-border flex flex-col items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors gap-1"
-          aria-label="Upload image"
+          aria-label={t('admin.about.gallery.uploadImage')}
         >
           <Upload className="h-4 w-4" />
-          <span className="text-[10px] leading-none">Image</span>
+          <span className="text-[10px] leading-none">{t('admin.about.gallery.imageLabel')}</span>
         </button>
       )}
       <input
@@ -98,6 +100,7 @@ function ImageCell({
 }
 
 export default function GalleryEditor({ items, onChange }: GalleryEditorProps) {
+  const { t } = useTranslation()
   return (
     <div className="space-y-3">
       {items.map((item, i) => (
@@ -109,20 +112,20 @@ export default function GalleryEditor({ items, onChange }: GalleryEditorProps) {
 
           <div className="flex-1 space-y-2 min-w-0">
             <div className="space-y-1.5">
-              <Label className="text-xs">Title</Label>
+              <Label className="text-xs">{t('admin.about.gallery.titleLabel')}</Label>
               <Input
                 value={item.title}
                 onChange={(e) => onChange(set(items, i, 'title', e.target.value))}
-                placeholder="Project or photo title"
+                placeholder={t('admin.about.gallery.titlePlaceholder')}
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs">Description</Label>
+              <Label className="text-xs">{t('admin.about.gallery.descriptionLabel')}</Label>
               <Textarea
                 rows={2}
                 value={item.description}
                 onChange={(e) => onChange(set(items, i, 'description', e.target.value))}
-                placeholder="Brief description…"
+                placeholder={t('admin.about.gallery.descriptionPlaceholder')}
               />
             </div>
           </div>
@@ -131,7 +134,7 @@ export default function GalleryEditor({ items, onChange }: GalleryEditorProps) {
             type="button"
             onClick={() => onChange(items.filter((_, j) => j !== i))}
             className="p-1.5 text-muted-foreground hover:text-destructive transition-colors shrink-0 mt-1"
-            aria-label="Delete"
+            aria-label={t('admin.about.delete')}
           >
             <Trash2 className="h-4 w-4" />
           </button>
@@ -146,7 +149,7 @@ export default function GalleryEditor({ items, onChange }: GalleryEditorProps) {
         className="w-full"
       >
         <Plus className="h-4 w-4 mr-1.5" />
-        Add image
+        {t('admin.about.gallery.add')}
       </Button>
     </div>
   )

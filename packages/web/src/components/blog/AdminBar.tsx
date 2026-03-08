@@ -2,8 +2,10 @@ import { Link } from 'react-router-dom'
 import { LayoutDashboard } from 'lucide-react'
 import { useAuthStore } from '@/store/auth'
 import { useSettings } from '@/hooks/useSettings'
+import { useTranslation } from 'react-i18next'
 
 export default function AdminBar() {
+  const { t } = useTranslation()
   const user = useAuthStore((s) => s.user)
   const { data } = useSettings()
   const theme = data?.data.blog_theme ?? 'default'
@@ -25,7 +27,7 @@ export default function AdminBar() {
           className="flex items-center gap-1.5 font-medium text-foreground hover:text-primary transition-colors"
         >
           <LayoutDashboard className="h-3.5 w-3.5" />
-          Admin
+          {t('blog.adminBar.admin')}
         </Link>
       </div>
     </div>

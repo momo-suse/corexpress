@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Trash2, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -23,6 +24,7 @@ function set<K extends keyof EducationItem>(
 }
 
 export default function EducationEditor({ items, onChange }: EducationEditorProps) {
+  const { t } = useTranslation()
   return (
     <div className="space-y-2">
       {items.map((item, i) => (
@@ -33,26 +35,26 @@ export default function EducationEditor({ items, onChange }: EducationEditorProp
           <Input
             value={item.degree}
             onChange={(e) => onChange(set(items, i, 'degree', e.target.value))}
-            placeholder="Degree / Program"
+            placeholder={t('admin.about.education.degreePlaceholder')}
             className="flex-[2]"
           />
           <Input
             value={item.institution}
             onChange={(e) => onChange(set(items, i, 'institution', e.target.value))}
-            placeholder="Institution"
+            placeholder={t('admin.about.education.institutionPlaceholder')}
             className="flex-[2]"
           />
           <Input
             value={item.period}
             onChange={(e) => onChange(set(items, i, 'period', e.target.value))}
-            placeholder="2018 – 2022"
+            placeholder={t('admin.about.education.periodPlaceholder')}
             className="flex-1 min-w-[110px]"
           />
           <button
             type="button"
             onClick={() => onChange(items.filter((_, j) => j !== i))}
             className="p-2 text-muted-foreground hover:text-destructive transition-colors shrink-0"
-            aria-label="Delete"
+            aria-label={t('admin.about.delete')}
           >
             <Trash2 className="h-4 w-4" />
           </button>
@@ -67,7 +69,7 @@ export default function EducationEditor({ items, onChange }: EducationEditorProp
         className="w-full"
       >
         <Plus className="h-4 w-4 mr-1.5" />
-        Add education
+        {t('admin.about.education.add')}
       </Button>
     </div>
   )

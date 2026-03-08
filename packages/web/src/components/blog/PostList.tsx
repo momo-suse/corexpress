@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
+import { useTranslation } from 'react-i18next'
 import PostCard, { FeaturedPostCard } from './PostCard'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import { usePosts } from '@/hooks/usePosts'
@@ -13,6 +14,7 @@ interface PostListProps {
 }
 
 export default function PostList({ styles, searchQuery = '', activeTag = '' }: PostListProps) {
+  const { t } = useTranslation()
   const [page, setPage] = useState(1)
 
   useEffect(() => {
@@ -26,7 +28,7 @@ export default function PostList({ styles, searchQuery = '', activeTag = '' }: P
   if (isError) {
     return (
       <p className="text-center text-muted-foreground py-16">
-        Error al cargar los posts.
+        {t('blog.posts.error')}
       </p>
     )
   }
@@ -43,7 +45,7 @@ export default function PostList({ styles, searchQuery = '', activeTag = '' }: P
       {isFirstPage && !searchQuery && !activeTag && featured && (
         <section className="mb-14">
           <div className="flex items-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold tracking-tight whitespace-nowrap">Destacado</h2>
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight whitespace-nowrap">{t('blog.posts.featured')}</h2>
             <div className="ml-4 h-px bg-gray-200 dark:bg-gray-800 flex-grow" />
           </div>
           <FeaturedPostCard post={featured} />
@@ -56,12 +58,12 @@ export default function PostList({ styles, searchQuery = '', activeTag = '' }: P
           <div className="flex items-center mb-8">
             <h2 className="text-2xl font-bold tracking-tight whitespace-nowrap">
               {activeTag
-                ? `Posts con tag: #${activeTag}`
+                ? t('blog.posts.taggedWith', { tag: activeTag })
                 : searchQuery
-                ? `Resultados para "${searchQuery}"`
+                ? t('blog.posts.resultsFor', { query: searchQuery })
                 : isFirstPage
-                ? 'Últimos artículos'
-                : 'Artículos'}
+                ? t('blog.posts.latest')
+                : t('blog.posts.articles')}
             </h2>
             <div className="ml-4 h-px bg-gray-200 dark:bg-gray-800 flex-grow" />
           </div>
@@ -74,7 +76,7 @@ export default function PostList({ styles, searchQuery = '', activeTag = '' }: P
           </div>
 
           {(data?.data.length ?? 0) === 0 && (
-            <p className="text-center text-muted-foreground py-12">No hay más artículos.</p>
+            <p className="text-center text-muted-foreground py-12">{t('blog.posts.noMore')}</p>
           )}
 
           {/* Pagination */}
@@ -85,7 +87,7 @@ export default function PostList({ styles, searchQuery = '', activeTag = '' }: P
                 className="rounded-full px-6"
                 onClick={() => setPage((p) => p - 1)}
               >
-                ← Anteriores
+                {t('blog.posts.previous')}
               </Button>
             )}
             {hasMore && (
@@ -94,7 +96,7 @@ export default function PostList({ styles, searchQuery = '', activeTag = '' }: P
                 className="rounded-full px-6 hover:border-indigo-300 hover:text-indigo-600 dark:hover:border-indigo-700 dark:hover:text-indigo-400 transition-all"
                 onClick={() => setPage((p) => p + 1)}
               >
-                Cargar más artículos
+                {t('blog.posts.loadMore')}
               </Button>
             )}
           </div>
@@ -104,10 +106,10 @@ export default function PostList({ styles, searchQuery = '', activeTag = '' }: P
       {posts.length === 0 && isFirstPage && (
         <p className="text-center text-muted-foreground py-16">
           {activeTag
-            ? `No hay posts con el tag "#${activeTag}".`
+            ? t('blog.posts.noTag', { tag: activeTag })
             : searchQuery
-            ? `No se encontraron resultados para "${searchQuery}".`
-            : 'Aún no hay posts publicados.'}
+            ? t('blog.posts.noSearch', { query: searchQuery })
+            : t('blog.posts.noResults')}
         </p>
       )}
     </div>

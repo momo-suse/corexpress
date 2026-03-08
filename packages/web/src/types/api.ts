@@ -43,6 +43,8 @@ export interface Settings {
   /** DB key: blog_theme — set by installer */
   blog_theme: 'default' | 'minimal' | 'dark'
   active_style_collection: string
+  /** UI language for blog visitors */
+  app_locale: string
   setup_complete: string
   // Blog logo
   blog_logo_id: string

@@ -168,8 +168,9 @@ INSERT INTO `page_components` (`page_id`, `component_definition_id`, `is_visible
     (3, 12, 1, 5),
     (3, 7,  1, 6);
 
--- Active style collection setting + tags max count
+-- Active style collection setting + tags max count + locale
 INSERT INTO `settings` (`key`, `value`) VALUES
     ('active_style_collection', 'default'),
-    ('tags_max_count', '6')
+    ('tags_max_count', '6'),
+    ('app_locale', 'en')
 ON DUPLICATE KEY UPDATE `value` = VALUES(`value`);

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
@@ -46,6 +47,7 @@ const EMPTY_FORM: PostForm = {
 
 export default function DashboardPage() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   // ── Settings / first-run guard ──────────────────────────────────────────────
   const { data: settingsData, isLoading: settingsLoading, isFetching: settingsFetching } = useSettings()
@@ -150,7 +152,7 @@ export default function DashboardPage() {
 
   async function handleSave(status: 'draft' | 'published') {
     if (!form.title.trim()) {
-      toast({ title: 'Title is required.', variant: 'destructive' })
+      toast({ title: t('admin.dashboard.titleRequired'), variant: 'destructive' })
       return
     }
 
@@ -161,7 +163,7 @@ export default function DashboardPage() {
         const result = await uploadImage(form._imageFile)
         imageId = result.data.id
       } catch {
-        toast({ title: 'Failed to upload image.', variant: 'destructive' })
+        toast({ title: t('admin.dashboard.imageUploadFailed'), variant: 'destructive' })
         return
       }
     }
@@ -179,14 +181,14 @@ export default function DashboardPage() {
     try {
       if (editingPost) {
         await update.mutateAsync({ id: editingPost.id, data: payload })
-        toast({ title: 'Post updated.' })
+        toast({ title: t('admin.dashboard.postUpdated') })
       } else {
         await create.mutateAsync(payload)
-        toast({ title: 'Post created.' })
+        toast({ title: t('admin.dashboard.postCreated') })
       }
       closeEditor()
     } catch {
-      toast({ title: 'Failed to save post.', variant: 'destructive' })
+      toast({ title: t('admin.dashboard.failedToSave'), variant: 'destructive' })
     }
   }
 
@@ -206,18 +208,18 @@ export default function DashboardPage() {
   async function handleApproveComment(id: number) {
     try {
       await updateComment.mutateAsync({ id, status: 'approved' })
-      toast({ title: 'Comment approved.' })
+      toast({ title: t('admin.dashboard.commentApproved') })
     } catch {
-      toast({ title: 'Failed to approve comment.', variant: 'destructive' })
+      toast({ title: t('admin.dashboard.failedToApprove'), variant: 'destructive' })
     }
   }
 
   async function handleSpamComment(id: number) {
     try {
       await updateComment.mutateAsync({ id, status: 'spam' })
-      toast({ title: 'Comment marked as spam.' })
+      toast({ title: t('admin.dashboard.commentSpam') })
     } catch {
-      toast({ title: 'Failed to update comment.', variant: 'destructive' })
+      toast({ title: t('admin.dashboard.failedToUpdate'), variant: 'destructive' })
     }
   }
 
@@ -234,14 +236,14 @@ export default function DashboardPage() {
     try {
       if (confirmType === 'post') {
         await removePost.mutateAsync(confirmId)
-        toast({ title: 'Post deleted.' })
+        toast({ title: t('admin.dashboard.postDeleted') })
         qc.invalidateQueries({ queryKey: ['comments'] })
       } else {
         await removeComment.mutateAsync(confirmId)
-        toast({ title: 'Comment deleted.' })
+        toast({ title: t('admin.dashboard.commentDeleted') })
       }
     } catch {
-      toast({ title: 'Failed to delete.', variant: 'destructive' })
+      toast({ title: t('admin.dashboard.failedToDelete'), variant: 'destructive' })
     } finally {
       setConfirmId(null)
     }
@@ -263,13 +265,13 @@ export default function DashboardPage() {
             <button
               onClick={closeEditor}
               className="p-2 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-              title="Back to dashboard"
+              title={t('admin.dashboard.backToDashboard')}
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
           )}
           <h1 className="text-2xl font-semibold tracking-tight">
-            {view === 'editor' ? (editingPost ? 'Edit Post' : 'Create New Post') : 'Dashboard'}
+            {view === 'editor' ? (editingPost ? t('admin.dashboard.editPost') : t('admin.dashboard.createPost')) : t('admin.dashboard.title')}
           </h1>
         </div>
 
@@ -277,17 +279,17 @@ export default function DashboardPage() {
           {view === 'list' && (
             <Button onClick={openCreate} size="sm" className="gap-2">
               <Plus className="h-4 w-4" />
-              New Post
+              {t('admin.dashboard.newPost')}
             </Button>
           )}
           {view === 'editor' && (
             <>
               <Button variant="outline" size="sm" onClick={() => handleSave('draft')} disabled={saving}>
-                Save Draft
+                {t('admin.dashboard.saveDraft')}
               </Button>
               <Button size="sm" onClick={() => handleSave('published')} disabled={saving} className="gap-2">
                 <Check className="h-4 w-4" />
-                Publish
+                {t('admin.dashboard.publish')}
               </Button>
             </>
           )}
@@ -304,21 +306,21 @@ export default function DashboardPage() {
             <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="p-5 flex flex-col gap-2 rounded-xl border bg-card shadow-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-muted-foreground">Total Posts</span>
+                  <span className="text-sm font-medium text-muted-foreground">{t('admin.dashboard.totalPosts')}</span>
                   <FileText className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <span className="text-3xl font-bold">{totalPosts}</span>
               </div>
               <div className="p-5 flex flex-col gap-2 rounded-xl border bg-card shadow-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-muted-foreground">Published</span>
+                  <span className="text-sm font-medium text-muted-foreground">{t('admin.dashboard.published')}</span>
                   <Check className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <span className="text-3xl font-bold">{publishedPosts}</span>
               </div>
               <div className="p-5 flex flex-col gap-2 rounded-xl border bg-card shadow-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-muted-foreground">Pending Comments</span>
+                  <span className="text-sm font-medium text-muted-foreground">{t('admin.dashboard.pendingComments')}</span>
                   <MessageCircle className={`h-4 w-4 ${commentsEnabled ? 'text-muted-foreground' : 'text-amber-500'}`} />
                 </div>
                 <span className="text-3xl font-bold">{pendingCount}</span>
@@ -327,7 +329,7 @@ export default function DashboardPage() {
                     href="/cx-admin/settings"
                     className="text-xs text-amber-500 hover:text-amber-600 transition-colors -mt-1"
                   >
-                    Disabled — Enable in Settings →
+                    {t('admin.dashboard.disabledEnableSettings')}
                   </a>
                 )}
               </div>
@@ -337,7 +339,7 @@ export default function DashboardPage() {
             {commentsEnabled && pendingComments.length > 0 && (
               <section>
                 <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">
-                  Quick Action: Pending
+                  {t('admin.dashboard.quickActionPending')}
                 </h2>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {pendingComments.map((comment) => (
@@ -358,14 +360,14 @@ export default function DashboardPage() {
                           className="h-7 text-xs gap-1.5 text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
                           onClick={() => askDelete('comment', comment.id)}
                         >
-                          <X className="h-3.5 w-3.5" /> Reject
+                          <X className="h-3.5 w-3.5" /> {t('admin.dashboard.reject')}
                         </Button>
                         <Button
                           size="sm"
                           className="h-7 text-xs gap-1.5"
                           onClick={() => handleApproveComment(comment.id)}
                         >
-                          <Check className="h-3.5 w-3.5" /> Approve
+                          <Check className="h-3.5 w-3.5" /> {t('admin.dashboard.approve')}
                         </Button>
                       </div>
                     </div>
@@ -377,7 +379,7 @@ export default function DashboardPage() {
             {/* Posts Table */}
             <section>
               <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">
-                Your Posts
+                {t('admin.dashboard.yourPosts')}
               </h2>
 
               {postsLoading && <LoadingSpinner className="py-12" />}
@@ -387,10 +389,10 @@ export default function DashboardPage() {
                   <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
                     {/* Table header */}
                     <div className="grid grid-cols-12 gap-4 p-4 border-b text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      <div className="col-span-6">Title</div>
-                      <div className="col-span-2">Status</div>
-                      <div className="col-span-2">Comments</div>
-                      <div className="col-span-2 text-right">Actions</div>
+                      <div className="col-span-6">{t('admin.dashboard.titleCol')}</div>
+                      <div className="col-span-2">{t('admin.dashboard.statusCol')}</div>
+                      <div className="col-span-2">{t('admin.dashboard.commentsCol')}</div>
+                      <div className="col-span-2 text-right">{t('admin.dashboard.actionsCol')}</div>
                     </div>
 
                     <div className="flex flex-col">
@@ -416,7 +418,7 @@ export default function DashboardPage() {
                           {/* Status badge */}
                           <div className="col-span-2">
                             <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
-                              {post.status === 'published' ? 'Published' : 'Draft'}
+                              {post.status === 'published' ? t('admin.dashboard.statusPublished') : t('admin.dashboard.statusDraft')}
                             </Badge>
                           </div>
 
@@ -425,7 +427,7 @@ export default function DashboardPage() {
                             <button
                               onClick={() => openDrawer(post.id, post.title)}
                               className="flex items-center gap-1.5 px-2 py-1 -ml-2 rounded-lg transition-colors hover:bg-muted text-muted-foreground hover:text-foreground"
-                              title="View comments"
+                              title={t('admin.dashboard.viewComments')}
                             >
                               <MessageCircle className="h-4 w-4" />
                               <span className="text-sm font-medium">{post.comments_count ?? 0}</span>
@@ -440,14 +442,14 @@ export default function DashboardPage() {
                             <button
                               onClick={() => openEdit(post)}
                               className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                              title="Edit"
+                              title={t('common.edit')}
                             >
                               <Edit3 className="h-4 w-4" />
                             </button>
                             <button
                               onClick={() => askDelete('post', post.id)}
                               className="p-1.5 rounded-lg text-muted-foreground hover:bg-red-50 hover:text-red-600 transition-colors"
-                              title="Delete"
+                              title={t('common.delete')}
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
@@ -457,7 +459,7 @@ export default function DashboardPage() {
 
                       {postsData.data.length === 0 && (
                         <div className="p-10 text-center text-sm text-muted-foreground">
-                          No posts yet. Start writing!
+                          {t('admin.dashboard.noPostsYet')}
                         </div>
                       )}
                     </div>
@@ -471,7 +473,7 @@ export default function DashboardPage() {
                         disabled={postsPage <= 1}
                         onClick={() => setPostsPage((p) => p - 1)}
                       >
-                        Previous
+                        {t('common.previous')}
                       </Button>
                       <span className="flex items-center text-sm px-2">
                         {postsPage} / {postsData.meta.last_page}
@@ -481,7 +483,7 @@ export default function DashboardPage() {
                         disabled={postsPage >= postsData.meta.last_page}
                         onClick={() => setPostsPage((p) => p + 1)}
                       >
-                        Next
+                        {t('common.next')}
                       </Button>
                     </div>
                   )}
@@ -498,12 +500,12 @@ export default function DashboardPage() {
             {/* Title */}
             <div className="space-y-2">
               <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Title
+                {t('admin.dashboard.titleCol')}
               </label>
               <input
                 type="text"
                 className="w-full px-3 py-3 text-lg font-medium border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                placeholder="Post title"
+                placeholder={t('admin.dashboard.titlePlaceholder')}
                 value={form.title}
                 onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
               />
@@ -512,12 +514,12 @@ export default function DashboardPage() {
             {/* Tags */}
             <div className="space-y-2">
               <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Tags
+                {t('admin.dashboard.tags')}
               </label>
               <input
                 type="text"
                 className="w-full px-3 py-2 border rounded-lg bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                placeholder="php, design, tutorial"
+                placeholder={t('admin.dashboard.tagsPlaceholder')}
                 value={form.tags}
                 onChange={(e) => setForm((f) => ({ ...f, tags: e.target.value }))}
               />
@@ -526,12 +528,12 @@ export default function DashboardPage() {
             {/* Excerpt */}
             <div className="space-y-2">
               <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Excerpt <span className="normal-case font-normal opacity-70">(optional)</span>
+                {t('admin.dashboard.excerpt')} <span className="normal-case font-normal opacity-70">({t('common.optional')})</span>
               </label>
               <input
                 type="text"
                 className="w-full px-3 py-2 border rounded-lg bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                placeholder="Short description shown in post list"
+                placeholder={t('admin.dashboard.excerptPlaceholder')}
                 value={form.excerpt}
                 onChange={(e) => setForm((f) => ({ ...f, excerpt: e.target.value }))}
               />
@@ -540,7 +542,7 @@ export default function DashboardPage() {
             {/* Featured Image */}
             <div className="space-y-2">
               <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Featured Image <span className="normal-case font-normal opacity-70">(optional — shown as thumbnail in post list)</span>
+                {t('admin.dashboard.featuredImage')} <span className="normal-case font-normal opacity-70">({t('admin.dashboard.featuredImageHint')})</span>
               </label>
               <div className="p-4 rounded-xl border bg-card shadow-sm">
                 {displayImage ? (
@@ -560,7 +562,7 @@ export default function DashboardPage() {
                     onClick={() => imageInputRef.current?.click()}
                   >
                     <Upload className="h-6 w-6 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground font-medium">Click to upload a featured image</span>
+                    <span className="text-sm text-muted-foreground font-medium">{t('admin.dashboard.uploadFeaturedImage')}</span>
                   </div>
                 )}
                 <input
@@ -576,7 +578,7 @@ export default function DashboardPage() {
             {/* Content */}
             <div className="space-y-2">
               <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Content
+                {t('admin.dashboard.content')}
               </label>
               <div onKeyDown={(e) => e.stopPropagation()}>
                 <PostEditor
@@ -590,7 +592,7 @@ export default function DashboardPage() {
             {/* Map embed URL */}
             <div className="space-y-2">
               <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Map Embed URL <span className="normal-case font-normal opacity-70">(optional)</span>
+                {t('admin.dashboard.mapEmbedUrl')} <span className="normal-case font-normal opacity-70">({t('common.optional')})</span>
               </label>
               <input
                 type="url"
@@ -600,7 +602,7 @@ export default function DashboardPage() {
                 onChange={(e) => setForm((f) => ({ ...f, map_embed_url: e.target.value }))}
               />
               <p className="text-xs text-muted-foreground">
-                In Google Maps: Share → Embed a map → copy the <code className="bg-muted px-1 rounded">src</code> URL from the iframe code.
+                {t('admin.dashboard.mapEmbedUrlHint')}
               </p>
             </div>
           </div>
@@ -624,9 +626,9 @@ export default function DashboardPage() {
         {/* Drawer header */}
         <div className="px-6 py-5 flex items-start justify-between border-b shrink-0">
           <div>
-            <h2 className="text-lg font-bold">Moderation</h2>
+            <h2 className="text-lg font-bold">{t('admin.dashboard.moderation')}</h2>
             <p className="text-sm mt-1 text-muted-foreground">
-              Viewing: <span className="font-medium">"{drawerPostTitle}"</span>
+              {t('admin.dashboard.viewingPost')} <span className="font-medium">"{drawerPostTitle}"</span>
             </p>
           </div>
           <button
@@ -644,7 +646,7 @@ export default function DashboardPage() {
           ) : drawerCommentsData.data.length === 0 ? (
             <div className="text-center py-10 text-muted-foreground">
               <MessageCircle className="h-8 w-8 mx-auto mb-3 opacity-20" />
-              <p>No comments on this post yet.</p>
+              <p>{t('admin.dashboard.noCommentsOnPost')}</p>
             </div>
           ) : (
             drawerCommentsData.data.map((comment) => (
@@ -659,17 +661,17 @@ export default function DashboardPage() {
                     <span className="font-bold text-sm">{comment.author_name}</span>
                     {comment.status === 'pending' && (
                       <span className="text-[10px] uppercase font-bold tracking-wider text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
-                        Pending
+                        {t('admin.dashboard.statusPending')}
                       </span>
                     )}
                     {comment.status === 'approved' && (
                       <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
-                        Approved
+                        {t('admin.dashboard.statusApproved')}
                       </span>
                     )}
                     {comment.status === 'spam' && (
                       <span className="text-[10px] uppercase font-bold tracking-wider text-red-600 bg-red-50 px-1.5 py-0.5 rounded">
-                        Spam
+                        {t('admin.dashboard.statusSpam')}
                       </span>
                     )}
                   </div>
@@ -687,7 +689,7 @@ export default function DashboardPage() {
                       className="flex-1 h-8 text-xs gap-1.5"
                       onClick={() => handleApproveComment(comment.id)}
                     >
-                      <Check className="h-3.5 w-3.5" /> Approve
+                      <Check className="h-3.5 w-3.5" /> {t('admin.dashboard.approve')}
                     </Button>
                   )}
                   {comment.status !== 'spam' && (
@@ -697,7 +699,7 @@ export default function DashboardPage() {
                       className="flex-1 h-8 text-xs gap-1.5 text-amber-600 border-amber-200 hover:bg-amber-50"
                       onClick={() => handleSpamComment(comment.id)}
                     >
-                      <AlertTriangle className="h-3.5 w-3.5" /> Spam
+                      <AlertTriangle className="h-3.5 w-3.5" /> {t('admin.dashboard.spam')}
                     </Button>
                   )}
                   <Button
@@ -718,13 +720,9 @@ export default function DashboardPage() {
       {/* ── DELETE CONFIRMATION ─────────────────────────────────────────────── */}
       <ConfirmDialog
         open={confirmOpen}
-        title={`Delete ${confirmType === 'post' ? 'Post' : 'Comment'}`}
-        description={
-          confirmType === 'post'
-            ? 'This action cannot be undone. The post and all its comments will be permanently deleted.'
-            : 'This comment will be permanently deleted.'
-        }
-        confirmLabel="Delete"
+        title={confirmType === 'post' ? t('admin.dashboard.deletePostTitle') : t('admin.dashboard.deleteCommentTitle')}
+        description={confirmType === 'post' ? t('admin.dashboard.deletePostDescription') : t('admin.dashboard.deleteCommentDescription')}
+        confirmLabel={t('common.delete')}
         onConfirm={executeDelete}
         onCancel={() => { setConfirmOpen(false); setConfirmId(null) }}
       />

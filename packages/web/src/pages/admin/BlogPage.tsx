@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   ImageIcon,
   User,
@@ -38,15 +39,6 @@ import type { PageComponent, Settings } from '@/types/api'
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 type Tab = 'hero' | 'profile' | 'social' | 'comments' | 'search' | 'tags'
-
-const TABS: { id: Tab; label: string; Icon: React.ComponentType<{ className?: string }> }[] = [
-  { id: 'hero',     label: 'Hero Banner',    Icon: ImageIcon },
-  { id: 'profile',  label: 'Profile & About', Icon: User },
-  { id: 'social',   label: 'Social Links',   Icon: Share2 },
-  { id: 'comments', label: 'Comments',       Icon: MessageSquare },
-  { id: 'search',   label: 'Buscador',       Icon: Search },
-  { id: 'tags',     label: 'Tags',           Icon: Tag },
-]
 
 function parseJSON<T>(value: string | undefined, fallback: T): T {
   try { return JSON.parse(value ?? '[]') as T } catch { return fallback }
@@ -107,13 +99,17 @@ interface SubSectionProps {
   onToggle: (v: boolean) => void
   Icon: React.ComponentType<{ className?: string }>
   children: React.ReactNode
+  /** When true: no data yet — switch is disabled, card appears muted */
+  disabled?: boolean
 }
 
-function SubSection({ title, description, visible, onToggle, Icon, children }: SubSectionProps) {
+function SubSection({ title, description, visible, onToggle, Icon, children, disabled = false }: SubSectionProps) {
+  const { t } = useTranslation()
   return (
     <div className={cn(
       'rounded-2xl border-2 overflow-hidden transition-all duration-200',
       visible ? 'border-primary/40 shadow-sm shadow-primary/5' : 'border-border',
+      (disabled && !visible) && 'opacity-60',
     )}>
       <div className={cn(
         'flex items-center gap-4 px-6 py-4 transition-colors cursor-default',
@@ -129,7 +125,9 @@ function SubSection({ title, description, visible, onToggle, Icon, children }: S
           <p className={cn('text-sm font-semibold', visible ? 'text-foreground' : 'text-muted-foreground')}>
             {title}
           </p>
-          <p className="text-xs text-muted-foreground">{description}</p>
+          <p className="text-xs text-muted-foreground">
+            {(disabled && !visible) ? t('admin.blog.aboutSubsections.noData') : description}
+          </p>
         </div>
         <Switch checked={visible} onCheckedChange={onToggle} />
       </div>
@@ -158,6 +156,7 @@ interface ImageUploadProps {
 }
 
 function ImageUpload({ label, hint, preview, currentUrl, fileRef, onClear, onChange, rounded, maxHeight = 'max-h-32' }: ImageUploadProps) {
+  const { t } = useTranslation()
   const roundedClass = rounded ? 'rounded-full' : 'rounded-xl'
   return (
     <div className="space-y-2">
@@ -182,7 +181,7 @@ function ImageUpload({ label, hint, preview, currentUrl, fileRef, onClear, onCha
           <img src={currentUrl} alt="" className={cn('object-cover', roundedClass, maxHeight, rounded ? 'w-20 h-20' : 'w-full')} />
           <div className={cn('absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity', roundedClass)}>
             <span className="text-white text-xs font-medium flex items-center gap-1">
-              <Upload className="h-3 w-3" /> Change
+              <Upload className="h-3 w-3" /> {t('common.change')}
             </span>
           </div>
         </div>
@@ -192,7 +191,7 @@ function ImageUpload({ label, hint, preview, currentUrl, fileRef, onClear, onCha
           onClick={() => fileRef.current?.click()}
         >
           <Upload className="h-5 w-5" />
-          {!rounded && <p className="text-sm">Click to upload</p>}
+          {!rounded && <p className="text-sm">{t('common.upload')}</p>}
         </div>
       )}
       <input ref={fileRef} type="file" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/avif" className="hidden" onChange={onChange} />
@@ -203,8 +202,18 @@ function ImageUpload({ label, hint, preview, currentUrl, fileRef, onClear, onCha
 // ── BlogPage ───────────────────────────────────────────────────────────────────
 
 export default function BlogPage() {
+  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<Tab>('hero')
   const [saving, setSaving] = useState(false)
+
+  const TABS: { id: Tab; label: string; Icon: React.ComponentType<{ className?: string }> }[] = [
+    { id: 'hero',     label: t('admin.blog.tabs.hero'),    Icon: ImageIcon },
+    { id: 'profile',  label: t('admin.blog.tabs.profile'), Icon: User },
+    { id: 'social',   label: t('admin.blog.tabs.social'),  Icon: Share2 },
+    { id: 'comments', label: t('admin.blog.tabs.comments'), Icon: MessageSquare },
+    { id: 'search',   label: t('admin.blog.tabs.search'),  Icon: Search },
+    { id: 'tags',     label: t('admin.blog.tabs.tags'),    Icon: Tag },
+  ]
 
   const qc = useQueryClient()
   const { data: settingsData, isLoading: settingsLoading } = useSettings()
@@ -247,6 +256,26 @@ export default function BlogPage() {
     setCertItems(parseJSON(s.profile_certifications, []))
     setTestiItems(parseJSON(s.profile_testimonials, []))
   }, [settingsData])
+
+  // Inicializa aboutVis: si el sub-componente no tiene datos, forzar false
+  // aunque el DB diga is_visible=true (el usuario debe activarlo manualmente)
+  useEffect(() => {
+    if (!settingsData?.data || !aboutData?.data) return
+    const s = settingsData.data
+    const hasData: Record<string, boolean> = {
+      'about-gallery':      parseJSON(s.profile_gallery, []).length > 0,
+      'about-experience':   parseJSON(s.profile_experience, []).length > 0,
+      'about-skills':       parseJSON(s.profile_skills, []).length > 0,
+      'about-education':    parseJSON(s.profile_education, []).length > 0 || parseJSON(s.profile_certifications, []).length > 0,
+      'about-testimonials': parseJSON(s.profile_testimonials, []).length > 0,
+      'social-links':       !!(s.social_linkedin || s.social_instagram || s.social_youtube || s.social_facebook),
+    }
+    const initVis: Record<number, boolean> = {}
+    for (const c of aboutData.data.components) {
+      initVis[c.id] = c.is_visible && (hasData[c.name] ?? true)
+    }
+    setAboutVis(initVis)
+  }, [settingsData, aboutData])
 
   // ── Visibility helpers ──────────────────────────────────────────────────────
 
@@ -296,7 +325,7 @@ export default function BlogPage() {
     setSaving(true)
     // Fix 3: validate hero text when hero is active
     if (homeVisible('hero') && !(form.hero_text ?? '').trim()) {
-      toast({ title: 'Banner text is required when Hero Banner is active.', variant: 'destructive' })
+      toast({ title: t('admin.blog.bannerRequired'), variant: 'destructive' })
       setActiveTab('hero')
       setSaving(false)
       return
@@ -359,9 +388,9 @@ export default function BlogPage() {
       await saveSettings(payload as never)
       // Invalidate page queries so visibility changes reflect immediately on return
       await qc.invalidateQueries({ queryKey: ['pages'] })
-      toast({ title: 'Blog settings saved.' })
+      toast({ title: t('admin.blog.saved') })
     } catch {
-      toast({ title: 'Failed to save.', variant: 'destructive' })
+      toast({ title: t('admin.blog.saveFailed'), variant: 'destructive' })
     } finally {
       setSaving(false)
     }
@@ -381,11 +410,11 @@ export default function BlogPage() {
       {/* Sticky header */}
       <header className="sticky top-0 z-10 px-8 py-4 flex items-center justify-between border-b bg-card/95 backdrop-blur-sm shrink-0">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Blog</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">Configure the public blog sections and content.</p>
+          <h1 className="text-2xl font-semibold tracking-tight">{t('admin.blog.title')}</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">{t('admin.blog.subtitle')}</p>
         </div>
         <Button onClick={handleSave} disabled={saving}>
-          {saving ? 'Saving…' : 'Save changes'}
+          {saving ? t('common.saving') : t('admin.blog.saveChanges')}
         </Button>
       </header>
 
@@ -415,20 +444,20 @@ export default function BlogPage() {
         {activeTab === 'hero' && (
           <>
             <p className="text-sm text-muted-foreground">
-              The hero banner is the first thing visitors see at the top of the home page.
+              {t('admin.blog.hero.description')}
             </p>
 
             <SectionCard
-              title="Hero Banner"
-              description="Show or hide the banner on the home page"
+              title={t('admin.blog.hero.cardTitle')}
+              description={t('admin.blog.hero.cardSubtitle')}
               visible={homeVisible('hero')}
               onToggle={(v) => toggleHome('hero', v)}
               Icon={ImageIcon}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <ImageUpload
-                  label="Banner image"
-                  hint="(1200 × 630 px recommended)"
+                  label={t('admin.blog.hero.bannerImage')}
+                  hint={t('admin.blog.hero.bannerHint')}
                   preview={heroPrev}
                   currentUrl={form.hero_image_url ?? ''}
                   fileRef={heroFileRef}
@@ -436,13 +465,13 @@ export default function BlogPage() {
                   onChange={(e) => handleFile(e, setHeroFile, setHeroPrev)}
                 />
                 <div className="space-y-2">
-                  <Label className="text-xs">Banner text</Label>
+                  <Label className="text-xs">{t('admin.blog.hero.bannerText')}</Label>
                   <Input
                     value={form.hero_text ?? ''}
                     onChange={(e) => setField('hero_text' as keyof Settings, e.target.value)}
-                    placeholder="Welcome to my blog"
+                    placeholder={t('admin.blog.hero.bannerPlaceholder')}
                   />
-                  <p className="text-xs text-muted-foreground">Overlay text displayed on the banner image.</p>
+                  <p className="text-xs text-muted-foreground">{t('admin.blog.hero.bannerOverlayInfo')}</p>
                 </div>
               </div>
             </SectionCard>
@@ -453,13 +482,13 @@ export default function BlogPage() {
         {activeTab === 'profile' && (
           <>
             <p className="text-sm text-muted-foreground">
-              Configure your profile card (shown on home) and the content of each About page section.
+              {t('admin.blog.profile.description')}
             </p>
 
             {/* Profile card */}
             <SectionCard
-              title="Profile card"
-              description="The profile widget shown on the home page"
+              title={t('admin.blog.profile.cardTitle')}
+              description={t('admin.blog.profile.cardSubtitle')}
               visible={homeVisible('profile')}
               onToggle={(v) => toggleHome('profile', v)}
               Icon={User}
@@ -469,8 +498,8 @@ export default function BlogPage() {
                 <div className="flex gap-5 items-start">
                   <div className="shrink-0">
                     <ImageUpload
-                      label="Photo"
-                      hint="(1:1)"
+                      label={t('admin.blog.profile.photo')}
+                      hint={t('admin.blog.profile.photoHint')}
                       preview={profilePrev}
                       currentUrl={form.profile_image_url ?? ''}
                       fileRef={profileFileRef}
@@ -482,22 +511,22 @@ export default function BlogPage() {
                   <div className="flex-1 space-y-3">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-1.5">
-                        <Label className="text-xs">Name</Label>
-                        <Input value={form.profile_name ?? ''} onChange={(e) => setField('profile_name' as keyof Settings, e.target.value)} placeholder="Your name" />
+                        <Label className="text-xs">{t('admin.blog.profile.name')}</Label>
+                        <Input value={form.profile_name ?? ''} onChange={(e) => setField('profile_name' as keyof Settings, e.target.value)} placeholder={t('admin.blog.profile.namePlaceholder')} />
                       </div>
                       <div className="space-y-1.5">
-                        <Label className="text-xs">Professional title</Label>
-                        <Input value={form.profile_title ?? ''} onChange={(e) => setField('profile_title' as keyof Settings, e.target.value)} placeholder="Full-stack Developer" />
+                        <Label className="text-xs">{t('admin.blog.profile.jobTitle')}</Label>
+                        <Input value={form.profile_title ?? ''} onChange={(e) => setField('profile_title' as keyof Settings, e.target.value)} placeholder={t('admin.blog.profile.jobTitlePlaceholder')} />
                       </div>
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="text-xs">Summary</Label>
-                      <Input value={form.profile_summary ?? ''} onChange={(e) => setField('profile_summary' as keyof Settings, e.target.value)} placeholder="A short bio or tagline" />
+                      <Label className="text-xs">{t('admin.blog.profile.summary')}</Label>
+                      <Input value={form.profile_summary ?? ''} onChange={(e) => setField('profile_summary' as keyof Settings, e.target.value)} placeholder={t('admin.blog.profile.summaryPlaceholder')} />
                     </div>
                     <div className="flex items-center justify-between pt-1">
                       <div>
-                        <Label className="text-xs font-medium" htmlFor="avail-sw">Show availability badge</Label>
-                        <p className="text-xs text-muted-foreground">Green "Disponible" badge on profile</p>
+                        <Label className="text-xs font-medium" htmlFor="avail-sw">{t('admin.blog.profile.availabilityLabel')}</Label>
+                        <p className="text-xs text-muted-foreground">{t('admin.blog.profile.availabilityHint')}</p>
                       </div>
                       <Switch id="avail-sw" checked={(form.profile_available ?? '0') === '1'} onCheckedChange={(v) => setField('profile_available' as keyof Settings, v ? '1' : '0')} />
                     </div>
@@ -506,7 +535,7 @@ export default function BlogPage() {
 
                 {/* Description */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Extended description <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                  <Label className="text-xs">{t('admin.blog.profile.extendedDescription')} <span className="text-muted-foreground font-normal">({t('common.optional')})</span></Label>
                   <div onKeyDown={(e) => e.stopPropagation()}>
                     <PostEditor key="profile-desc" content={form.profile_description ?? ''} onChange={(html) => setField('profile_description' as keyof Settings, html)} />
                   </div>
@@ -515,8 +544,8 @@ export default function BlogPage() {
                 {/* Cover image */}
                 <div className="pt-3 border-t">
                   <ImageUpload
-                    label="Cover image"
-                    hint="(About page banner — 1500 × 500 px)"
+                    label={t('admin.blog.profile.coverImage')}
+                    hint={t('admin.blog.profile.coverHint')}
                     preview={coverPrev}
                     currentUrl={form.profile_cover_url ?? ''}
                     fileRef={profileCoverRef}
@@ -533,7 +562,7 @@ export default function BlogPage() {
               {!homeVisible('profile') && (
                 <div className="absolute inset-0 bg-background/70 z-10 flex items-end justify-center pb-6 rounded-2xl">
                   <p className="text-xs text-muted-foreground bg-card border rounded-lg px-3 py-1.5 shadow-sm">
-                    Activate the Profile card to edit About page sections
+                    {t('admin.blog.profile.activateHint')}
                   </p>
                 </div>
               )}
@@ -541,79 +570,85 @@ export default function BlogPage() {
               {/* Divider */}
               <div className="flex items-center gap-3 pt-2">
                 <div className="h-px flex-1 bg-border" />
-                <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">About page sections</span>
+                <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('admin.blog.profile.aboutSections')}</span>
                 <div className="h-px flex-1 bg-border" />
               </div>
 
               {/* Sub-component accordions */}
               <SubSection
-                title="Gallery"
-                description="Project or photo carousel shown on /about"
+                title={t('admin.blog.aboutSubsections.gallery.title')}
+                description={t('admin.blog.aboutSubsections.gallery.subtitle')}
                 visible={aboutVisible('about-gallery')}
                 onToggle={(v) => toggleAbout('about-gallery', v)}
                 Icon={Images}
+                disabled={galleryItems.length === 0}
               >
                 <GalleryEditor items={galleryItems} onChange={setGalleryItems} />
               </SubSection>
 
               <SubSection
-                title="Experience"
-                description="Professional roles, companies, and tech tags"
+                title={t('admin.blog.aboutSubsections.experience.title')}
+                description={t('admin.blog.aboutSubsections.experience.subtitle')}
                 visible={aboutVisible('about-experience')}
                 onToggle={(v) => toggleAbout('about-experience', v)}
                 Icon={Briefcase}
+                disabled={expItems.length === 0}
               >
                 <ExperienceEditor items={expItems} onChange={setExpItems} />
               </SubSection>
 
               <SubSection
-                title="Skills"
-                description="Technical skills grouped by category"
+                title={t('admin.blog.aboutSubsections.skills.title')}
+                description={t('admin.blog.aboutSubsections.skills.subtitle')}
                 visible={aboutVisible('about-skills')}
                 onToggle={(v) => toggleAbout('about-skills', v)}
                 Icon={Code2}
+                disabled={skillItems.length === 0}
               >
                 <SkillsEditor items={skillItems} onChange={setSkillItems} />
               </SubSection>
 
               <SubSection
-                title="Education & Certifications"
-                description="Academic background and professional certifications"
+                title={t('admin.blog.aboutSubsections.education.title')}
+                description={t('admin.blog.aboutSubsections.education.subtitle')}
                 visible={aboutVisible('about-education')}
                 onToggle={(v) => toggleAbout('about-education', v)}
                 Icon={GraduationCap}
+                disabled={eduItems.length === 0 && certItems.length === 0}
               >
                 <div className="space-y-6">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Education</p>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">{t('admin.blog.educationLabel')}</p>
                     <EducationEditor items={eduItems} onChange={setEduItems} />
                   </div>
                   <div className="border-t pt-5">
-                    <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Certifications</p>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">{t('admin.blog.certificationsLabel')}</p>
                     <CertificationsEditor items={certItems} onChange={setCertItems} />
                   </div>
                 </div>
               </SubSection>
 
               <SubSection
-                title="Testimonials"
-                description="Recommendations from colleagues and clients"
+                title={t('admin.blog.aboutSubsections.testimonials.title')}
+                description={t('admin.blog.aboutSubsections.testimonials.subtitle')}
                 visible={aboutVisible('about-testimonials')}
                 onToggle={(v) => toggleAbout('about-testimonials', v)}
                 Icon={Quote}
+                disabled={testiItems.length === 0}
               >
                 <TestimonialsEditor items={testiItems} onChange={setTestiItems} />
               </SubSection>
 
               <SubSection
-                title="Social Links"
-                description="Social network icons shown at the bottom of /about"
+                title={t('admin.blog.aboutSubsections.social.title')}
+                description={t('admin.blog.aboutSubsections.social.subtitle')}
                 visible={homeVisible('social-links')}
                 onToggle={(v) => { toggleHome('social-links', v); toggleAbout('social-links', v) }}
                 Icon={Share2}
+                disabled={!(form.social_linkedin || form.social_instagram || form.social_youtube || form.social_facebook)}
               >
                 <p className="text-sm text-muted-foreground">
-                  To edit the social link URLs, go to the <strong>Social Links</strong> tab.
+                  {t('admin.blog.aboutSubsections.social.editHint')}
                 </p>
               </SubSection>
             </div>
@@ -624,12 +659,12 @@ export default function BlogPage() {
         {activeTab === 'social' && (
           <>
             <p className="text-sm text-muted-foreground">
-              Social network links displayed on the blog. Toggle to show or hide the section.
+              {t('admin.blog.social.description')}
             </p>
 
             <SectionCard
-              title="Social Links"
-              description="Show or hide the social links section on the home page"
+              title={t('admin.blog.social.cardTitle')}
+              description={t('admin.blog.social.cardSubtitle')}
               visible={homeVisible('social-links')}
               onToggle={(v) => toggleHome('social-links', v)}
               Icon={Share2}
@@ -655,7 +690,7 @@ export default function BlogPage() {
         {activeTab === 'comments' && (
           <>
             <p className="text-sm text-muted-foreground">
-              Control whether comments appear on individual post pages.
+              {t('admin.blog.comments.description')}
             </p>
 
             {/* Global master switch */}
@@ -675,9 +710,9 @@ export default function BlogPage() {
                 </div>
                 <div className="flex-1">
                   <p className={cn('text-sm font-semibold', (form.comments_enabled ?? '1') === '1' ? 'text-foreground' : 'text-muted-foreground')}>
-                    Comments globally enabled
+                    {t('admin.blog.comments.globalTitle')}
                   </p>
-                  <p className="text-xs text-muted-foreground">Master switch — disabling hides all comment sections</p>
+                  <p className="text-xs text-muted-foreground">{t('admin.blog.comments.globalSubtitle')}</p>
                 </div>
                 <Switch
                   checked={(form.comments_enabled ?? '1') === '1'}
@@ -691,28 +726,28 @@ export default function BlogPage() {
 
         {activeTab === 'search' && (
           <SectionCard
-            title="Buscador"
-            description="Muestra un campo de búsqueda que filtra publicaciones por título, resumen, contenido o tags."
+            title={t('admin.blog.search.cardTitle')}
+            description={t('admin.blog.search.cardSubtitle')}
             visible={homeVisible('search')}
             onToggle={(v) => toggleHome('search', v)}
             Icon={Search}
           >
             <p className="text-sm text-muted-foreground">
-              La búsqueda filtra las publicaciones directamente en el servidor. Actívalo para que los visitantes puedan buscar en tu blog.
+              {t('admin.blog.search.info')}
             </p>
           </SectionCard>
         )}
 
         {activeTab === 'tags' && (
           <SectionCard
-            title="Tag Cloud"
-            description="Muestra los tags más utilizados del blog para filtrar publicaciones."
+            title={t('admin.blog.tags.cardTitle')}
+            description={t('admin.blog.tags.cardSubtitle')}
             visible={homeVisible('tag-cloud')}
             onToggle={(v) => toggleHome('tag-cloud', v)}
             Icon={Tag}
           >
             <div className="space-y-3">
-              <Label htmlFor="tags-max-count">Número de tags a mostrar</Label>
+              <Label htmlFor="tags-max-count">{t('admin.blog.tags.countLabel')}</Label>
               <Input
                 id="tags-max-count"
                 type="number"
@@ -722,7 +757,7 @@ export default function BlogPage() {
                 onChange={(e) => setField('tags_max_count' as keyof Settings, e.target.value)}
                 className="w-24"
               />
-              <p className="text-xs text-muted-foreground">Mínimo 1, máximo 20. Ordenados por popularidad.</p>
+              <p className="text-xs text-muted-foreground">{t('admin.blog.tags.countHint')}</p>
             </div>
           </SectionCard>
         )}

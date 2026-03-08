@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight, Clock } from 'lucide-react'
 import type { Post } from '@/types/api'
-
+import { useTranslation } from 'react-i18next'
 import { formatTimeAgo } from '@/lib/utils'
 
 interface PostCardProps {
@@ -21,6 +21,7 @@ function firstTag(tags: string | null): string | null {
 
 /** Regular post card — displayed in the "Últimos Artículos" 2-column grid. */
 export default function PostCard({ post }: PostCardProps) {
+  const { t } = useTranslation()
   const date = formatTimeAgo(post.created_at)
   const time = readingTime(post.content || post.excerpt || '')
   const hasImage = Boolean(post.featured_image_url)
@@ -96,7 +97,7 @@ export default function PostCard({ post }: PostCardProps) {
             className="inline-flex items-center text-sm font-semibold group-hover:underline"
             style={{ color: 'var(--blog-accent)' }}
           >
-            Leer artículo
+            {t('blog.posts.readArticle')}
             <ArrowRight size={16} className="ml-1" />
           </Link>
         </div>
@@ -107,6 +108,7 @@ export default function PostCard({ post }: PostCardProps) {
 
 /** Featured (Destacado) post card — large 2-column card for the most recent post. */
 export function FeaturedPostCard({ post }: PostCardProps) {
+  const { t } = useTranslation()
   const date = formatTimeAgo(post.created_at)
   const time = readingTime(post.content || post.excerpt || '')
   const hasImage = Boolean(post.featured_image_url)
@@ -171,7 +173,7 @@ export function FeaturedPostCard({ post }: PostCardProps) {
               className="inline-flex items-center font-semibold group-hover:translate-x-2 transition-transform duration-300"
               style={{ color: 'var(--blog-accent)' }}
             >
-              Leer más
+              {t('blog.posts.readMore')}
               <ArrowRight size={18} className="ml-2" />
             </span>
           </div>

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { applyComponentStyles } from '@/lib/utils'
 
 interface HeroSectionProps {
@@ -6,7 +7,8 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ styles, settings }: HeroSectionProps) {
-  const heroText = settings.hero_text || settings.blog_name || 'Welcome to my blog'
+  const { t } = useTranslation()
+  const heroText = settings.hero_text || settings.blog_name || t('blog.hero.welcome')
   const description = settings.blog_description || ''
   const heroImageUrl = settings.hero_image_url || ''
   const logoUrl = settings.blog_logo_url || ''
@@ -22,7 +24,7 @@ export default function HeroSection({ styles, settings }: HeroSectionProps) {
         <div className="absolute inset-0 z-0">
           <img
             src={heroImageUrl}
-            alt="Hero banner"
+            alt={t('blog.hero.bannerAlt')}
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gray-900/75 backdrop-blur-[2px]" />

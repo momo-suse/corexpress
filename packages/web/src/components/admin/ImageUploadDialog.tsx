@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -18,6 +19,7 @@ interface ImageUploadDialogProps {
 type Mode = 'upload' | 'url'
 
 export default function ImageUploadDialog({ open, onClose, onInsert, postId }: ImageUploadDialogProps) {
+  const { t } = useTranslation()
   const [mode, setMode] = useState<Mode>('upload')
   const [urlValue, setUrlValue] = useState('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -62,7 +64,7 @@ export default function ImageUploadDialog({ open, onClose, onInsert, postId }: I
       onInsert(result.data.url)
       handleClose()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Upload failed')
+      setError(err instanceof Error ? err.message : t('admin.imageUpload.uploadFailed'))
     } finally {
       setUploading(false)
     }
@@ -81,7 +83,7 @@ export default function ImageUploadDialog({ open, onClose, onInsert, postId }: I
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ImageIcon className="h-5 w-5" />
-            Insert image
+            {t('admin.imageUpload.title')}
           </DialogTitle>
         </DialogHeader>
 
@@ -98,7 +100,7 @@ export default function ImageUploadDialog({ open, onClose, onInsert, postId }: I
             )}
           >
             <Upload className="h-4 w-4" />
-            Upload file
+            {t('admin.imageUpload.uploadTab')}
           </button>
           <button
             type="button"
@@ -111,7 +113,7 @@ export default function ImageUploadDialog({ open, onClose, onInsert, postId }: I
             )}
           >
             <Link2 className="h-4 w-4" />
-            From URL
+            {t('admin.imageUpload.urlTab')}
           </button>
         </div>
 
@@ -127,8 +129,8 @@ export default function ImageUploadDialog({ open, onClose, onInsert, postId }: I
               ) : (
                 <div className="space-y-2 text-muted-foreground">
                   <Upload className="h-8 w-8 mx-auto" />
-                  <p className="text-sm">Click to select an image</p>
-                  <p className="text-xs">JPEG, PNG, GIF, WebP — max 10 MB</p>
+                  <p className="text-sm">{t('admin.imageUpload.clickToSelect')}</p>
+                  <p className="text-xs">{t('admin.imageUpload.fileTypes')}</p>
                 </div>
               )}
             </div>
@@ -150,11 +152,11 @@ export default function ImageUploadDialog({ open, onClose, onInsert, postId }: I
         {/* URL mode */}
         {mode === 'url' && (
           <div className="space-y-2">
-            <Label htmlFor="img-url">Image URL</Label>
+            <Label htmlFor="img-url">{t('admin.imageUpload.urlLabel')}</Label>
             <Input
               id="img-url"
               type="url"
-              placeholder="https://example.com/image.jpg"
+              placeholder={t('admin.imageUpload.urlPlaceholder')}
               value={urlValue}
               onChange={(e) => setUrlValue(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') handleInsertUrl() }}
@@ -169,15 +171,15 @@ export default function ImageUploadDialog({ open, onClose, onInsert, postId }: I
 
         <DialogFooter>
           <Button variant="outline" onClick={handleClose}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           {mode === 'upload' ? (
             <Button onClick={handleUpload} disabled={!selectedFile || uploading}>
-              {uploading ? 'Uploading…' : 'Upload & insert'}
+              {uploading ? t('admin.imageUpload.uploading') : t('admin.imageUpload.uploadInsert')}
             </Button>
           ) : (
             <Button onClick={handleInsertUrl} disabled={!urlValue.trim()}>
-              Insert
+              {t('admin.imageUpload.insert')}
             </Button>
           )}
         </DialogFooter>

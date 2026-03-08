@@ -1,12 +1,14 @@
 import { useComments } from '@/hooks/useComments'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import { MessageCircle } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 interface CommentListProps {
   postId: number
 }
 
 export default function CommentList({ postId }: CommentListProps) {
+  const { t } = useTranslation()
   const { data, isLoading } = useComments({ post_id: postId, status: 'approved' })
 
   if (isLoading) return <LoadingSpinner className="py-6" />
@@ -18,19 +20,19 @@ export default function CommentList({ postId }: CommentListProps) {
       <div className="flex items-center gap-2 mb-6">
         <MessageCircle size={18} className="text-indigo-500" />
         <h3 className="text-lg font-bold">
-          {comments.length} {comments.length === 1 ? 'Comentario' : 'Comentarios'}
+          {t('blog.comments.count', { count: comments.length })}
         </h3>
       </div>
 
       {comments.length === 0 && (
         <p className="text-sm text-muted-foreground py-4">
-          Aún no hay comentarios. ¡Sé el primero!
+          {t('blog.comments.none')}
         </p>
       )}
 
       <div className="space-y-6">
         {comments.map((comment) => {
-          const date = new Date(comment.created_at).toLocaleDateString('es-MX', {
+          const date = new Date(comment.created_at).toLocaleDateString(undefined, {
             year: 'numeric', month: 'long', day: 'numeric',
           })
           return (

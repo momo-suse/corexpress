@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Navigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useBlogPage } from '@/hooks/useBlogPage'
@@ -25,6 +26,7 @@ const SOCIAL_ICONS: Record<string, typeof Linkedin> = {
 }
 
 export default function BlogHomePage() {
+  const { t } = useTranslation()
   const user = useAuthStore((s) => s.user)
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTag, setActiveTag] = useState('')
@@ -44,14 +46,14 @@ export default function BlogHomePage() {
   if (settingsError) return <Navigate to="/setup" replace />
 
   if (!settingsData || settingsData.data.setup_complete !== '1') {
-    return <Navigate to={user ? '/cx-admin/setup' : '/cx-admin/login'} replace />
+    return <Navigate to={user ? '/cx-admin/setup' : '/setup'} replace />
   }
 
   if (pageLoading) return <LoadingSpinner className="min-h-screen" size="lg" />
   if (pageError) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Error al cargar el blog.</p>
+        <p className="text-muted-foreground">{t('blog.errorLoading')}</p>
       </div>
     )
   }
@@ -136,7 +138,7 @@ export default function BlogHomePage() {
                     style={{ borderRadius: 'var(--blog-radius-card)' }}
                   >
                     <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-5 pb-2 border-b border-gray-100 dark:border-gray-800">
-                      Explorar
+                      {t('blog.tags.explore')}
                     </h3>
                     {searchVisible && (
                       <div className={tagCloudVisible && tags.length > 0 ? 'mb-5' : ''}>
@@ -173,7 +175,7 @@ export default function BlogHomePage() {
 
             {/* Copyright */}
             <p className="text-muted-foreground text-sm">
-              © {new Date().getFullYear()} {blogName}. Todos los derechos reservados.
+              © {new Date().getFullYear()} {blogName}. {t('blog.footer.rights')}
             </p>
 
             {/* Social icons in footer */}

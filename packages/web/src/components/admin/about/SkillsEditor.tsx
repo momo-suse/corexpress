@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { ChevronUp, ChevronDown, Trash2, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -22,6 +23,7 @@ function move(items: SkillGroup[], from: number, to: number): SkillGroup[] {
 }
 
 export default function SkillsEditor({ items, onChange }: SkillsEditorProps) {
+  const { t } = useTranslation()
   return (
     <div className="space-y-3">
       {items.map((group, i) => (
@@ -33,7 +35,7 @@ export default function SkillsEditor({ items, onChange }: SkillsEditorProps) {
               onChange={(e) =>
                 onChange(items.map((g, j) => (j === i ? { ...g, name: e.target.value } : g)))
               }
-              placeholder="Group name (e.g. Frontend)"
+              placeholder={t('admin.about.skills.groupPlaceholder')}
               className="h-8 text-sm font-medium flex-1"
             />
             <div className="flex items-center gap-1 shrink-0">
@@ -42,7 +44,7 @@ export default function SkillsEditor({ items, onChange }: SkillsEditorProps) {
                 onClick={() => onChange(move(items, i, i - 1))}
                 disabled={i === 0}
                 className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
-                aria-label="Move up"
+                aria-label={t('admin.about.moveUp')}
               >
                 <ChevronUp className="h-4 w-4" />
               </button>
@@ -51,7 +53,7 @@ export default function SkillsEditor({ items, onChange }: SkillsEditorProps) {
                 onClick={() => onChange(move(items, i, i + 1))}
                 disabled={i === items.length - 1}
                 className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
-                aria-label="Move down"
+                aria-label={t('admin.about.moveDown')}
               >
                 <ChevronDown className="h-4 w-4" />
               </button>
@@ -59,7 +61,7 @@ export default function SkillsEditor({ items, onChange }: SkillsEditorProps) {
                 type="button"
                 onClick={() => onChange(items.filter((_, j) => j !== i))}
                 className="p-1 text-muted-foreground hover:text-destructive transition-colors"
-                aria-label="Delete group"
+                aria-label={t('admin.about.deleteGroup')}
               >
                 <Trash2 className="h-4 w-4" />
               </button>
@@ -68,13 +70,13 @@ export default function SkillsEditor({ items, onChange }: SkillsEditorProps) {
 
           {/* Skills chips */}
           <div className="p-3 space-y-1.5">
-            <Label className="text-xs">Skills</Label>
+            <Label className="text-xs">{t('admin.about.skills.skillsLabel')}</Label>
             <ChipInput
               value={group.skills}
               onChange={(skills) =>
                 onChange(items.map((g, j) => (j === i ? { ...g, skills } : g)))
               }
-              placeholder="React, TypeScript… (Enter or comma to add)"
+              placeholder={t('admin.about.chipPlaceholder')}
             />
           </div>
         </div>
@@ -88,7 +90,7 @@ export default function SkillsEditor({ items, onChange }: SkillsEditorProps) {
         className="w-full"
       >
         <Plus className="h-4 w-4 mr-1.5" />
-        Add group
+        {t('admin.about.skills.add')}
       </Button>
     </div>
   )

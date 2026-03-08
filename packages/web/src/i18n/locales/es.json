@@ -1,0 +1,545 @@
+{
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "back": "Volver",
+    "loading": "Cargando…",
+    "error": "Error",
+    "confirm": "Confirmar",
+    "close": "Cerrar",
+    "search": "Buscar",
+    "yes": "Sí",
+    "no": "No",
+    "optional": "opcional",
+    "required": "requerido",
+    "saving": "Guardando…",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "change": "Cambiar",
+    "upload": "Subir"
+  },
+  "admin": {
+    "login": {
+      "title": "Inicia sesión en tu panel",
+      "titleForgot": "Recupera tu acceso",
+      "email": "Email",
+      "password": "Contraseña",
+      "submit": "Entrar",
+      "submitting": "Entrando…",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "forgotDescription": "Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña (válido por 10 minutos).",
+      "sendLink": "Enviar enlace",
+      "sending": "Enviando…",
+      "emailSentTitle": "Revisa tu correo",
+      "emailSentText": "Si ese email está registrado, recibirás un enlace en breve.",
+      "emailProblem": "Problemas al enviar el correo",
+      "emailProblemDetail": "El enlace fue generado pero no pudimos enviarlo. Verifica la configuración de correo del servidor.",
+      "backToLogin": "← Volver al inicio de sesión",
+      "invalidCredentials": "Email o contraseña incorrectos.",
+      "unexpectedError": "Error inesperado. Inténtalo de nuevo.",
+      "tooManyRequests": "Demasiadas solicitudes. Espera unos minutos.",
+      "sendError": "Error al enviar el correo. Inténtalo de nuevo."
+    },
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "comments": "Comentarios",
+      "blog": "Blog",
+      "styles": "Estilos",
+      "settings": "Configuración",
+      "viewBlog": "Ver blog",
+      "signOut": "Cerrar sesión"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "totalPosts": "Total de posts",
+      "published": "Publicados",
+      "pendingComments": "Comentarios pendientes",
+      "yourPosts": "Tus posts",
+      "createPost": "Nuevo post",
+      "editPost": "Editar post",
+      "titleCol": "Título",
+      "statusCol": "Estado",
+      "commentsCol": "Comentarios",
+      "actionsCol": "Acciones",
+      "noPostsYet": "Aún no hay posts. ¡Empieza a escribir!",
+      "saveDraft": "Guardar borrador",
+      "publish": "Publicar",
+      "tags": "Tags",
+      "excerpt": "Resumen",
+      "featuredImage": "Imagen destacada",
+      "content": "Contenido",
+      "mapEmbedUrl": "URL de mapa embebido",
+      "moderation": "Moderación",
+      "noCommentsOnPost": "Aún no hay comentarios en este post.",
+      "approve": "Aprobar",
+      "spam": "Spam",
+      "reject": "Rechazar",
+      "statusPublished": "Publicado",
+      "statusDraft": "Borrador",
+      "statusPending": "Pendiente",
+      "statusApproved": "Aprobado",
+      "statusSpam": "Spam",
+      "popularTags": "Tags populares",
+      "titleRequired": "El título es obligatorio.",
+      "postUpdated": "Post actualizado.",
+      "postCreated": "Post creado.",
+      "postDeleted": "Post eliminado.",
+      "commentApproved": "Comentario aprobado.",
+      "commentSpam": "Comentario marcado como spam.",
+      "imageUploadFailed": "Error al subir la imagen.",
+      "deletePostTitle": "Eliminar post",
+      "deletePostDescription": "Esta acción no se puede deshacer. El post y todos sus comentarios serán eliminados permanentemente.",
+      "deleteCommentTitle": "Eliminar comentario",
+      "deleteCommentDescription": "Este comentario será eliminado permanentemente.",
+      "cancel": "Cancelar",
+      "backToDashboard": "Volver al dashboard",
+      "newPost": "Nuevo post",
+      "disabledEnableSettings": "Desactivado — Activar en Configuración →",
+      "quickActionPending": "Acción rápida: Pendientes",
+      "viewComments": "Ver comentarios",
+      "titlePlaceholder": "Título del post",
+      "tagsPlaceholder": "php, diseño, tutorial",
+      "excerptPlaceholder": "Descripción breve mostrada en la lista",
+      "featuredImageHint": "opcional — se muestra como miniatura en la lista",
+      "uploadFeaturedImage": "Haz clic para subir una imagen destacada",
+      "mapEmbedUrlHint": "En Google Maps: Compartir → Insertar un mapa → copia la URL src del código iframe.",
+      "viewingPost": "Viendo:",
+      "failedToDelete": "Error al eliminar.",
+      "failedToSave": "Error al guardar el post.",
+      "failedToApprove": "Error al aprobar el comentario.",
+      "failedToUpdate": "Error al actualizar el comentario.",
+      "commentDeleted": "Comentario eliminado."
+    },
+    "comments": {
+      "title": "Comentarios",
+      "tabAll": "Todos",
+      "tabPending": "Pendientes",
+      "tabApproved": "Aprobados",
+      "tabSpam": "Spam",
+      "emptySpam": "Vaciar spam",
+      "colAuthor": "Autor",
+      "colComment": "Comentario",
+      "colStatus": "Estado",
+      "colDate": "Fecha",
+      "approve": "Aprobar",
+      "markAsSpam": "Marcar como spam",
+      "delete": "Eliminar",
+      "statusPending": "Pendiente",
+      "statusApproved": "Aprobado",
+      "statusSpam": "Spam",
+      "noComments": "No hay comentarios {{status}}.",
+      "deleteTitle": "Eliminar comentario",
+      "deleteDescription": "Este comentario será eliminado permanentemente.",
+      "deleteLabel": "Eliminar",
+      "emptySpamTitle": "Vaciar carpeta de spam",
+      "emptySpamDescription": "Todos los comentarios spam serán eliminados permanentemente. Esta acción no se puede deshacer.",
+      "deleteAllSpam": "Eliminar todo el spam",
+      "markedAs": "Comentario marcado como {{status}}.",
+      "updateFailed": "Error al actualizar el comentario.",
+      "deleted": "Comentario eliminado.",
+      "deleteFailed": "Error al eliminar el comentario.",
+      "allSpamDeleted": "Todos los comentarios spam han sido eliminados.",
+      "clearSpamFailed": "Error al vaciar el spam."
+    },
+    "settings": {
+      "title": "Configuración",
+      "subtitle": "Configuración general de tu blog y panel de administración.",
+      "saveChanges": "Guardar cambios",
+      "saved": "Configuración guardada.",
+      "saveFailed": "Error al guardar la configuración.",
+      "general": {
+        "title": "General",
+        "subtitle": "Identidad y logo del blog",
+        "blogName": "Nombre del blog",
+        "blogNamePlaceholder": "Mi Blog",
+        "description": "Descripción",
+        "descriptionPlaceholder": "Una breve descripción de tu blog",
+        "logo": "Logo del blog",
+        "logoHint": "(cuadrado — 128 × 128 px recomendado)",
+        "logoInfo": "Se muestra en el encabezado del blog y en la pestaña del navegador. Usa un PNG o WebP cuadrado para mejores resultados."
+      },
+      "theme": {
+        "title": "Estilo del panel",
+        "subtitle": "Apariencia visual del dashboard (no afecta al blog público)"
+      },
+      "locale": {
+        "title": "Idioma",
+        "subtitle": "Idioma que verán los visitantes del blog"
+      },
+      "security": {
+        "title": "Seguridad",
+        "subtitle": "Cambia la contraseña de tu cuenta",
+        "currentPwd": "Contraseña actual",
+        "newPwd": "Nueva contraseña",
+        "newPwdHint": "Mínimo 8 caracteres.",
+        "newPwdConfirm": "Confirmar nueva contraseña",
+        "change": "Actualizar contraseña",
+        "changing": "Actualizando…",
+        "changed": "Contraseña actualizada.",
+        "tooShort": "La contraseña debe tener al menos 8 caracteres.",
+        "noMatch": "Las contraseñas nuevas no coinciden.",
+        "error": "Error al cambiar la contraseña."
+      }
+    },
+    "setup": {
+      "title": "Configura tu blog",
+      "subtitle": "Elige qué secciones aparecerán en tu página de inicio y completa los detalles.",
+      "saveGo": "Guardar e ir al panel",
+      "saved": "¡Configuración guardada!",
+      "sessionExpired": "Tu sesión ha expirado. Por favor inicia sesión de nuevo.",
+      "csrfError": "No se pudo verificar la seguridad de la sesión. Recarga la página.",
+      "heroTextRequired": "El texto del banner es obligatorio.",
+      "profileNameRequired": "El nombre es obligatorio.",
+      "profileSummaryRequired": "El resumen es obligatorio.",
+      "socialRequired": "Se requiere al menos un enlace social.",
+      "logo": {
+        "title": "Logo del blog",
+        "subtitle": "Se muestra en la parte superior del blog y como favicon.",
+        "label": "Imagen del logo",
+        "hint": "(cuadrado recomendado, ej. 128 × 128 px)",
+        "upload": "Haz clic para subir tu logo",
+        "formats": "JPEG, PNG, GIF, WebP — máx 10 MB"
+      },
+      "postList": {
+        "title": "Lista de posts",
+        "subtitle": "Tus posts siempre serán visibles."
+      },
+      "hero": {
+        "title": "Banner de inicio",
+        "subtitle": "Una imagen de banner con texto superpuesto.",
+        "bannerImage": "Imagen del banner",
+        "bannerHint": "(1200 × 630 px recomendado)",
+        "uploadBanner": "Haz clic para subir una imagen de banner",
+        "displayText": "Texto del banner",
+        "placeholder": "Bienvenido a mi blog"
+      },
+      "profile": {
+        "title": "Perfil / Sobre mí",
+        "subtitle": "Muestra tu información de perfil en el blog.",
+        "image": "Foto de perfil",
+        "imageHint": "(1080 × 1080 px recomendado)",
+        "uploadImage": "Haz clic para subir una foto de perfil",
+        "name": "Nombre",
+        "namePlaceholder": "Tu nombre",
+        "summary": "Resumen",
+        "summaryPlaceholder": "Una breve bio o eslogan",
+        "description": "Descripción"
+      },
+      "social": {
+        "title": "Redes sociales",
+        "subtitle": "Muestra tus perfiles de redes sociales en el blog."
+      },
+      "comments": {
+        "title": "Comentarios en posts",
+        "subtitle": "Permite que los lectores dejen comentarios en tus posts."
+      }
+    },
+    "blog": {
+      "title": "Blog",
+      "subtitle": "Configura las secciones y el contenido del blog público.",
+      "saveChanges": "Guardar cambios",
+      "saved": "Configuración del blog guardada.",
+      "saveFailed": "Error al guardar.",
+      "bannerRequired": "El texto del banner es obligatorio cuando el Banner de inicio está activo.",
+      "tabs": {
+        "hero": "Banner de inicio",
+        "profile": "Perfil y Sobre mí",
+        "social": "Redes sociales",
+        "comments": "Comentarios",
+        "search": "Buscador",
+        "tags": "Tags"
+      },
+      "hero": {
+        "description": "El banner de inicio es lo primero que ven los visitantes al llegar al blog.",
+        "cardTitle": "Banner de inicio",
+        "cardSubtitle": "Mostrar u ocultar el banner en la página de inicio",
+        "bannerImage": "Imagen del banner",
+        "bannerHint": "(1200 × 630 px recomendado)",
+        "bannerText": "Texto del banner",
+        "bannerPlaceholder": "Bienvenido a mi blog",
+        "bannerOverlayInfo": "Texto superpuesto que se muestra sobre la imagen del banner."
+      },
+      "profile": {
+        "description": "Configura tu tarjeta de perfil (visible en el inicio) y el contenido de cada sección de la página Sobre mí.",
+        "cardTitle": "Tarjeta de perfil",
+        "cardSubtitle": "El widget de perfil mostrado en la página de inicio",
+        "photo": "Foto",
+        "photoHint": "(1:1)",
+        "name": "Nombre",
+        "namePlaceholder": "Tu nombre",
+        "jobTitle": "Título profesional",
+        "jobTitlePlaceholder": "Desarrollador Full-stack",
+        "summary": "Resumen",
+        "summaryPlaceholder": "Una breve bio o eslogan",
+        "availabilityLabel": "Mostrar badge de disponibilidad",
+        "availabilityHint": "Badge verde \"Disponible\" en el perfil",
+        "extendedDescription": "Descripción extendida",
+        "coverImage": "Imagen de portada",
+        "coverHint": "(Banner de la página Sobre mí — 1500 × 500 px)",
+        "activateHint": "Activa la tarjeta de perfil para editar las secciones de la página Sobre mí",
+        "aboutSections": "Secciones de la página Sobre mí"
+      },
+      "aboutSubsections": {
+        "noData": "Agrega contenido para activar esta sección",
+        "gallery": {
+          "title": "Galería",
+          "subtitle": "Carrusel de proyectos o fotos en /about"
+        },
+        "experience": {
+          "title": "Experiencia",
+          "subtitle": "Roles, empresas y tecnologías utilizadas"
+        },
+        "skills": {
+          "title": "Habilidades",
+          "subtitle": "Habilidades técnicas agrupadas por categoría"
+        },
+        "education": {
+          "title": "Formación y Certificaciones",
+          "subtitle": "Formación académica y certificaciones profesionales"
+        },
+        "testimonials": {
+          "title": "Recomendaciones",
+          "subtitle": "Recomendaciones de colegas y clientes"
+        },
+        "social": {
+          "title": "Redes sociales",
+          "subtitle": "Iconos de redes sociales al pie de /about",
+          "editHint": "Para editar las URLs de las redes sociales, ve a la pestaña Redes sociales."
+        }
+      },
+      "educationLabel": "Educación",
+      "certificationsLabel": "Certificaciones",
+      "social": {
+        "description": "Redes sociales que se muestran en el blog. Activa o desactiva la sección.",
+        "cardTitle": "Redes sociales",
+        "cardSubtitle": "Mostrar u ocultar la sección de redes sociales en la página de inicio"
+      },
+      "comments": {
+        "description": "Controla si aparecen comentarios en las páginas de posts individuales.",
+        "globalTitle": "Comentarios habilitados globalmente",
+        "globalSubtitle": "Interruptor maestro — desactivar oculta todas las secciones de comentarios"
+      },
+      "search": {
+        "cardTitle": "Buscador",
+        "cardSubtitle": "Muestra un campo de búsqueda que filtra publicaciones por título, resumen, contenido o tags.",
+        "info": "La búsqueda filtra las publicaciones directamente en el servidor. Actívalo para que los visitantes puedan buscar en tu blog."
+      },
+      "tags": {
+        "cardTitle": "Nube de tags",
+        "cardSubtitle": "Muestra los tags más utilizados del blog para filtrar publicaciones.",
+        "countLabel": "Número de tags a mostrar",
+        "countHint": "Mínimo 1, máximo 20. Ordenados por popularidad."
+      }
+    },
+    "styles": {
+      "title": "Estilo del blog",
+      "subtitle": "Selecciona el estilo visual del blog público.",
+      "info": "El estilo se aplica al blog que ven tus lectores en /. El estilo del dashboard no se ve afectado.",
+      "noStyles": "No hay estilos disponibles.",
+      "active": "Activo",
+      "updated": "Estilo del blog actualizado a \"{{name}}\".",
+      "updateError": "Error al actualizar el estilo.",
+      "descriptions": {
+        "default": "Tarjetas redondeadas, imágenes a color y acento índigo. Diseño moderno y amigable.",
+        "classic": "Layout editorial con sidebar fijo, tipografía serif, imágenes en escala de grises y acento rosa."
+      }
+    },
+    "editor": {
+      "placeholder": "Empieza a escribir tu post…",
+      "heading1": "Título 1",
+      "heading2": "Título 2",
+      "heading3": "Título 3",
+      "bold": "Negrita",
+      "italic": "Cursiva",
+      "strikethrough": "Tachado",
+      "inlineCode": "Código en línea",
+      "highlight": "Resaltar texto",
+      "bulletList": "Lista de viñetas",
+      "orderedList": "Lista numerada",
+      "blockquote": "Cita",
+      "alignLeft": "Alinear a la izquierda",
+      "alignCenter": "Centrar",
+      "alignRight": "Alinear a la derecha",
+      "justify": "Justificar",
+      "insertLink": "Insertar / editar enlace",
+      "insertImage": "Insertar imagen",
+      "undo": "Deshacer",
+      "redo": "Rehacer",
+      "insertLinkTitle": "Insertar enlace",
+      "linkUrl": "URL",
+      "linkPlaceholder": "https://ejemplo.com",
+      "linkHint": "Déjalo vacío para eliminar el enlace.",
+      "apply": "Aplicar"
+    },
+    "imageUpload": {
+      "title": "Insertar imagen",
+      "uploadTab": "Subir archivo",
+      "urlTab": "Desde URL",
+      "clickToSelect": "Haz clic para seleccionar una imagen",
+      "fileTypes": "JPEG, PNG, GIF, WebP — máx. 10 MB",
+      "urlLabel": "URL de imagen",
+      "urlPlaceholder": "https://ejemplo.com/imagen.jpg",
+      "uploading": "Subiendo…",
+      "uploadInsert": "Subir e insertar",
+      "insert": "Insertar",
+      "uploadFailed": "Error al subir"
+    },
+    "about": {
+      "moveUp": "Mover arriba",
+      "moveDown": "Mover abajo",
+      "delete": "Eliminar",
+      "deleteGroup": "Eliminar grupo",
+      "chipPlaceholder": "React, TypeScript… (Enter o coma para añadir)",
+      "experience": {
+        "itemTitle": "Experiencia {{n}}",
+        "roleLabel": "Cargo / Posición",
+        "companyLabel": "Empresa",
+        "periodLabel": "Período",
+        "descriptionLabel": "Descripción",
+        "tagsLabel": "Tecnologías / Etiquetas",
+        "rolePlaceholder": "Lead Frontend Developer",
+        "companyPlaceholder": "Tech Solutions Global",
+        "periodPlaceholder": "2020 – Presente",
+        "descriptionPlaceholder": "Principales logros y responsabilidades…",
+        "add": "Añadir experiencia"
+      },
+      "skills": {
+        "groupPlaceholder": "Nombre del grupo (p. ej. Frontend)",
+        "skillsLabel": "Habilidades",
+        "add": "Añadir grupo"
+      },
+      "education": {
+        "degreePlaceholder": "Título / Programa",
+        "institutionPlaceholder": "Institución",
+        "periodPlaceholder": "2018 – 2022",
+        "add": "Añadir educación"
+      },
+      "certifications": {
+        "namePlaceholder": "Nombre de la certificación",
+        "urlPlaceholder": "https:// (opcional)",
+        "add": "Añadir certificación"
+      },
+      "testimonials": {
+        "itemTitle": "Testimonio {{n}}",
+        "nameLabel": "Nombre",
+        "namePlaceholder": "Laura Martínez",
+        "roleLabel": "Cargo / Posición",
+        "rolePlaceholder": "Product Owner en ACME",
+        "textLabel": "Texto del testimonio",
+        "textPlaceholder": "Escribe lo que dijeron sobre trabajar contigo…",
+        "linkedinLabel": "URL de LinkedIn",
+        "linkedinPlaceholder": "https://linkedin.com/in/…",
+        "uploadAvatar": "Subir avatar",
+        "add": "Añadir testimonio"
+      },
+      "gallery": {
+        "uploadImage": "Subir imagen",
+        "imageLabel": "Imagen",
+        "imageAlt": "Miniatura de galería",
+        "titleLabel": "Título",
+        "titlePlaceholder": "Título del proyecto o foto",
+        "descriptionLabel": "Descripción",
+        "descriptionPlaceholder": "Descripción breve…",
+        "add": "Añadir imagen"
+      }
+    }
+  },
+  "blog": {
+    "nav": {
+      "home": "Inicio",
+      "about": "Sobre mí",
+      "closeMenu": "Cerrar menú",
+      "openMenu": "Abrir menú"
+    },
+    "adminBar": {
+      "admin": "Admin"
+    },
+    "search": {
+      "title": "Buscar",
+      "placeholder": "Buscar publicaciones…",
+      "ariaLabel": "Buscar publicaciones",
+      "button": "Buscar"
+    },
+    "tags": {
+      "title": "Tags",
+      "explore": "Explorar",
+      "popular": "Tags populares",
+      "active": "Posts con tag:"
+    },
+    "posts": {
+      "featured": "Destacado",
+      "latest": "Últimos artículos",
+      "articles": "Artículos",
+      "taggedWith": "Posts con tag: #{{tag}}",
+      "resultsFor": "Resultados para \"{{query}}\"",
+      "noResults": "Aún no hay posts publicados.",
+      "noTag": "No hay posts con el tag \"#{{tag}}\".",
+      "noSearch": "No se encontraron resultados para \"{{query}}\".",
+      "noMore": "No hay más artículos.",
+      "loadMore": "Cargar más artículos",
+      "previous": "← Anteriores",
+      "readArticle": "Leer artículo",
+      "readMore": "Leer más",
+      "error": "Error al cargar los posts.",
+      "recentPosts": "Publicaciones Recientes"
+    },
+    "comments": {
+      "count_one": "{{count}} Comentario",
+      "count_other": "{{count}} Comentarios",
+      "none": "Aún no hay comentarios. ¡Sé el primero!",
+      "leave": "Dejar un comentario",
+      "name": "Nombre",
+      "namePlaceholder": "Tu nombre",
+      "email": "Email",
+      "emailNote": "(no se publica)",
+      "emailPlaceholder": "tu@email.com",
+      "content": "Comentario",
+      "contentPlaceholder": "Escribe tu comentario aquí…",
+      "submit": "Enviar comentario",
+      "submitting": "Enviando…",
+      "submitError": "No se pudo enviar el comentario.",
+      "successTitle": "¡Comentario enviado!",
+      "successText": "Tu comentario está pendiente de aprobación. ¡Gracias!"
+    },
+    "about": {
+      "sectionTitle": "Sobre Mí",
+      "experience": "Experiencia Profesional",
+      "skills": "Habilidades Técnicas",
+      "training": "Formación",
+      "education": "Educación",
+      "certifications": "Certificaciones",
+      "testimonials": "Recomendaciones",
+      "testimonialPrev": "Anterior",
+      "testimonialNext": "Siguiente",
+      "testimonialItem": "Recomendación {{index}}",
+      "available": "Disponible",
+      "viewProfile": "Ver perfil completo →",
+      "aboutMe": "Sobre mí",
+      "galleryTitle": "Galería de Proyectos",
+      "galleryImage": "Imagen {{n}}"
+    },
+    "post": {
+      "back": "Volver al inicio",
+      "keepReading": "Sigue Leyendo",
+      "readingTime": "min de lectura",
+      "share": "Compartir",
+      "copied": "¡Copiado!",
+      "copyLink": "Copiar enlace del artículo",
+      "location": "Ubicación",
+      "notFound": "Post no encontrado."
+    },
+    "footer": {
+      "rights": "Todos los derechos reservados."
+    },
+    "hero": {
+      "bannerAlt": "Banner del hero",
+      "welcome": "Bienvenido a mi blog"
+    },
+    "socialLinks": {
+      "connect": "Conéctate"
+    },
+    "errorLoading": "Error al cargar el blog."
+  }
+}

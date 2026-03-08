@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getSettings } from '@/api/settings'
 import { useAboutPage } from '@/hooks/useBlogPage'
 import { useAuthStore } from '@/store/auth'
+import { useTranslation } from 'react-i18next'
 import AdminBar from '@/components/blog/AdminBar'
 import AboutHero from '@/components/blog/AboutHero'
 import AboutGallery from '@/components/blog/AboutGallery'
@@ -24,6 +25,7 @@ function parseJSON<T>(value: string | undefined, fallback: T): T {
 }
 
 export default function AboutPage() {
+  const { t } = useTranslation()
   const user = useAuthStore((s) => s.user)
 
   const { data: settingsData, isLoading: settingsLoading } = useQuery({
@@ -95,7 +97,7 @@ export default function AboutPage() {
           <section className="mb-12">
             <div className="flex items-center mb-6 mt-2">
               <User className="w-5 h-5 mr-3 shrink-0" style={{ color: 'var(--blog-accent)' }} />
-              <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">Sobre Mí</h2>
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">{t('blog.about.sectionTitle')}</h2>
               <div className="ml-4 h-px bg-gray-200 dark:bg-gray-800 flex-grow" />
             </div>
 

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Trash2, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -22,6 +23,7 @@ function set<K extends keyof CertItem>(
 }
 
 export default function CertificationsEditor({ items, onChange }: CertificationsEditorProps) {
+  const { t } = useTranslation()
   return (
     <div className="space-y-2">
       {items.map((item, i) => (
@@ -32,13 +34,13 @@ export default function CertificationsEditor({ items, onChange }: Certifications
           <Input
             value={item.name}
             onChange={(e) => onChange(set(items, i, 'name', e.target.value))}
-            placeholder="Certification name"
+            placeholder={t('admin.about.certifications.namePlaceholder')}
             className="flex-[3]"
           />
           <Input
             value={item.url ?? ''}
             onChange={(e) => onChange(set(items, i, 'url', e.target.value || undefined))}
-            placeholder="https:// (optional)"
+            placeholder={t('admin.about.certifications.urlPlaceholder')}
             type="url"
             className="flex-[2]"
           />
@@ -46,7 +48,7 @@ export default function CertificationsEditor({ items, onChange }: Certifications
             type="button"
             onClick={() => onChange(items.filter((_, j) => j !== i))}
             className="p-2 text-muted-foreground hover:text-destructive transition-colors shrink-0"
-            aria-label="Delete"
+            aria-label={t('admin.about.delete')}
           >
             <Trash2 className="h-4 w-4" />
           </button>
@@ -61,7 +63,7 @@ export default function CertificationsEditor({ items, onChange }: Certifications
         className="w-full"
       >
         <Plus className="h-4 w-4 mr-1.5" />
-        Add certification
+        {t('admin.about.certifications.add')}
       </Button>
     </div>
   )

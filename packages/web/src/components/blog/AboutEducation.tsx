@@ -1,4 +1,5 @@
 import { GraduationCap, Award, ExternalLink } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 interface EducationItem {
   degree: string
@@ -17,13 +18,14 @@ interface AboutEducationProps {
 }
 
 export default function AboutEducation({ education, certifications }: AboutEducationProps) {
+  const { t } = useTranslation()
   if (education.length === 0 && certifications.length === 0) return null
 
   return (
     <section className="mb-12">
       <div className="flex items-center mb-6 mt-10">
         <GraduationCap className="w-5 h-5 mr-3 shrink-0" style={{ color: 'var(--blog-accent)' }} />
-        <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">Formación</h2>
+        <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">{t('blog.about.training')}</h2>
         <div className="ml-4 h-px bg-gray-200 dark:bg-gray-800 flex-grow" />
       </div>
 
@@ -35,7 +37,7 @@ export default function AboutEducation({ education, certifications }: AboutEduca
             style={{ borderRadius: 'var(--blog-radius-card)' }}
           >
             <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-4">
-              Educación
+              {t('blog.about.education')}
             </h3>
             {education.map((item, idx) => (
               <div key={idx} className="flex gap-4 items-start">
@@ -63,7 +65,7 @@ export default function AboutEducation({ education, certifications }: AboutEduca
             style={{ borderRadius: 'var(--blog-radius-card)' }}
           >
             <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-4">
-              Certificaciones
+              {t('blog.about.certifications')}
             </h3>
             <ul className="space-y-3">
               {certifications.map((cert, idx) => (

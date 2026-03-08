@@ -1,4 +1,5 @@
 import { Briefcase } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 interface ExperienceItem {
   role: string
@@ -13,13 +14,14 @@ interface AboutExperienceProps {
 }
 
 export default function AboutExperience({ data }: AboutExperienceProps) {
+  const { t } = useTranslation()
   if (data.length === 0) return null
 
   return (
     <section className="mb-12">
       <div className="flex items-center mb-6 mt-10">
         <Briefcase className="w-5 h-5 mr-3 shrink-0" style={{ color: 'var(--blog-accent)' }} />
-        <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">Experiencia Profesional</h2>
+        <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">{t('blog.about.experience')}</h2>
         <div className="ml-4 h-px bg-gray-200 dark:bg-gray-800 flex-grow" />
       </div>
 

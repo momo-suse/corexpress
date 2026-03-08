@@ -3,17 +3,12 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
+import { useTranslation } from 'react-i18next'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import { useComments, useMutateComment, useClearSpamComments } from '@/hooks/useComments'
 import { toast } from '@/hooks/useToast'
 import { Trash2, CheckCircle, AlertTriangle } from 'lucide-react'
 import type { Comment } from '@/types/api'
-
-const STATUS_LABELS: Record<Comment['status'], string> = {
-  pending: 'Pending',
-  approved: 'Approved',
-  spam: 'Spam',
-}
 
 const STATUS_VARIANT: Record<Comment['status'], 'default' | 'secondary' | 'destructive'> = {
   pending: 'secondary',
@@ -21,14 +16,8 @@ const STATUS_VARIANT: Record<Comment['status'], 'default' | 'secondary' | 'destr
   spam: 'destructive',
 }
 
-const TABS: { label: string; value: string }[] = [
-  { label: 'All', value: 'all' },
-  { label: 'Pending', value: 'pending' },
-  { label: 'Approved', value: 'approved' },
-  { label: 'Spam', value: 'spam' },
-]
-
 export default function CommentsPage() {
+  const { t } = useTranslation()
   const [statusFilter, setStatusFilter] = useState<string>('pending')
   const [page, setPage] = useState(1)
   const queryParams = statusFilter === 'all' ? { page } : { status: statusFilter, page }
@@ -43,9 +32,9 @@ export default function CommentsPage() {
   async function handleStatus(id: number, status: Comment['status']) {
     try {
       await update.mutateAsync({ id, status })
-      toast({ title: `Comment marked as ${status}.` })
+      toast({ title: t('admin.comments.markedAs', { status }) })
     } catch {
-      toast({ title: 'Failed to update comment.', variant: 'destructive' })
+      toast({ title: t('admin.comments.updateFailed'), variant: 'destructive' })
     }
   }
 
@@ -59,9 +48,9 @@ export default function CommentsPage() {
     setConfirmOpen(false)
     try {
       await remove.mutateAsync(deletingId)
-      toast({ title: 'Comment deleted.' })
+      toast({ title: t('admin.comments.deleted') })
     } catch {
-      toast({ title: 'Failed to delete comment.', variant: 'destructive' })
+      toast({ title: t('admin.comments.deleteFailed'), variant: 'destructive' })
     } finally {
       setDeletingId(null)
     }
@@ -71,9 +60,9 @@ export default function CommentsPage() {
     setConfirmSpamOpen(false)
     try {
       await clearSpam.mutateAsync()
-      toast({ title: 'All spam comments deleted.' })
+      toast({ title: t('admin.comments.allSpamDeleted') })
     } catch {
-      toast({ title: 'Failed to clear spam.', variant: 'destructive' })
+      toast({ title: t('admin.comments.clearSpamFailed'), variant: 'destructive' })
     }
   }
 
@@ -81,9 +70,14 @@ export default function CommentsPage() {
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3 flex-wrap">
-          <h1 className="text-2xl font-bold">Comments</h1>
+          <h1 className="text-2xl font-bold">{t('admin.comments.title')}</h1>
           <div className="flex gap-1 p-1 rounded-lg bg-muted">
-            {TABS.map((tab) => (
+            {([
+              { label: t('admin.comments.tabAll'), value: 'all' },
+              { label: t('admin.comments.tabPending'), value: 'pending' },
+              { label: t('admin.comments.tabApproved'), value: 'approved' },
+              { label: t('admin.comments.tabSpam'), value: 'spam' },
+            ]).map((tab) => (
               <button
                 key={tab.value}
                 onClick={() => { setStatusFilter(tab.value); setPage(1) }}
@@ -106,7 +100,7 @@ export default function CommentsPage() {
             disabled={clearSpam.isPending}
           >
             <Trash2 className="h-4 w-4 mr-2" />
-            Empty Spam
+            {t('admin.comments.emptySpam')}
           </Button>
         )}
       </div>
@@ -118,10 +112,10 @@ export default function CommentsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Author</TableHead>
-                <TableHead>Comment</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead>{t('admin.comments.colAuthor')}</TableHead>
+                <TableHead>{t('admin.comments.colComment')}</TableHead>
+                <TableHead>{t('admin.comments.colStatus')}</TableHead>
+                <TableHead>{t('admin.comments.colDate')}</TableHead>
                 <TableHead className="w-32" />
               </TableRow>
             </TableHeader>
@@ -132,7 +126,7 @@ export default function CommentsPage() {
                   <TableCell className="max-w-xs truncate">{comment.content}</TableCell>
                   <TableCell>
                     <Badge variant={STATUS_VARIANT[comment.status]}>
-                      {STATUS_LABELS[comment.status]}
+                      {t(`admin.comments.status${comment.status.charAt(0).toUpperCase() + comment.status.slice(1)}`)}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
@@ -144,7 +138,7 @@ export default function CommentsPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          title="Approve"
+                          title={t('admin.comments.approve')}
                           onClick={() => handleStatus(comment.id, 'approved')}
                         >
                           <CheckCircle className="h-4 w-4 text-green-600" />
@@ -154,7 +148,7 @@ export default function CommentsPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          title="Mark as spam"
+                          title={t('admin.comments.markAsSpam')}
                           onClick={() => handleStatus(comment.id, 'spam')}
                         >
                           <AlertTriangle className="h-4 w-4 text-amber-500" />
@@ -164,7 +158,7 @@ export default function CommentsPage() {
                         variant="ghost"
                         size="icon"
                         className="text-destructive hover:text-destructive"
-                        title="Delete"
+                        title={t('admin.comments.delete')}
                         onClick={() => askDelete(comment.id)}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -176,7 +170,7 @@ export default function CommentsPage() {
               {data.data.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                    No {statusFilter} comments.
+                    {t('admin.comments.noComments', { status: statusFilter })}
                   </TableCell>
                 </TableRow>
               )}
@@ -186,11 +180,11 @@ export default function CommentsPage() {
           {data.meta.last_page > 1 && (
             <div className="flex justify-center gap-2">
               <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
-                Previous
+                {t('common.previous')}
               </Button>
               <span className="flex items-center text-sm px-2">{page} / {data.meta.last_page}</span>
               <Button variant="outline" size="sm" disabled={page >= data.meta.last_page} onClick={() => setPage((p) => p + 1)}>
-                Next
+                {t('common.next')}
               </Button>
             </div>
           )}
@@ -200,9 +194,9 @@ export default function CommentsPage() {
       {/* Delete comment confirmation */}
       <ConfirmDialog
         open={confirmOpen}
-        title="Delete comment"
-        description="This comment will be permanently deleted."
-        confirmLabel="Delete"
+        title={t('admin.comments.deleteTitle')}
+        description={t('admin.comments.deleteDescription')}
+        confirmLabel={t('admin.comments.deleteLabel')}
         onConfirm={handleDelete}
         onCancel={() => { setConfirmOpen(false); setDeletingId(null) }}
       />
@@ -210,9 +204,9 @@ export default function CommentsPage() {
       {/* Empty spam confirmation */}
       <ConfirmDialog
         open={confirmSpamOpen}
-        title="Empty spam folder"
-        description="All spam comments will be permanently deleted. This action cannot be undone."
-        confirmLabel="Delete all spam"
+        title={t('admin.comments.emptySpamTitle')}
+        description={t('admin.comments.emptySpamDescription')}
+        confirmLabel={t('admin.comments.deleteAllSpam')}
         onConfirm={handleClearSpam}
         onCancel={() => setConfirmSpamOpen(false)}
       />

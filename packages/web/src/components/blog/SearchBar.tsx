@@ -1,5 +1,6 @@
 import { useState, type KeyboardEvent } from 'react'
 import { Search } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 interface SearchBarProps {
   styles?: Record<string, string>
@@ -9,6 +10,7 @@ interface SearchBarProps {
 }
 
 export default function SearchBar({ styles = {}, onSearch, initialQuery = '', variant = 'default' }: SearchBarProps) {
+  const { t } = useTranslation()
   const [value, setValue] = useState(initialQuery)
 
   const isOutline = styles.buttonStyle === 'outline'
@@ -30,14 +32,14 @@ export default function SearchBar({ styles = {}, onSearch, initialQuery = '', va
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Buscar publicaciones…"
+          placeholder={t('blog.search.placeholder')}
           className="flex-1 min-w-0 bg-transparent outline-none font-sans text-sm text-gray-600 dark:text-gray-400 placeholder:text-gray-400 dark:placeholder:text-gray-600"
-          aria-label="Buscar publicaciones"
+          aria-label={t('blog.search.ariaLabel')}
         />
         <button
           type="button"
           onClick={handleSubmit}
-          aria-label="Buscar"
+          aria-label={t('blog.search.button')}
           className="shrink-0 text-gray-400 transition-colors"
           onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--blog-accent)' }}
           onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '' }}
@@ -54,7 +56,7 @@ export default function SearchBar({ styles = {}, onSearch, initialQuery = '', va
       style={{ borderRadius: 'var(--blog-radius-card)' }}
     >
       <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-5 pb-2 border-b border-gray-100 dark:border-gray-800">
-        Buscar
+        {t('blog.search.title')}
       </h3>
       <div
         className="flex w-full overflow-hidden border border-gray-200 dark:border-gray-700"
@@ -65,15 +67,15 @@ export default function SearchBar({ styles = {}, onSearch, initialQuery = '', va
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Buscar publicaciones…"
+          placeholder={t('blog.search.placeholder')}
           className="flex-1 min-w-0 px-3 py-2 text-sm bg-transparent outline-none"
           style={{ color: 'var(--blog-text, #111827)' }}
-          aria-label="Buscar publicaciones"
+          aria-label={t('blog.search.ariaLabel')}
         />
         <button
           type="button"
           onClick={handleSubmit}
-          aria-label="Buscar"
+          aria-label={t('blog.search.button')}
           className="flex items-center px-3 py-2 text-sm font-medium transition-opacity hover:opacity-80 shrink-0"
           style={
             isOutline

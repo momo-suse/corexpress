@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 interface AboutHeroProps {
   settings: Record<string, string>
 }
 
 export default function AboutHero({ settings }: AboutHeroProps) {
+  const { t } = useTranslation()
   const name      = settings.profile_name      || 'About Me'
   const title     = settings.profile_title     || ''
   const imageUrl  = settings.profile_image_url || ''
@@ -67,7 +69,7 @@ export default function AboutHero({ settings }: AboutHeroProps) {
             {available && (
               <span
                 className="absolute bottom-2 right-2 md:bottom-4 md:right-4 w-5 h-5 md:w-6 md:h-6 rounded-full bg-green-500 border-4 border-white dark:border-gray-900 block"
-                title="Disponible"
+                title={t('blog.about.available')}
               />
             )}
           </div>
@@ -85,7 +87,7 @@ export default function AboutHero({ settings }: AboutHeroProps) {
             {available && (
               <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2.5 py-1 rounded-full">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                Disponible
+                {t('blog.about.available')}
               </span>
             )}
           </div>

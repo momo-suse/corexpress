@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useSettings } from '@/hooks/useSettings'
 import { Linkedin, Instagram, Youtube, Facebook } from 'lucide-react'
 
@@ -34,6 +35,7 @@ const NETWORKS = [
 ] as const
 
 export default function SocialLinks(_props: SocialLinksProps) {
+  const { t } = useTranslation()
   const { data } = useSettings()
   const settings = data?.data
 
@@ -48,7 +50,7 @@ export default function SocialLinks(_props: SocialLinksProps) {
       style={{ borderRadius: 'var(--blog-radius-card)' }}
     >
       <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-5 pb-2 border-b border-gray-100 dark:border-gray-800">
-        Conéctate
+        {t('blog.socialLinks.connect')}
       </h3>
 
       <div className="flex justify-center gap-3 flex-wrap">

@@ -19,6 +19,45 @@ use Corexpress\Installer\Migrator;
 use Corexpress\Installer\Requirements;
 use Corexpress\Installer\Security;
 
+// ── i18n helpers ───────────────────────────────────────────────────────────────
+
+function detectInstallerLocale(): string
+{
+    if (session_status() === PHP_SESSION_ACTIVE && isset($_SESSION['installer']['locale'])) {
+        return $_SESSION['installer']['locale'];
+    }
+    $accept = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? 'en';
+    preg_match('/^([a-z]{2})/i', $accept, $m);
+    $code   = strtolower($m[1] ?? 'en');
+    $locale = in_array($code, ['en', 'es', 'ja'], true) ? $code : 'en';
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        $_SESSION['installer']['locale'] = $locale;
+    }
+    return $locale;
+}
+
+/**
+ * Translate a key using the active installer locale.
+ * Automatically HTML-escapes the result — safe for direct echo in HTML.
+ * For raw JS strings use Security::escape() directly.
+ *
+ * @param array<string, string> $params Placeholder replacements {key} → value
+ */
+function t(string $key, array $params = []): string
+{
+    static $strings = null;
+    if ($strings === null) {
+        $locale = detectInstallerLocale();
+        $file   = __DIR__ . '/lang/' . $locale . '.php';
+        $strings = file_exists($file) ? require $file : require __DIR__ . '/lang/en.php';
+    }
+    $str = $strings[$key] ?? $key;
+    foreach ($params as $k => $v) {
+        $str = str_replace('{' . $k . '}', (string)$v, $str);
+    }
+    return htmlspecialchars($str, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+}
+
 // ── Constants ──────────────────────────────────────────────────────────────────
 // config.php is written to the app root: /var/www/html/config.php
 // Installer lives at /var/www/html/public/setup/, so dirname up 2 levels:
@@ -96,7 +135,7 @@ if ($step > 0 && $step > $completedStep + 1) {
 if ($method === 'POST') {
     $csrfToken = trim($_POST['_csrf'] ?? '');
     if (!Security::verifyCsrfToken($csrfToken)) {
-        renderError('Security error', 'Invalid or expired CSRF token. Please go back and try again.');
+        renderError(t('security.error'), t('security.csrf'));
         exit;
     }
 
@@ -143,15 +182,15 @@ function handleDbPost(): void
     $pass = $_POST['db_password'] ?? '';
 
     $errors = [];
-    if ($host === '') $errors[] = 'Database host is required.';
-    if ($name === '') $errors[] = 'Database name is required.';
-    if ($user === '') $errors[] = 'Database user is required.';
-    if ($port < 1 || $port > 65535) $errors[] = 'Invalid port number.';
+    if ($host === '') $errors[] = t('errors.db_host_required');
+    if ($name === '') $errors[] = t('errors.db_name_required');
+    if ($user === '') $errors[] = t('errors.db_user_required');
+    if ($port < 1 || $port > 65535) $errors[] = t('errors.db_port_invalid');
 
     if (empty($errors)) {
         $result = Database::test(compact('host', 'port', 'name', 'user') + ['password' => $pass]);
         if (!$result['ok']) {
-            $errors[] = $result['error'] ?? 'Connection failed.';
+            $errors[] = $result['error'] ?? t('errors.db_connect_fail');
         }
     }
 
@@ -175,13 +214,13 @@ function handleAdminPost(): void
 
     $errors = [];
     if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = 'A valid email address is required.';
+        $errors[] = t('errors.email_invalid');
     }
     if (strlen($password) < 8) {
-        $errors[] = 'Password must be at least 8 characters.';
+        $errors[] = t('errors.password_short');
     }
     if ($password !== $confirm) {
-        $errors[] = 'Passwords do not match.';
+        $errors[] = t('errors.password_mismatch');
     }
 
     if (!empty($errors)) {
@@ -204,22 +243,29 @@ function handleSettingsPost(): void
     $name        = trim($_POST['blog_name'] ?? '');
     $description = trim($_POST['blog_description'] ?? '');
     $theme       = $_POST['blog_theme'] ?? 'default';
+    $locale      = $_POST['app_locale'] ?? detectInstallerLocale();
 
     if (!in_array($theme, ['default', 'minimal', 'dark'], true)) {
         $theme = 'default';
     }
+    if (!in_array($locale, ['en', 'es', 'ja'], true)) {
+        $locale = 'en';
+    }
+
+    // Store chosen locale in session so subsequent pages render in that language
+    $_SESSION['installer']['locale'] = $locale;
 
     $errors = [];
-    if ($name === '') $errors[] = 'Blog name is required.';
-    if (strlen($name) > 100) $errors[] = 'Blog name must be 100 characters or less.';
+    if ($name === '') $errors[] = t('errors.name_required');
+    if (strlen($name) > 100) $errors[] = t('errors.name_too_long');
 
     if (!empty($errors)) {
         $_SESSION['installer']['errors'] = $errors;
-        $_SESSION['installer']['form']   = compact('name', 'description', 'theme');
+        $_SESSION['installer']['form']   = compact('name', 'description', 'theme', 'locale');
         redirect('?step=3');
     }
 
-    $_SESSION['installer']['blog'] = compact('name', 'description', 'theme');
+    $_SESSION['installer']['blog'] = compact('name', 'description', 'theme', 'locale');
     unset($_SESSION['installer']['errors'], $_SESSION['installer']['form']);
     advanceStep(3);
     redirect('?step=4');
@@ -232,7 +278,7 @@ function handleInstallAjax(): void
     $blog  = $_SESSION['installer']['blog']  ?? null;
 
     if (!$db || !$admin || !$blog) {
-        echo json_encode(['ok' => false, 'error' => 'Session expired. Please start over.']);
+        echo json_encode(['ok' => false, 'error' => t('session.expired')]);
         return;
     }
 
@@ -249,6 +295,7 @@ function handleInstallAjax(): void
             'blog_name'        => $blog['name'],
             'blog_description' => $blog['description'],
             'blog_theme'       => $blog['theme'],
+            'app_locale'       => $blog['locale'] ?? 'en',
             'comments_enabled' => '1',
         ] as $key => $value) {
             $stmt->execute([':k' => $key, ':v' => $value]);
@@ -458,6 +505,8 @@ function renderSettings(): void
     $selectedTheme = $form['theme'] ?? 'default';
     unset($_SESSION['installer']['errors'], $_SESSION['installer']['form']);
 
+    $selectedLocale = $form['locale'] ?? detectInstallerLocale();
+
     $themes = [
         // White cards on gray-100 background, dark-gray primary button
         'default' => ['label' => 'Default', 'accent' => '#111827', 'accentHover' => '#374151', 'bg' => '#ffffff', 'surface' => '#f3f4f6', 'text' => '#111827', 'muted' => '#6b7280', 'border' => '#e5e7eb'],
@@ -467,7 +516,7 @@ function renderSettings(): void
         'dark'    => ['label' => 'Dark',    'accent' => '#4f46e5', 'accentHover' => '#4338ca', 'bg' => '#09090b', 'surface' => '#18181b', 'text' => '#fafafa', 'muted' => '#a1a1aa', 'border' => '#27272a'],
     ];
 
-    renderLayout('Blog Settings', 3, function () use ($errors, $form, $csrf, $themes, $selectedTheme): void {
+    renderLayout('Blog Settings', 3, function () use ($errors, $form, $csrf, $themes, $selectedTheme, $selectedLocale): void {
         echo '<div class="step-img-wrap"><div class="step-img-circle"><img src="docs/settings.png" alt="" class="step-img"></div></div>';
         echo '<div class="card-body">';
         echo '<h2 class="step-title" style="text-align:center;">Blog Settings</h2>';
@@ -500,9 +549,20 @@ function renderSettings(): void
         echo '</div>';
         echo '</div>';
 
+        echo '<div class="field">';
+        echo '<label for="app_locale">' . t('settings.language') . ' <span class="hint">(' . t('settings.language_hint') . ')</span></label>';
+        echo '<select id="app_locale" name="app_locale" style="width:100%;padding:.5rem .75rem;border:1px solid var(--border);border-radius:var(--radius);font-size:.9rem;color:var(--text);background:var(--bg);font-family:inherit;">';
+        $localeOptions = ['en' => 'English', 'es' => 'Español', 'ja' => '日本語'];
+        foreach ($localeOptions as $value => $label) {
+            $sel = $value === $selectedLocale ? ' selected' : '';
+            echo '<option value="' . Security::escape($value) . '"' . $sel . '>' . Security::escape($label) . '</option>';
+        }
+        echo '</select>';
+        echo '</div>';
+
         echo '<div class="form-actions form-actions--between" style="margin-top:1.5rem;">';
-        echo '<a href="?step=2" class="btn btn-ghost">← Back</a>';
-        echo '<button type="submit" class="btn btn-primary">Continue</button>';
+        echo '<a href="?step=2" class="btn btn-ghost">' . t('back') . '</a>';
+        echo '<button type="submit" class="btn btn-primary">' . t('continue') . '</button>';
         echo '</div>';
         echo '</form>';
         echo '</div>';
@@ -681,7 +741,7 @@ function renderLayout(string $pageTitle, int $currentStep, callable $body): void
     $esc = static fn(string $s): string => htmlspecialchars($s, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= htmlspecialchars(detectInstallerLocale(), ENT_QUOTES, 'UTF-8') ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1046,7 +1106,7 @@ function renderErrors(array $errors): void
     if (empty($errors)) {
         return;
     }
-    echo '<div class="alert alert-error"><strong>Please fix the following:</strong><ul>';
+    echo '<div class="alert alert-error"><strong>' . t('errors.fix_following') . '</strong><ul>';
     foreach ($errors as $error) {
         echo '<li>' . Security::escape($error) . '</li>';
     }

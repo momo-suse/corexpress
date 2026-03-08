@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { ChevronUp, ChevronDown, Trash2, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -39,6 +40,7 @@ function move(items: ExperienceItem[], from: number, to: number): ExperienceItem
 }
 
 export default function ExperienceEditor({ items, onChange }: ExperienceEditorProps) {
+  const { t } = useTranslation()
   return (
     <div className="space-y-3">
       {items.map((item, i) => (
@@ -48,7 +50,7 @@ export default function ExperienceEditor({ items, onChange }: ExperienceEditorPr
             <span className="text-sm font-medium text-foreground truncate">
               {item.role || item.company
                 ? `${item.role || '—'}${item.company ? ` @ ${item.company}` : ''}`
-                : `Experience ${i + 1}`}
+                : t('admin.about.experience.itemTitle', { n: i + 1 })}
             </span>
             <div className="flex items-center gap-1 shrink-0 ml-2">
               <button
@@ -56,7 +58,7 @@ export default function ExperienceEditor({ items, onChange }: ExperienceEditorPr
                 onClick={() => onChange(move(items, i, i - 1))}
                 disabled={i === 0}
                 className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
-                aria-label="Move up"
+                aria-label={t('admin.about.moveUp')}
               >
                 <ChevronUp className="h-4 w-4" />
               </button>
@@ -65,7 +67,7 @@ export default function ExperienceEditor({ items, onChange }: ExperienceEditorPr
                 onClick={() => onChange(move(items, i, i + 1))}
                 disabled={i === items.length - 1}
                 className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
-                aria-label="Move down"
+                aria-label={t('admin.about.moveDown')}
               >
                 <ChevronDown className="h-4 w-4" />
               </button>
@@ -73,7 +75,7 @@ export default function ExperienceEditor({ items, onChange }: ExperienceEditorPr
                 type="button"
                 onClick={() => onChange(items.filter((_, j) => j !== i))}
                 className="p-1 text-muted-foreground hover:text-destructive transition-colors"
-                aria-label="Delete"
+                aria-label={t('admin.about.delete')}
               >
                 <Trash2 className="h-4 w-4" />
               </button>
@@ -84,49 +86,49 @@ export default function ExperienceEditor({ items, onChange }: ExperienceEditorPr
           <div className="p-4 space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs">Role / Position</Label>
+                <Label className="text-xs">{t('admin.about.experience.roleLabel')}</Label>
                 <Input
                   value={item.role}
                   onChange={(e) => onChange(set(items, i, 'role', e.target.value))}
-                  placeholder="Lead Frontend Developer"
+                  placeholder={t('admin.about.experience.rolePlaceholder')}
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs">Company</Label>
+                <Label className="text-xs">{t('admin.about.experience.companyLabel')}</Label>
                 <Input
                   value={item.company}
                   onChange={(e) => onChange(set(items, i, 'company', e.target.value))}
-                  placeholder="Tech Solutions Global"
+                  placeholder={t('admin.about.experience.companyPlaceholder')}
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs">Period</Label>
+              <Label className="text-xs">{t('admin.about.experience.periodLabel')}</Label>
               <Input
                 value={item.period}
                 onChange={(e) => onChange(set(items, i, 'period', e.target.value))}
-                placeholder="2020 – Present"
+                placeholder={t('admin.about.experience.periodPlaceholder')}
                 className="max-w-xs"
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs">Description</Label>
+              <Label className="text-xs">{t('admin.about.experience.descriptionLabel')}</Label>
               <Textarea
                 rows={3}
                 value={item.description}
                 onChange={(e) => onChange(set(items, i, 'description', e.target.value))}
-                placeholder="Key achievements and responsibilities…"
+                placeholder={t('admin.about.experience.descriptionPlaceholder')}
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs">Technologies / Tags</Label>
+              <Label className="text-xs">{t('admin.about.experience.tagsLabel')}</Label>
               <ChipInput
                 value={item.tags}
                 onChange={(tags) => onChange(set(items, i, 'tags', tags))}
-                placeholder="React, TypeScript… (Enter or comma to add)"
+                placeholder={t('admin.about.chipPlaceholder')}
               />
             </div>
           </div>
@@ -141,7 +143,7 @@ export default function ExperienceEditor({ items, onChange }: ExperienceEditorPr
         className="w-full"
       >
         <Plus className="h-4 w-4 mr-1.5" />
-        Add experience
+        {t('admin.about.experience.add')}
       </Button>
     </div>
   )

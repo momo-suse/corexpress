@@ -14,7 +14,8 @@ import { updatePageComponent } from '@/api/pages'
 import { uploadImage } from '@/api/images'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from '@/hooks/useToast'
-import { Upload, ImageIcon, User, List, Share2, Sparkles, Globe, MessageCircle } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { Upload, ImageIcon, User, List, Share2, Sparkles, Globe, MessageCircle, Languages } from 'lucide-react'
 import type { PageComponent } from '@/types/api'
 
 interface HeroData {
@@ -39,6 +40,7 @@ interface SocialData {
 }
 
 export default function SetupPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const qc = useQueryClient()
 
@@ -52,6 +54,7 @@ export default function SetupPage() {
   const [profileEnabled, setProfileEnabled] = useState(false)
   const [socialEnabled, setSocialEnabled] = useState(false)
   const [commentsEnabled, setCommentsEnabled] = useState(true)
+  const [appLocale, setAppLocale] = useState('en')
 
   const [hero, setHero] = useState<HeroData>({ text: '', imageFile: null, imagePreview: null })
   const [profile, setProfile] = useState<ProfileData>({
@@ -202,6 +205,7 @@ export default function SetupPage() {
       const settingsPayload: Record<string, string> = {
         setup_complete: '1',
         comments_enabled: commentsEnabled ? '1' : '0',
+        app_locale: appLocale,
       }
       if (logoImageId) settingsPayload.blog_logo_id = logoImageId
 
@@ -501,9 +505,40 @@ export default function SetupPage() {
           </CardHeader>
         </Card>
 
+        {/* Language */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-3">
+              <Languages className="h-5 w-5 text-primary" />
+              <div>
+                <CardTitle className="text-base">{t('admin.settings.locale.title')} / Language / 言語</CardTitle>
+                <CardDescription>{t('admin.settings.locale.subtitle')}</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="border-t pt-4">
+            <div className="flex gap-2">
+              {(['en', 'es', 'ja'] as const).map((lk) => (
+                <button
+                  key={lk}
+                  type="button"
+                  onClick={() => setAppLocale(lk)}
+                  className={`flex-1 py-2 text-sm font-medium rounded-lg border transition-colors ${
+                    appLocale === lk
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'text-muted-foreground border-border hover:border-primary/50'
+                  }`}
+                >
+                  {lk === 'en' ? 'English' : lk === 'es' ? 'Español' : '日本語'}
+                </button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
         <div className="flex justify-center pb-8">
           <Button size="lg" onClick={handleSave} disabled={saving} className="px-8">
-            {saving ? 'Saving…' : 'Save & go to dashboard'}
+            {saving ? t('common.saving') : t('admin.setup.saveGo')}
           </Button>
         </div>
       </div>

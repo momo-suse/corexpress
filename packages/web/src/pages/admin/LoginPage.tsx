@@ -7,8 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useAuthStore } from '@/store/auth'
 import { csrf, login, forgotPassword } from '@/api/auth'
 import { ApiError } from '@/api/client'
+import { useTranslation } from 'react-i18next'
 
 export default function LoginPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
 
@@ -41,9 +43,9 @@ export default function LoginPage() {
       navigate('/cx-admin', { replace: true })
     } catch (err) {
       if (err instanceof ApiError) {
-        setError(err.status === 401 ? 'Email o contraseña incorrectos.' : err.message)
+        setError(err.status === 401 ? t('admin.login.invalidCredentials') : err.message)
       } else {
-        setError('Error inesperado. Inténtalo de nuevo.')
+        setError(t('admin.login.unexpectedError'))
       }
     } finally {
       setLoading(false)
@@ -61,9 +63,9 @@ export default function LoginPage() {
       setResetSent(true)
     } catch (err) {
       if (err instanceof ApiError && err.status === 429) {
-        setResetError('Demasiadas solicitudes. Espera unos minutos.')
+        setResetError(t('admin.login.tooManyRequests'))
       } else {
-        setResetError('Error al enviar el correo. Inténtalo de nuevo.')
+        setResetError(t('admin.login.sendError'))
       }
     } finally {
       setResetLoading(false)
@@ -76,7 +78,7 @@ export default function LoginPage() {
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Corexpress</CardTitle>
           <CardDescription>
-            {showForgot ? 'Recupera tu acceso' : 'Inicia sesión en tu panel'}
+            {showForgot ? t('admin.login.titleForgot') : t('admin.login.title')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -84,7 +86,7 @@ export default function LoginPage() {
             <>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t('admin.login.email')}</Label>
                   <Input
                     id="email"
                     type="email"
@@ -96,7 +98,7 @@ export default function LoginPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password">Contraseña</Label>
+                  <Label htmlFor="password">{t('admin.login.password')}</Label>
                   <Input
                     id="password"
                     type="password"
@@ -110,7 +112,7 @@ export default function LoginPage() {
                   <p className="text-sm text-destructive">{error}</p>
                 )}
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Entrando…' : 'Entrar'}
+                  {loading ? t('admin.login.submitting') : t('admin.login.submit')}
                 </Button>
               </form>
               <div className="mt-4 text-center">
@@ -119,7 +121,7 @@ export default function LoginPage() {
                   onClick={() => { setShowForgot(true); setError(null) }}
                   className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  ¿Olvidaste tu contraseña?
+                  {t('admin.login.forgotPassword')}
                 </button>
               </div>
             </>
@@ -128,10 +130,10 @@ export default function LoginPage() {
               {!resetSent ? (
                 <form onSubmit={handleForgot} className="space-y-4">
                   <p className="text-sm text-muted-foreground">
-                    Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña (válido por 10 minutos).
+                    {t('admin.login.forgotDescription')}
                   </p>
                   <div className="space-y-2">
-                    <Label htmlFor="reset-email">Email</Label>
+                    <Label htmlFor="reset-email">{t('admin.login.email')}</Label>
                     <Input
                       id="reset-email"
                       type="email"
@@ -146,7 +148,7 @@ export default function LoginPage() {
                     <p className="text-sm text-destructive">{resetError}</p>
                   )}
                   <Button type="submit" className="w-full" disabled={resetLoading}>
-                    {resetLoading ? 'Enviando…' : 'Enviar enlace'}
+                    {resetLoading ? t('admin.login.sending') : t('admin.login.sendLink')}
                   </Button>
                 </form>
               ) : (
@@ -154,17 +156,17 @@ export default function LoginPage() {
                   {resetEmailWarning ? (
                     <div className="rounded-lg border border-yellow-300 bg-yellow-50 px-4 py-3 text-center dark:border-yellow-700 dark:bg-yellow-950/30">
                       <p className="text-sm font-medium text-yellow-800 dark:text-yellow-300">
-                        Problemas al enviar el correo
+                        {t('admin.login.emailProblem')}
                       </p>
                       <p className="text-xs text-yellow-700 dark:text-yellow-400 mt-1">
-                        El enlace fue generado pero no pudimos enviarlo. Verifica la configuración de correo del servidor.
+                        {t('admin.login.emailProblemDetail')}
                       </p>
                     </div>
                   ) : (
                     <div className="text-center space-y-1">
-                      <p className="text-sm font-medium">Revisa tu correo</p>
+                      <p className="text-sm font-medium">{t('admin.login.emailSentTitle')}</p>
                       <p className="text-xs text-muted-foreground">
-                        Si ese email está registrado, recibirás un enlace en breve.
+                        {t('admin.login.emailSentText')}
                       </p>
                     </div>
                   )}
@@ -176,7 +178,7 @@ export default function LoginPage() {
                   onClick={() => { setShowForgot(false); setResetSent(false); setResetEmail(''); setResetError(null); setResetEmailWarning(false) }}
                   className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  ← Volver al inicio de sesión
+                  {t('admin.login.backToLogin')}
                 </button>
               </div>
             </>

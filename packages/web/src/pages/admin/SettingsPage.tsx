@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Upload, X, Globe, Palette, ShieldCheck } from 'lucide-react'
+import { Upload, X, Globe, Palette, ShieldCheck, Languages } from 'lucide-react'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import { useSettings, useMutateSettings } from '@/hooks/useSettings'
 import { uploadImage } from '@/api/images'
@@ -10,11 +10,13 @@ import { changePassword } from '@/api/auth'
 import { toast } from '@/hooks/useToast'
 import { cn } from '@/lib/utils'
 import { ApiError } from '@/api/client'
+import { useTranslation } from 'react-i18next'
 import type { Settings } from '@/types/api'
 
 const THEME_CLASSES = ['theme-default', 'theme-minimal', 'theme-dark'] as const
 
 export default function SettingsPage() {
+  const { t } = useTranslation()
   const { data, isLoading } = useSettings()
   const { mutateAsync: save, isPending: saving } = useMutateSettings()
 
@@ -73,28 +75,28 @@ export default function SettingsPage() {
         setLogoPreview(null)
       }
       await save(payload as never)
-      toast({ title: 'Settings saved.' })
+      toast({ title: t('admin.settings.saved') })
     } catch {
-      toast({ title: 'Failed to save settings.', variant: 'destructive' })
+      toast({ title: t('admin.settings.saveFailed'), variant: 'destructive' })
     }
   }
 
   async function handlePasswordChange() {
     if (newPwd.length < 8) {
-      toast({ title: 'La contraseña debe tener al menos 8 caracteres.', variant: 'destructive' })
+      toast({ title: t('admin.settings.security.tooShort'), variant: 'destructive' })
       return
     }
     if (newPwd !== newPwdConfirm) {
-      toast({ title: 'Las contraseñas nuevas no coinciden.', variant: 'destructive' })
+      toast({ title: t('admin.settings.security.noMatch'), variant: 'destructive' })
       return
     }
     setPwdSaving(true)
     try {
       await changePassword(currentPwd, newPwd, newPwdConfirm)
-      toast({ title: 'Contraseña actualizada.' })
+      toast({ title: t('admin.settings.security.changed') })
       setCurrentPwd(''); setNewPwd(''); setNewPwdConfirm('')
     } catch (err) {
-      const msg = err instanceof ApiError ? err.message : 'Error al cambiar la contraseña.'
+      const msg = err instanceof ApiError ? err.message : t('admin.settings.security.error')
       toast({ title: msg, variant: 'destructive' })
     } finally {
       setPwdSaving(false)
@@ -109,11 +111,11 @@ export default function SettingsPage() {
       {/* Sticky header */}
       <header className="sticky top-0 z-10 px-8 py-4 flex items-center justify-between border-b bg-card/95 backdrop-blur-sm shrink-0">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">General configuration for your blog and dashboard.</p>
+          <h1 className="text-2xl font-semibold tracking-tight">{t('admin.settings.title')}</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">{t('admin.settings.subtitle')}</p>
         </div>
         <Button onClick={handleSave} disabled={saving}>
-          {saving ? 'Saving…' : 'Save changes'}
+          {saving ? t('common.saving') : t('admin.settings.saveChanges')}
         </Button>
       </header>
 
@@ -127,35 +129,35 @@ export default function SettingsPage() {
               <Globe className="h-4 w-4" />
             </div>
             <div>
-              <p className="text-sm font-semibold">General</p>
-              <p className="text-xs text-muted-foreground">Blog identity and logo</p>
+              <p className="text-sm font-semibold">{t('admin.settings.general.title')}</p>
+              <p className="text-xs text-muted-foreground">{t('admin.settings.general.subtitle')}</p>
             </div>
           </div>
           <div className="px-6 py-5 space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="blog-name">Blog name</Label>
+              <Label htmlFor="blog-name">{t('admin.settings.general.blogName')}</Label>
               <Input
                 id="blog-name"
                 value={form.blog_name ?? ''}
                 onChange={(e) => set('blog_name', e.target.value)}
-                placeholder="My Blog"
+                placeholder={t('admin.settings.general.blogNamePlaceholder')}
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="blog-desc">Description</Label>
+              <Label htmlFor="blog-desc">{t('admin.settings.general.description')}</Label>
               <Input
                 id="blog-desc"
                 value={form.blog_description ?? ''}
                 onChange={(e) => set('blog_description', e.target.value)}
-                placeholder="A short description of your blog"
+                placeholder={t('admin.settings.general.descriptionPlaceholder')}
               />
             </div>
 
             {/* Logo */}
             <div className="space-y-2">
               <Label className="flex items-center gap-1.5">
-                Blog logo
-                <span className="text-xs text-muted-foreground font-normal">(square — 128 × 128 px recommended)</span>
+                {t('admin.settings.general.logo')}
+                <span className="text-xs text-muted-foreground font-normal">{t('admin.settings.general.logoHint')}</span>
               </Label>
               <div className="flex items-center gap-4">
                 {logoPreview ? (
@@ -189,7 +191,7 @@ export default function SettingsPage() {
                   </div>
                 )}
                 <p className="text-xs text-muted-foreground">
-                  Shown in the blog header and browser tab. Use a square PNG or WebP for best results.
+                  {t('admin.settings.general.logoInfo')}
                 </p>
               </div>
               <input
@@ -210,8 +212,8 @@ export default function SettingsPage() {
               <Palette className="h-4 w-4" />
             </div>
             <div>
-              <p className="text-sm font-semibold">Admin theme</p>
-              <p className="text-xs text-muted-foreground">Visual style of the dashboard (does not affect the public blog)</p>
+              <p className="text-sm font-semibold">{t('admin.settings.theme.title')}</p>
+              <p className="text-xs text-muted-foreground">{t('admin.settings.theme.subtitle')}</p>
             </div>
           </div>
           <div className="px-6 py-5">
@@ -235,6 +237,38 @@ export default function SettingsPage() {
           </div>
         </div>
 
+        {/* Language */}
+        <div className="rounded-2xl border-2 border-border overflow-hidden">
+          <div className="flex items-center gap-4 px-6 py-4 bg-muted/30 border-b">
+            <div className="p-2.5 rounded-xl bg-muted text-muted-foreground shrink-0">
+              <Languages className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold">{t('admin.settings.locale.title')}</p>
+              <p className="text-xs text-muted-foreground">{t('admin.settings.locale.subtitle')}</p>
+            </div>
+          </div>
+          <div className="px-6 py-5">
+            <div className="flex p-1 rounded-xl border bg-muted gap-1">
+              {(['en', 'es', 'ja'] as const).map((lk) => (
+                <button
+                  key={lk}
+                  type="button"
+                  onClick={() => set('app_locale' as keyof typeof form, lk)}
+                  className={cn(
+                    'flex-1 py-2.5 text-sm font-medium transition-colors rounded-lg',
+                    (form.app_locale ?? 'en') === lk
+                      ? 'bg-card text-foreground shadow-sm border border-border/60'
+                      : 'text-muted-foreground hover:text-foreground',
+                  )}
+                >
+                  {lk === 'en' ? 'English' : lk === 'es' ? 'Español' : '日本語'}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* Security */}
         <div className="rounded-2xl border-2 border-border overflow-hidden">
           <div className="flex items-center gap-4 px-6 py-4 bg-muted/30 border-b">
@@ -242,13 +276,13 @@ export default function SettingsPage() {
               <ShieldCheck className="h-4 w-4" />
             </div>
             <div>
-              <p className="text-sm font-semibold">Seguridad</p>
-              <p className="text-xs text-muted-foreground">Cambia la contraseña de tu cuenta</p>
+              <p className="text-sm font-semibold">{t('admin.settings.security.title')}</p>
+              <p className="text-xs text-muted-foreground">{t('admin.settings.security.subtitle')}</p>
             </div>
           </div>
           <div className="px-6 py-5 space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="current-pwd">Contraseña actual</Label>
+              <Label htmlFor="current-pwd">{t('admin.settings.security.currentPwd')}</Label>
               <Input
                 id="current-pwd"
                 type="password"
@@ -258,7 +292,7 @@ export default function SettingsPage() {
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="new-pwd">Nueva contraseña</Label>
+              <Label htmlFor="new-pwd">{t('admin.settings.security.newPwd')}</Label>
               <Input
                 id="new-pwd"
                 type="password"
@@ -267,10 +301,10 @@ export default function SettingsPage() {
                 autoComplete="new-password"
                 minLength={8}
               />
-              <p className="text-xs text-muted-foreground">Mínimo 8 caracteres.</p>
+              <p className="text-xs text-muted-foreground">{t('admin.settings.security.newPwdHint')}</p>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="new-pwd-confirm">Confirmar nueva contraseña</Label>
+              <Label htmlFor="new-pwd-confirm">{t('admin.settings.security.newPwdConfirm')}</Label>
               <Input
                 id="new-pwd-confirm"
                 type="password"
@@ -281,7 +315,7 @@ export default function SettingsPage() {
               />
             </div>
             <Button onClick={handlePasswordChange} disabled={pwdSaving || !currentPwd || !newPwd || !newPwdConfirm}>
-              {pwdSaving ? 'Actualizando…' : 'Actualizar contraseña'}
+              {pwdSaving ? t('admin.settings.security.changing') : t('admin.settings.security.change')}
             </Button>
           </div>
         </div>

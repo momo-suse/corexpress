@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { TagItem } from '@/types/api'
 
 interface TagCloudProps {
@@ -33,6 +34,7 @@ const Chips = ({ tags, activeTag, onTagSelect }: Pick<TagCloudProps, 'tags' | 'a
 )
 
 export default function TagCloud({ tags, activeTag, onTagSelect, bare = false }: TagCloudProps) {
+  const { t } = useTranslation()
   if (tags.length === 0) return null
 
   if (bare) return <Chips tags={tags} activeTag={activeTag} onTagSelect={onTagSelect} />
@@ -43,7 +45,7 @@ export default function TagCloud({ tags, activeTag, onTagSelect, bare = false }:
       style={{ borderRadius: 'var(--blog-radius-card)' }}
     >
       <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-5 pb-2 border-b border-gray-100 dark:border-gray-800">
-        Temas
+        {t('blog.tags.title')}
       </h3>
       <Chips tags={tags} activeTag={activeTag} onTagSelect={onTagSelect} />
     </div>

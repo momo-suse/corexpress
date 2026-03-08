@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 interface ProfileSectionProps {
   styles?: Record<string, string>
@@ -7,6 +8,7 @@ interface ProfileSectionProps {
 
 /** Profile section rendered as a sidebar widget card for the default collection layout. */
 export default function ProfileSection({ settings }: ProfileSectionProps) {
+  const { t } = useTranslation()
   const name = settings.profile_name || 'About me'
   const summary = settings.profile_summary || ''
   const imageUrl = settings.profile_image_url || ''
@@ -20,7 +22,7 @@ export default function ProfileSection({ settings }: ProfileSectionProps) {
       <div className="absolute top-0 right-0 w-28 h-28 bg-indigo-50 dark:bg-indigo-900/10 rounded-bl-full -z-10" />
 
       <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-5 pb-2 border-b border-gray-100 dark:border-gray-800">
-        Sobre mí
+        {t('blog.about.aboutMe')}
       </h3>
 
       <div className="flex flex-col items-center text-center">
@@ -51,7 +53,7 @@ export default function ProfileSection({ settings }: ProfileSectionProps) {
           onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--blog-accent)' }}
           onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '' }}
         >
-          Ver perfil completo →
+          {t('blog.about.viewProfile')}
         </Link>
       </div>
     </div>

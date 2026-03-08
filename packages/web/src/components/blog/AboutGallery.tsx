@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react'
 
 interface GalleryImage {
@@ -12,6 +13,7 @@ interface AboutGalleryProps {
 }
 
 export default function AboutGallery({ data }: AboutGalleryProps) {
+  const { t } = useTranslation()
   const [current, setCurrent] = useState(0)
 
   if (data.length === 0) return null
@@ -25,7 +27,7 @@ export default function AboutGallery({ data }: AboutGalleryProps) {
     <section className="mb-12">
       <div className="flex items-center mb-6 mt-10">
         <ImageIcon className="w-5 h-5 mr-3 shrink-0" style={{ color: 'var(--blog-accent)' }} />
-        <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">Galería de Proyectos</h2>
+        <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">{t('blog.about.galleryTitle')}</h2>
         <div className="ml-4 h-px bg-gray-200 dark:bg-gray-800 flex-grow" />
       </div>
 
@@ -52,7 +54,7 @@ export default function AboutGallery({ data }: AboutGalleryProps) {
           <button
             onClick={prev}
             className="hidden group-hover:flex absolute top-1/2 -translate-y-1/2 left-4 items-center justify-center bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-2.5 rounded-full shadow-md hover:scale-110 transition-all border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-white"
-            aria-label="Anterior"
+            aria-label={t('blog.about.testimonialPrev')}
           >
             <ChevronLeft size={22} />
           </button>
@@ -63,7 +65,7 @@ export default function AboutGallery({ data }: AboutGalleryProps) {
           <button
             onClick={next}
             className="hidden group-hover:flex absolute top-1/2 -translate-y-1/2 right-4 items-center justify-center bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-2.5 rounded-full shadow-md hover:scale-110 transition-all border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-white"
-            aria-label="Siguiente"
+            aria-label={t('blog.about.testimonialNext')}
           >
             <ChevronRight size={22} />
           </button>
@@ -79,7 +81,7 @@ export default function AboutGallery({ data }: AboutGalleryProps) {
                 className={`rounded-full bg-white transition-all duration-300 ${
                   i === current ? 'w-7 h-2.5 opacity-100' : 'w-2.5 h-2.5 opacity-50 hover:opacity-90'
                 }`}
-                aria-label={`Imagen ${i + 1}`}
+                aria-label={t('blog.about.galleryImage', { n: i + 1 })}
               />
             ))}
           </div>
