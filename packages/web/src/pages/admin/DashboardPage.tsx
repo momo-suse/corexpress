@@ -408,18 +408,31 @@ export default function DashboardPage() {
                           key={post.id}
                           className="grid grid-cols-12 gap-4 p-4 items-center border-b last:border-b-0 hover:bg-muted/30 transition-colors"
                         >
-                          {/* Title + tags */}
-                          <div className="col-span-6 flex flex-col gap-1.5 pr-4">
-                            <span className="font-medium truncate">{post.title}</span>
-                            {post.tags && (
-                              <div className="flex flex-wrap gap-1">
-                                {post.tags.split(',').map((tag) => (
-                                  <Badge key={tag} variant="outline" className="text-[10px] px-1.5 py-0">
-                                    {tag.trim()}
-                                  </Badge>
-                                ))}
+                          {/* Thumbnail + Title + tags */}
+                          <div className="col-span-6 flex items-center gap-3 pr-4">
+                            {post.featured_image_url ? (
+                              <img
+                                src={post.featured_image_url}
+                                alt=""
+                                className="w-10 h-10 rounded-md object-cover shrink-0 border border-border"
+                              />
+                            ) : (
+                              <div className="w-10 h-10 rounded-md bg-muted border border-border flex items-center justify-center shrink-0">
+                                <FileText className="h-4 w-4 text-muted-foreground" />
                               </div>
                             )}
+                            <div className="flex flex-col gap-1.5 min-w-0">
+                              <span className="font-medium truncate">{post.title}</span>
+                              {post.tags && (
+                                <div className="flex flex-wrap gap-1">
+                                  {post.tags.split(',').map((tag) => (
+                                    <Badge key={tag} variant="outline" className="text-[10px] px-1.5 py-0">
+                                      {tag.trim()}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
                           </div>
 
                           {/* Status badge */}

@@ -98,10 +98,11 @@ INSERT INTO `component_definitions` (`name`, `label`, `type`, `parent_id`, `has_
     ('search',             'Search',       'component',     NULL, 0),
     ('tag-cloud',          'Tag Cloud',    'component',     NULL, 0);
 
--- Style collections (2 built-in — default is the fallback)
+-- Style collections (3 built-in — default is the fallback)
 INSERT INTO `style_collections` (`name`, `label`, `is_default`) VALUES
     ('default', 'Default', 1),
-    ('classic', 'Classic', 0);
+    ('classic', 'Classic', 0),
+    ('nebula',  'Nebula',  0);
 
 -- Default collection styles (covers all 14 components)
 INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `styles_config`) VALUES
@@ -167,6 +168,23 @@ INSERT INTO `page_components` (`page_id`, `component_definition_id`, `is_visible
     (3, 11, 1, 4),
     (3, 12, 1, 5),
     (3, 7,  1, 6);
+
+-- Nebula collection styles (dark tech bento-grid — all 14 components)
+INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `styles_config`) VALUES
+    (3, 1,  '{"background":"#030712","textColor":"#f1f5f9","layout":"bento-hero"}'),
+    (3, 2,  '{"background":"#030712","textColor":"#f1f5f9","layout":"bento-profile"}'),
+    (3, 3,  '{"background":"#030712","textColor":"#f1f5f9","layout":"bento-grid"}'),
+    (3, 4,  '{"background":"#030712","textColor":"#e2e8f0","layout":"article-dark"}'),
+    (3, 5,  '{"background":"#030712","textColor":"#e2e8f0","layout":"card-dark"}'),
+    (3, 6,  '{"background":"#030712","textColor":"#e2e8f0","layout":"list-dark"}'),
+    (3, 7,  '{"background":"#030712","textColor":"#94a3b8","layout":"inline-dark"}'),
+    (3, 8,  '{"background":"#030712","textColor":"#e2e8f0","layout":"carousel-dark"}'),
+    (3, 9,  '{"background":"#030712","textColor":"#e2e8f0","layout":"card-dark"}'),
+    (3, 10, '{"background":"#030712","textColor":"#e2e8f0","layout":"grid-dark"}'),
+    (3, 11, '{"background":"#030712","textColor":"#e2e8f0","layout":"two-col-dark"}'),
+    (3, 12, '{"background":"#030712","textColor":"#e2e8f0","layout":"carousel-dark"}'),
+    (3, 13, '{"background":"#030712","textColor":"#e2e8f0","layout":"inline-dark","buttonStyle":"outlined"}'),
+    (3, 14, '{"background":"#030712","textColor":"#94a3b8","layout":"cloud-dark"}');
 
 -- Active style collection setting + tags max count + locale
 INSERT INTO `settings` (`key`, `value`) VALUES

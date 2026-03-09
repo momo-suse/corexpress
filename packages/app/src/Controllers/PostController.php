@@ -55,7 +55,7 @@ class PostController extends Controller
 
         $total = $query->count();
         $posts = (clone $query)
-            ->select(['id', 'title', 'slug', 'excerpt', 'tags', 'featured_image_id', 'status', 'created_at', 'updated_at'])
+            ->select(['id', 'title', 'slug', 'excerpt', 'tags', 'reading_time', 'content', 'featured_image_id', 'status', 'created_at', 'updated_at'])
             ->withCount([
                 'comments as comments_count',
                 'comments as comments_pending_count' => static fn ($q) => $q->where('status', 'pending'),
@@ -64,10 +64,17 @@ class PostController extends Controller
             ->take($perPage)
             ->get()
             ->map(function (Post $post) {
-            $data = $post->toArray();
-            $data['featured_image_url'] = $this->resolveFeaturedImageUrl($post->featured_image_id);
-            return $data;
-        });
+                $data = $post->toArray();
+                $data['featured_image_url'] = $this->resolveFeaturedImageUrl($post->featured_image_id);
+                // Compute reading_time from content when not manually set
+                if (empty($data['reading_time']) && !empty($data['content'])) {
+                    $words = str_word_count(strip_tags((string) $data['content']));
+                    $data['reading_time'] = max(1, (int) round($words / 200)) . ' min';
+                }
+                // Don't expose full content in list endpoint
+                unset($data['content']);
+                return $data;
+            });
 
         return $this->json($response, [
             'data' => $posts->values()->toArray(),

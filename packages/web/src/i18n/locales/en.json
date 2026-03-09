@@ -350,7 +350,8 @@
       "updateError": "Error updating style.",
       "descriptions": {
         "default": "Rounded cards, color images and indigo accent. Modern and friendly design.",
-        "classic": "Editorial layout with fixed sidebar, serif typography, grayscale images, and pink accent."
+        "classic": "Editorial layout with fixed sidebar, serif typography, grayscale images, and pink accent.",
+        "nebula": "Dark tech aesthetic with a bento grid layout, glassmorphism cards, and cyan/violet glow accents."
       }
     },
     "editor": {
@@ -536,6 +537,12 @@
       "copyLink": "Copy article link",
       "location": "Location",
       "notFound": "Post not found."
+    },
+    "nebula": {
+      "keepExploring": "Keep exploring",
+      "finishedReading": "Finished reading?",
+      "backToHomeDesc": "Go back to explore more articles.",
+      "backToHome": "BACK TO HOME"
     },
     "footer": {
       "rights": "All rights reserved."

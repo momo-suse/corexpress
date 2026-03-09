@@ -234,3 +234,13 @@
   --blog-radius-card: 0px;
   --blog-img-filter:  grayscale(100%);
 }
+
+/* Nebula: dark tech bento-grid, cyan/violet glow accents, pill nav, 2rem radius */
+.blog-collection-nebula {
+  --blog-accent:           #22d3ee;  /* cyan-400 */
+  --blog-accent-soft:      #061820;  /* dark cyan tint for glass cards */
+  --blog-radius-card:      2rem;
+  --blog-img-filter:       none;
+  --blog-bg:               #030712;  /* near-black base */
+  --blog-accent-secondary: #8b5cf6;  /* violet-500 — secondary hover/labels */
+}

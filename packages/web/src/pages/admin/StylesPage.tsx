@@ -11,6 +11,45 @@ import { useTranslation } from 'react-i18next'
 function CollectionPreview({ name }: { name: string }) {
   const { t } = useTranslation()
   const isClassic = name === 'classic'
+  const isNebula  = name === 'nebula'
+
+  if (isNebula) {
+    return (
+      <div className="blog-collection-nebula pointer-events-none select-none">
+        <div className="rounded-[2rem] overflow-hidden bg-[#030712] border border-white/10">
+          {/* Mini pill nav */}
+          <div className="px-3 pt-3 pb-2 flex justify-between items-center">
+            <div className="h-1.5 w-8 rounded-full bg-white/20" />
+            <div className="h-4 w-16 rounded-full bg-white/5 border border-white/10" />
+            <div className="flex gap-1">
+              <div className="h-1.5 w-3 rounded-full bg-white/20" />
+              <div className="h-1.5 w-3 rounded-full bg-white/20" />
+            </div>
+          </div>
+          {/* Mini bento grid */}
+          <div className="px-3 pb-3 grid grid-cols-3 gap-1.5">
+            {/* Featured post (2 cols) */}
+            <div className="col-span-2 rounded-xl h-16 bg-white/5 border border-white/10 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-slate-700/50 to-slate-800/50" />
+              <div className="absolute bottom-2 left-2 right-2">
+                <div className="h-1.5 w-3/4 rounded bg-white/50 mb-1" />
+                <div className="h-1 w-1/2 rounded" style={{ background: 'var(--blog-accent)', opacity: 0.7 }} />
+              </div>
+            </div>
+            {/* Small posts (1 col, stacked) */}
+            <div className="col-span-1 flex flex-col gap-1.5">
+              <div className="rounded-xl h-[29px] bg-white/5 border border-white/10 flex items-center justify-center">
+                <div className="h-1 w-2/3 rounded bg-white/20" />
+              </div>
+              <div className="rounded-xl h-[29px] bg-white/5 border border-white/10 flex items-center justify-center">
+                <div className="h-1 w-1/2 rounded bg-white/20" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={`blog-collection-${name} pointer-events-none select-none`}>
