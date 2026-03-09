@@ -10,24 +10,12 @@ interface PostDetailProps {
   settings?: Record<string, string>
 }
 
-function readingTime(content: string): string {
-  const words = content.replace(/<[^>]+>/g, '').split(/\s+/).filter(Boolean).length
-  return `${Math.max(1, Math.round(words / 200))} min`
-}
-
-function firstTag(tags: string | null): string | null {
-  if (!tags) return null
-  const t = tags.split(',')[0]?.trim()
-  return t || null
-}
-
 export default function PostDetail({ post, settings = {} }: PostDetailProps) {
   const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
 
   const date = formatTimeAgo(post.created_at)
-  const time = readingTime(post.content || '')
-  const tag = firstTag(post.tags)
+  const tags = post.tags ? post.tags.split(',').map((t) => t.trim()).filter(Boolean) : []
 
   // settings kept in props for future use (e.g. branding)
   void settings
@@ -71,19 +59,22 @@ export default function PostDetail({ post, settings = {} }: PostDetailProps) {
           </button>
         </div>
 
-        {/* Meta row: category + readtime + date */}
+        {/* Meta row: tags + reading time + date */}
         <div className="flex items-center flex-wrap gap-3 mb-5">
-          {tag && (
+          {tags.map((tag) => (
             <span
+              key={tag}
               className="text-xs font-bold uppercase tracking-wider py-1.5 px-3 rounded-full"
               style={{ background: 'var(--blog-accent-soft)', color: 'var(--blog-accent)' }}
             >
               {tag}
             </span>
+          ))}
+          {post.reading_time && (
+            <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center font-medium">
+              <Clock size={14} className="mr-1.5" /> {post.reading_time}
+            </span>
           )}
-          <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center font-medium">
-            <Clock size={14} className="mr-1.5" /> {time}
-          </span>
           <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">• {date}</span>
         </div>
 

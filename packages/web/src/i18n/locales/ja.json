@@ -82,6 +82,8 @@
       "statusApproved": "承認済み",
       "statusSpam": "スパム",
       "popularTags": "人気のタグ",
+      "readingTime": "読了時間",
+      "readingTimeHint": "任意 — 投稿に表示されます（例：「5分」）",
       "titleRequired": "タイトルは必須です。",
       "postUpdated": "投稿を更新しました。",
       "postCreated": "投稿を作成しました。",
@@ -147,6 +149,11 @@
       "title": "設定",
       "subtitle": "ブログとダッシュボードの全般設定。",
       "saveChanges": "変更を保存",
+      "tabs": {
+        "general": "一般",
+        "style": "スタイルと言語",
+        "security": "セキュリティ"
+      },
       "saved": "設定を保存しました。",
       "saveFailed": "設定の保存に失敗しました。",
       "general": {

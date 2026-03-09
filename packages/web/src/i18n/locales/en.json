@@ -82,6 +82,8 @@
       "statusApproved": "Approved",
       "statusSpam": "Spam",
       "popularTags": "Popular tags",
+      "readingTime": "Reading time",
+      "readingTimeHint": "Optional — shown in the post (e.g. \"5 min\")",
       "titleRequired": "Title is required.",
       "postUpdated": "Post updated.",
       "postCreated": "Post created.",
@@ -147,6 +149,11 @@
       "title": "Settings",
       "subtitle": "General configuration for your blog and dashboard.",
       "saveChanges": "Save changes",
+      "tabs": {
+        "general": "General",
+        "style": "Style & Language",
+        "security": "Security"
+      },
       "saved": "Settings saved.",
       "saveFailed": "Failed to save settings.",
       "general": {

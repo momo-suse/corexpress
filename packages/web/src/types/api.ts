@@ -14,6 +14,7 @@ export interface Post {
   featured_image_id: number | null
   featured_image_url: string | null
   map_embed_url: string | null
+  reading_time: string | null
   status: 'draft' | 'published'
   author_id: number
   created_at: string

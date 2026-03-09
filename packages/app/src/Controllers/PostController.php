@@ -131,6 +131,7 @@ class PostController extends Controller
             'tags' => isset($body['tags']) && $body['tags'] !== '' ? trim((string)$body['tags']) : null,
             'featured_image_id' => $featuredImageId,
             'map_embed_url' => $this->sanitizeMapUrl($body['map_embed_url'] ?? null),
+            'reading_time' => isset($body['reading_time']) && $body['reading_time'] !== '' ? trim((string)$body['reading_time']) : null,
             'status' => in_array($body['status'] ?? '', ['draft', 'published'], true)
             ? $body['status']
             : 'draft',
@@ -197,6 +198,10 @@ class PostController extends Controller
 
         if (array_key_exists('map_embed_url', $body)) {
             $post->map_embed_url = $this->sanitizeMapUrl($body['map_embed_url']);
+        }
+
+        if (array_key_exists('reading_time', $body)) {
+            $post->reading_time = $body['reading_time'] !== null && $body['reading_time'] !== '' ? trim((string)$body['reading_time']) : null;
         }
 
         $post->save();

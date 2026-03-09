@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS `posts` (
     `tags`               VARCHAR(500)                       NULL     DEFAULT NULL,
     `featured_image_id`  INT UNSIGNED                       NULL     DEFAULT NULL COMMENT 'Optional thumbnail / hero image for the post',
     `map_embed_url`      VARCHAR(2048)                      NULL     DEFAULT NULL COMMENT 'Optional map embed URL (Google Maps, OpenStreetMap, etc.)',
+    `reading_time`       VARCHAR(50)                        NULL     DEFAULT NULL COMMENT 'Optional manual reading time label (e.g. "5 min")',
     `status`             ENUM('draft','published')          NOT NULL DEFAULT 'draft',
     `created_at`         TIMESTAMP                          NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at`         TIMESTAMP                          NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

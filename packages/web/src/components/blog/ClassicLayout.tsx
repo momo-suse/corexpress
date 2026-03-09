@@ -701,13 +701,15 @@ export function ClassicPostContent({
                 </p>
               )}
 
-              {/* Reading time — thick border closes the header */}
-              <div className="flex items-center gap-3 pt-5 border-t-2 border-gray-900 dark:border-white">
-                <Clock size={13} className="text-gray-400 shrink-0" />
-                <span className="font-sans text-xs uppercase tracking-widest text-gray-400">
-                  {readingTime(post.content || '')} {t('blog.post.readingTime')}
-                </span>
-              </div>
+              {/* Reading time — thick border closes the header; only shown when set manually */}
+              {post.reading_time && (
+                <div className="flex items-center gap-3 pt-5 border-t-2 border-gray-900 dark:border-white">
+                  <Clock size={13} className="text-gray-400 shrink-0" />
+                  <span className="font-sans text-xs uppercase tracking-widest text-gray-400">
+                    {post.reading_time}
+                  </span>
+                </div>
+              )}
             </header>
 
             {/* Featured image — editorial framed style */}

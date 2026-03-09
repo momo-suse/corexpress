@@ -82,6 +82,8 @@
       "statusApproved": "Aprobado",
       "statusSpam": "Spam",
       "popularTags": "Tags populares",
+      "readingTime": "Tiempo de lectura",
+      "readingTimeHint": "Opcional — se muestra en el post (ej. \"5 min\")",
       "titleRequired": "El título es obligatorio.",
       "postUpdated": "Post actualizado.",
       "postCreated": "Post creado.",
@@ -147,6 +149,11 @@
       "title": "Configuración",
       "subtitle": "Configuración general de tu blog y panel de administración.",
       "saveChanges": "Guardar cambios",
+      "tabs": {
+        "general": "General",
+        "style": "Estilo & Idioma",
+        "security": "Seguridad"
+      },
       "saved": "Configuración guardada.",
       "saveFailed": "Error al guardar la configuración.",
       "general": {
