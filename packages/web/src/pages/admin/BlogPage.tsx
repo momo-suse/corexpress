@@ -14,6 +14,7 @@ import {
   Images,
   Search,
   Tag,
+  FileDown,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -98,12 +99,14 @@ interface SubSectionProps {
   visible: boolean
   onToggle: (v: boolean) => void
   Icon: React.ComponentType<{ className?: string }>
-  children: React.ReactNode
+  children?: React.ReactNode
   /** When true: no data yet — switch is disabled, card appears muted */
   disabled?: boolean
+  /** Optional badge shown next to the title (e.g. "Beta") */
+  badge?: string
 }
 
-function SubSection({ title, description, visible, onToggle, Icon, children, disabled = false }: SubSectionProps) {
+function SubSection({ title, description, visible, onToggle, Icon, children, disabled = false, badge }: SubSectionProps) {
   const { t } = useTranslation()
   return (
     <div className={cn(
@@ -122,8 +125,13 @@ function SubSection({ title, description, visible, onToggle, Icon, children, dis
           <Icon className="h-4 w-4" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className={cn('text-sm font-semibold', visible ? 'text-foreground' : 'text-muted-foreground')}>
+          <p className={cn('text-sm font-semibold flex items-center gap-2', visible ? 'text-foreground' : 'text-muted-foreground')}>
             {title}
+            {badge && (
+              <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                {badge}
+              </span>
+            )}
           </p>
           <p className="text-xs text-muted-foreground">
             {(disabled && !visible) ? t('admin.blog.aboutSubsections.noData') : description}
@@ -132,7 +140,7 @@ function SubSection({ title, description, visible, onToggle, Icon, children, dis
         <Switch checked={visible} onCheckedChange={onToggle} />
       </div>
 
-      {visible && (
+      {visible && children && (
         <div className="px-6 py-5 border-t border-border/50">
           {children}
         </div>
@@ -523,13 +531,6 @@ export default function BlogPage() {
                       <Label className="text-xs">{t('admin.blog.profile.summary')}</Label>
                       <Input value={form.profile_summary ?? ''} onChange={(e) => setField('profile_summary' as keyof Settings, e.target.value)} placeholder={t('admin.blog.profile.summaryPlaceholder')} />
                     </div>
-                    <div className="flex items-center justify-between pt-1">
-                      <div>
-                        <Label className="text-xs font-medium" htmlFor="avail-sw">{t('admin.blog.profile.availabilityLabel')}</Label>
-                        <p className="text-xs text-muted-foreground">{t('admin.blog.profile.availabilityHint')}</p>
-                      </div>
-                      <Switch id="avail-sw" checked={(form.profile_available ?? '0') === '1'} onCheckedChange={(v) => setField('profile_available' as keyof Settings, v ? '1' : '0')} />
-                    </div>
                   </div>
                 </div>
 
@@ -651,6 +652,15 @@ export default function BlogPage() {
                   {t('admin.blog.aboutSubsections.social.editHint')}
                 </p>
               </SubSection>
+
+              <SubSection
+                title={t('admin.blog.aboutSubsections.download-pdf.title')}
+                description={t('admin.blog.aboutSubsections.download-pdf.subtitle')}
+                visible={aboutVisible('download-pdf')}
+                onToggle={(v) => toggleAbout('download-pdf', v)}
+                Icon={FileDown}
+                badge="Beta"
+              />
             </div>
           </>
         )}

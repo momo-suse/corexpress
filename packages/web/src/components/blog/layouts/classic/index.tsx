@@ -28,6 +28,7 @@ import AboutSkills from '@/components/blog/AboutSkills'
 import AboutEducation from '@/components/blog/AboutEducation'
 import AboutTestimonials from '@/components/blog/AboutTestimonials'
 import SocialLinks from '@/components/blog/SocialLinks'
+import AboutPdfButton from '@/components/blog/AboutPdfButton'
 import SearchBar from '@/components/blog/SearchBar'
 import TagCloud from '@/components/blog/TagCloud'
 import { usePosts } from '@/hooks/usePosts'
@@ -801,6 +802,7 @@ export interface ClassicAboutContentProps {
   educationVisible: boolean
   testimonialsVisible: boolean
   socialVisible: boolean
+  downloadPdfVisible?: boolean
 }
 
 export function ClassicAboutContent({
@@ -812,6 +814,7 @@ export function ClassicAboutContent({
   educationVisible,
   testimonialsVisible,
   socialVisible,
+  downloadPdfVisible = false,
 }: ClassicAboutContentProps) {
   const { t } = useTranslation()
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -819,7 +822,6 @@ export function ClassicAboutContent({
   const name        = settings.profile_name     || 'About Me'
   const title       = settings.profile_title    || ''
   const imageUrl    = settings.profile_image_url || ''
-  const available   = settings.profile_available === '1'
   const summary     = settings.profile_summary  || ''
   const description = settings.profile_description || ''
 
@@ -888,13 +890,24 @@ export function ClassicAboutContent({
               </p>
             )}
 
-            {available && (
-              <span className="inline-flex items-center gap-1.5 mt-3 text-xs font-semibold text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2.5 py-1 rounded-full">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                {t('blog.about.available')}
-              </span>
-            )}
           </header>
+
+          {/* Download PDF button — top-right */}
+          {downloadPdfVisible && (
+            <div className="flex justify-end mb-8">
+              <AboutPdfButton
+                styles={{}}
+                settings={settings}
+                collection="classic"
+                experienceVisible={experienceVisible}
+                skillsVisible={skillsVisible}
+                educationVisible={educationVisible}
+                testimonialsVisible={testimonialsVisible}
+                galleryVisible={galleryVisible}
+                socialVisible={socialVisible}
+              />
+            </div>
+          )}
 
           {/* Summary / bio */}
           {(summary || description) && (

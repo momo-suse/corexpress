@@ -1,18 +1,15 @@
 import { Link } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 
 interface AboutHeroProps {
   settings: Record<string, string>
 }
 
 export default function AboutHero({ settings }: AboutHeroProps) {
-  const { t } = useTranslation()
   const name      = settings.profile_name      || 'About Me'
   const title     = settings.profile_title     || ''
   const imageUrl  = settings.profile_image_url || ''
   const coverUrl  = settings.profile_cover_url || ''
-  const available = settings.profile_available === '1'
 
   return (
     <div className="mb-12">
@@ -66,15 +63,9 @@ export default function AboutHero({ settings }: AboutHeroProps) {
                 {name.charAt(0).toUpperCase()}
               </div>
             )}
-            {available && (
-              <span
-                className="absolute bottom-2 right-2 md:bottom-4 md:right-4 w-5 h-5 md:w-6 md:h-6 rounded-full bg-green-500 border-4 border-white dark:border-gray-900 block"
-                title={t('blog.about.available')}
-              />
-            )}
           </div>
 
-          {/* Name + title + badge */}
+          {/* Name + title */}
           <div className="flex-1 mt-2 md:mt-0">
             <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white leading-tight mb-2">
               {name}
@@ -83,12 +74,6 @@ export default function AboutHero({ settings }: AboutHeroProps) {
               <p className="text-lg md:text-xl font-medium mb-3" style={{ color: 'var(--blog-accent)' }}>
                 {title}
               </p>
-            )}
-            {available && (
-              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2.5 py-1 rounded-full">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                {t('blog.about.available')}
-              </span>
             )}
           </div>
         </div>

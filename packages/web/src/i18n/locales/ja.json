@@ -280,8 +280,6 @@
         "jobTitlePlaceholder": "フルスタック開発者",
         "summary": "概要",
         "summaryPlaceholder": "短い自己紹介またはキャッチフレーズ",
-        "availabilityLabel": "在職中バッジを表示",
-        "availabilityHint": "プロフィールに緑の「対応可能」バッジを表示",
         "extendedDescription": "詳細説明",
         "coverImage": "カバー画像",
         "coverHint": "（自己紹介ページのバナー — 1500 × 500 px）",
@@ -314,6 +312,10 @@
           "title": "ソーシャルリンク",
           "subtitle": "/aboutの下部に表示されるソーシャルメディアアイコン",
           "editHint": "ソーシャルリンクのURLを編集するには、「ソーシャルリンク」タブに移動してください。"
+        },
+        "download-pdf": {
+          "title": "PDFダウンロード",
+          "subtitle": "アクティブなコレクションスタイルでAboutページをPDFとしてダウンロードするボタン"
         }
       },
       "educationLabel": "学歴",
@@ -522,11 +524,12 @@
       "testimonialPrev": "前へ",
       "testimonialNext": "次へ",
       "testimonialItem": "推薦文 {{index}}",
-      "available": "対応可能",
       "viewProfile": "プロフィール全文を見る →",
       "aboutMe": "自己紹介",
       "galleryTitle": "プロジェクトギャラリー",
-      "galleryImage": "画像 {{n}}"
+      "galleryImage": "画像 {{n}}",
+      "downloadPdf": "PDFをダウンロード",
+      "generatingPdf": "生成中..."
     },
     "post": {
       "back": "ホームへ戻る",

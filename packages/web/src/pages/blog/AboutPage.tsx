@@ -40,6 +40,7 @@ export default function AboutPage() {
   const educationVisible    = isVisible('about-education')
   const testimonialsVisible = isVisible('about-testimonials')
   const socialVisible       = isVisible('social-links')
+  const downloadPdfVisible  = isVisible('download-pdf')
 
   // Nebula layout — dark tech bento-grid
   if (activeCollection === 'nebula') {
@@ -53,6 +54,7 @@ export default function AboutPage() {
         educationVisible={educationVisible}
         testimonialsVisible={testimonialsVisible}
         socialVisible={socialVisible}
+        downloadPdfVisible={downloadPdfVisible}
       />
     )
   }
@@ -69,6 +71,7 @@ export default function AboutPage() {
         educationVisible={educationVisible}
         testimonialsVisible={testimonialsVisible}
         socialVisible={socialVisible}
+        downloadPdfVisible={downloadPdfVisible}
       />
     )
   }
@@ -84,6 +87,7 @@ export default function AboutPage() {
       educationVisible={educationVisible}
       testimonialsVisible={testimonialsVisible}
       socialVisible={socialVisible}
+      downloadPdfVisible={downloadPdfVisible}
     />
   )
 }

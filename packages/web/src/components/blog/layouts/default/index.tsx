@@ -29,6 +29,7 @@ import AboutExperience from '@/components/blog/AboutExperience'
 import AboutSkills from '@/components/blog/AboutSkills'
 import AboutEducation from '@/components/blog/AboutEducation'
 import AboutTestimonials from '@/components/blog/AboutTestimonials'
+import AboutPdfButton from '@/components/blog/AboutPdfButton'
 import type { Post, TagItem } from '@/types/api'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -356,6 +357,7 @@ export interface DefaultAboutContentProps {
   educationVisible: boolean
   testimonialsVisible: boolean
   socialVisible: boolean
+  downloadPdfVisible?: boolean
 }
 
 export function DefaultAboutContent({
@@ -367,6 +369,7 @@ export function DefaultAboutContent({
   educationVisible,
   testimonialsVisible,
   socialVisible,
+  downloadPdfVisible = false,
 }: DefaultAboutContentProps) {
   const { t } = useTranslation()
   const activeCollection = settings.active_style_collection ?? 'default'
@@ -386,6 +389,23 @@ export function DefaultAboutContent({
       {user && <AdminBar />}
 
       <main className={`max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 ${user ? 'mt-9' : ''}`}>
+
+        {/* Download PDF button — top-right, shown when enabled */}
+        {downloadPdfVisible && (
+          <div className="flex justify-end mb-4">
+            <AboutPdfButton
+              styles={{}}
+              settings={settings}
+              collection={activeCollection}
+              experienceVisible={experienceVisible}
+              skillsVisible={skillsVisible}
+              educationVisible={educationVisible}
+              testimonialsVisible={testimonialsVisible}
+              galleryVisible={galleryVisible}
+              socialVisible={socialVisible}
+            />
+          </div>
+        )}
 
         {/* Hero — always shown */}
         <AboutHero settings={settings} />

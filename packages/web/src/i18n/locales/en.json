@@ -280,8 +280,6 @@
         "jobTitlePlaceholder": "Full-stack Developer",
         "summary": "Summary",
         "summaryPlaceholder": "A short bio or tagline",
-        "availabilityLabel": "Show availability badge",
-        "availabilityHint": "Green \"Available\" badge on profile",
         "extendedDescription": "Extended description",
         "coverImage": "Cover image",
         "coverHint": "(About page banner — 1500 × 500 px)",
@@ -314,6 +312,10 @@
           "title": "Social Links",
           "subtitle": "Social network icons shown at the bottom of /about",
           "editHint": "To edit the social link URLs, go to the Social Links tab."
+        },
+        "download-pdf": {
+          "title": "Download PDF",
+          "subtitle": "Button to download the About page as a PDF with the active collection style"
         }
       },
       "educationLabel": "Education",
@@ -522,11 +524,12 @@
       "testimonialPrev": "Previous",
       "testimonialNext": "Next",
       "testimonialItem": "Testimonial {{index}}",
-      "available": "Available",
       "viewProfile": "View full profile →",
       "aboutMe": "About me",
       "galleryTitle": "Projects Gallery",
-      "galleryImage": "Image {{n}}"
+      "galleryImage": "Image {{n}}",
+      "downloadPdf": "Download PDF",
+      "generatingPdf": "Generating..."
     },
     "post": {
       "back": "Back to home",

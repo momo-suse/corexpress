@@ -280,8 +280,6 @@
         "jobTitlePlaceholder": "Desarrollador Full-stack",
         "summary": "Resumen",
         "summaryPlaceholder": "Una breve bio o eslogan",
-        "availabilityLabel": "Mostrar badge de disponibilidad",
-        "availabilityHint": "Badge verde \"Disponible\" en el perfil",
         "extendedDescription": "Descripción extendida",
         "coverImage": "Imagen de portada",
         "coverHint": "(Banner de la página Sobre mí — 1500 × 500 px)",
@@ -314,6 +312,10 @@
           "title": "Redes sociales",
           "subtitle": "Iconos de redes sociales al pie de /about",
           "editHint": "Para editar las URLs de las redes sociales, ve a la pestaña Redes sociales."
+        },
+        "download-pdf": {
+          "title": "Descargar PDF",
+          "subtitle": "Botón para descargar la página de About como PDF con el estilo de colección activo"
         }
       },
       "educationLabel": "Educación",
@@ -522,11 +524,12 @@
       "testimonialPrev": "Anterior",
       "testimonialNext": "Siguiente",
       "testimonialItem": "Recomendación {{index}}",
-      "available": "Disponible",
       "viewProfile": "Ver perfil completo →",
       "aboutMe": "Sobre mí",
       "galleryTitle": "Galería de Proyectos",
-      "galleryImage": "Imagen {{n}}"
+      "galleryImage": "Imagen {{n}}",
+      "downloadPdf": "Descargar PDF",
+      "generatingPdf": "Generando..."
     },
     "post": {
       "back": "Volver al inicio",

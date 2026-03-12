@@ -27,6 +27,7 @@ import AboutGallery from '@/components/blog/AboutGallery'
 import AboutExperience from '@/components/blog/AboutExperience'
 import AboutEducation from '@/components/blog/AboutEducation'
 import AboutTestimonials from '@/components/blog/AboutTestimonials'
+import AboutPdfButton from '@/components/blog/AboutPdfButton'
 import SearchBar from '@/components/blog/SearchBar'
 import TagCloud from '@/components/blog/TagCloud'
 import { usePosts } from '@/hooks/usePosts'
@@ -744,6 +745,7 @@ interface NebulaAboutContentProps {
   educationVisible: boolean
   testimonialsVisible: boolean
   socialVisible: boolean
+  downloadPdfVisible?: boolean
 }
 
 export function NebulaAboutContent({
@@ -755,13 +757,13 @@ export function NebulaAboutContent({
   educationVisible,
   testimonialsVisible,
   socialVisible,
+  downloadPdfVisible = false,
 }: NebulaAboutContentProps) {
   const { t } = useTranslation()
 
   const name           = settings.profile_name        || ''
   const title          = settings.profile_title       || ''
   const imageUrl       = settings.profile_image_url   || ''
-  const available      = settings.profile_available === '1'
   const summary        = settings.profile_summary     || ''
   const description    = settings.profile_description || ''
 
@@ -819,13 +821,6 @@ export function NebulaAboutContent({
               {name && <h2 className="text-2xl font-bold text-white mb-1">{name}</h2>}
               {title && <p className="text-sm font-mono text-violet-400 mb-4">{title}</p>}
 
-              {available && (
-                <span className="inline-flex items-center gap-1.5 mb-5 text-xs font-semibold text-green-400 bg-green-900/20 px-2.5 py-1 rounded-full border border-green-500/20">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                  {t('blog.about.available')}
-                </span>
-              )}
-
               {summary && (
                 <p className="text-slate-400 font-light leading-relaxed mb-6 text-base">
                   {summary}
@@ -854,6 +849,23 @@ export function NebulaAboutContent({
                       <Icon size={18} />
                     </a>
                   ))}
+                </div>
+              )}
+
+              {/* Download PDF CTA */}
+              {downloadPdfVisible && (
+                <div className="mt-6">
+                  <AboutPdfButton
+                    styles={{}}
+                    settings={settings}
+                    collection="nebula"
+                    experienceVisible={experienceVisible}
+                    skillsVisible={skillsVisible}
+                    educationVisible={educationVisible}
+                    testimonialsVisible={testimonialsVisible}
+                    galleryVisible={galleryVisible}
+                    socialVisible={socialVisible}
+                  />
                 </div>
               )}
             </div>
