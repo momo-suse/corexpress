@@ -48,6 +48,7 @@ jobs:
             packages/app \
             packages/installer \
             install.sh \
+            .htaccess \
             --exclude "packages/app/vendor/*" \
             --exclude "packages/app/config.php" \
             --exclude "packages/app/public/setup/*" \

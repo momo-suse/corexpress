@@ -1,0 +1,15 @@
+# Corexpress — Root dispatcher for Hostinger shared hosting
+# Routes requests to the correct package (app or installer)
+
+Options -Indexes
+RewriteEngine On
+
+# Static assets (React build output + uploaded images)
+RewriteRule ^(assets|img)(/.*)? packages/app/public/$1$2 [L]
+
+# Web installer (/setup and /setup/*)
+RewriteCond %{REQUEST_URI} ^/setup(/.*)?$
+RewriteRule ^setup(/.*)?$ packages/installer/index.php [L,QSA]
+
+# Everything else → Slim 4 front-controller
+RewriteRule ^ packages/app/public/index.php [QSA,L]
