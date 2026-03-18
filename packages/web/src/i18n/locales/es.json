@@ -82,6 +82,8 @@
       "statusApproved": "Aprobado",
       "statusSpam": "Spam",
       "popularTags": "Tags populares",
+      "readingTime": "Tiempo de lectura",
+      "readingTimeHint": "Opcional — se muestra en el post (ej. \"5 min\")",
       "titleRequired": "El título es obligatorio.",
       "postUpdated": "Post actualizado.",
       "postCreated": "Post creado.",
@@ -147,6 +149,11 @@
       "title": "Configuración",
       "subtitle": "Configuración general de tu blog y panel de administración.",
       "saveChanges": "Guardar cambios",
+      "tabs": {
+        "general": "General",
+        "style": "Estilo & Idioma",
+        "security": "Seguridad"
+      },
       "saved": "Configuración guardada.",
       "saveFailed": "Error al guardar la configuración.",
       "general": {
@@ -273,8 +280,6 @@
         "jobTitlePlaceholder": "Desarrollador Full-stack",
         "summary": "Resumen",
         "summaryPlaceholder": "Una breve bio o eslogan",
-        "availabilityLabel": "Mostrar badge de disponibilidad",
-        "availabilityHint": "Badge verde \"Disponible\" en el perfil",
         "extendedDescription": "Descripción extendida",
         "coverImage": "Imagen de portada",
         "coverHint": "(Banner de la página Sobre mí — 1500 × 500 px)",
@@ -307,6 +312,10 @@
           "title": "Redes sociales",
           "subtitle": "Iconos de redes sociales al pie de /about",
           "editHint": "Para editar las URLs de las redes sociales, ve a la pestaña Redes sociales."
+        },
+        "download-pdf": {
+          "title": "Descargar PDF",
+          "subtitle": "Botón para descargar la página de About como PDF con el estilo de colección activo"
         }
       },
       "educationLabel": "Educación",
@@ -343,7 +352,8 @@
       "updateError": "Error al actualizar el estilo.",
       "descriptions": {
         "default": "Tarjetas redondeadas, imágenes a color y acento índigo. Diseño moderno y amigable.",
-        "classic": "Layout editorial con sidebar fijo, tipografía serif, imágenes en escala de grises y acento rosa."
+        "classic": "Layout editorial con sidebar fijo, tipografía serif, imágenes en escala de grises y acento rosa.",
+        "nebula": "Estética dark tech con cuadrícula bento, tarjetas glassmorphism y acentos de luz en cyan y violeta."
       }
     },
     "editor": {
@@ -514,11 +524,12 @@
       "testimonialPrev": "Anterior",
       "testimonialNext": "Siguiente",
       "testimonialItem": "Recomendación {{index}}",
-      "available": "Disponible",
       "viewProfile": "Ver perfil completo →",
       "aboutMe": "Sobre mí",
       "galleryTitle": "Galería de Proyectos",
-      "galleryImage": "Imagen {{n}}"
+      "galleryImage": "Imagen {{n}}",
+      "downloadPdf": "Descargar PDF",
+      "generatingPdf": "Generando..."
     },
     "post": {
       "back": "Volver al inicio",
@@ -529,6 +540,12 @@
       "copyLink": "Copiar enlace del artículo",
       "location": "Ubicación",
       "notFound": "Post no encontrado."
+    },
+    "nebula": {
+      "keepExploring": "Sigue explorando",
+      "finishedReading": "¿Terminaste de leer?",
+      "backToHomeDesc": "Vuelve al inicio para explorar más artículos.",
+      "backToHome": "VOLVER AL INICIO"
     },
     "footer": {
       "rights": "Todos los derechos reservados."

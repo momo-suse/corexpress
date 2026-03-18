@@ -96,12 +96,14 @@ INSERT INTO `component_definitions` (`name`, `label`, `type`, `parent_id`, `has_
     ('about-education',    'Education',    'sub-component', 2,    0),
     ('about-testimonials', 'Testimonials', 'sub-component', 2,    0),
     ('search',             'Search',       'component',     NULL, 0),
-    ('tag-cloud',          'Tag Cloud',    'component',     NULL, 0);
+    ('tag-cloud',          'Tag Cloud',    'component',     NULL, 0),
+    ('download-pdf',       'Download PDF', 'sub-component', 2,    0);
 
--- Style collections (2 built-in — default is the fallback)
+-- Style collections (3 built-in — default is the fallback)
 INSERT INTO `style_collections` (`name`, `label`, `is_default`) VALUES
     ('default', 'Default', 1),
-    ('classic', 'Classic', 0);
+    ('classic', 'Classic', 0),
+    ('nebula',  'Nebula',  0);
 
 -- Default collection styles (covers all 14 components)
 INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `styles_config`) VALUES
@@ -118,7 +120,8 @@ INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `sty
     (1, 11, '{"background":"#ffffff","textColor":"#111827","layout":"two-col"}'),
     (1, 12, '{"background":"#ffffff","textColor":"#111827","layout":"carousel"}'),
     (1, 13, '{"background":"#ffffff","textColor":"#111827","layout":"inline","buttonStyle":"filled"}'),
-    (1, 14, '{"background":"#ffffff","textColor":"#111827","layout":"cloud"}');
+    (1, 14, '{"background":"#ffffff","textColor":"#111827","layout":"cloud"}'),
+    (1, 15, '{"layout":"default"}');
 
 -- Classic collection styles (all 14 components — editorial layout)
 INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `styles_config`) VALUES
@@ -135,7 +138,8 @@ INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `sty
     (2, 11, '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
     (2, 12, '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
     (2, 13, '{"background":"#ffffff","textColor":"#111827","layout":"inline","buttonStyle":"outline"}'),
-    (2, 14, '{"background":"#ffffff","textColor":"#111827","layout":"cloud"}');
+    (2, 14, '{"background":"#ffffff","textColor":"#111827","layout":"cloud"}'),
+    (2, 15, '{"layout":"classic"}');
 
 -- Pages (home, blog, about)
 INSERT INTO `pages` (`slug`, `title`) VALUES
@@ -159,18 +163,38 @@ INSERT INTO `page_components` (`page_id`, `component_definition_id`, `is_visible
     (2, 6, 1, 3),
     (2, 5, 1, 4);
 
--- About page components (page_id=3): sub-components visible by default; social-links visible
+-- About page components (page_id=3): sub-components visible by default; social-links visible; download-pdf hidden by default
 INSERT INTO `page_components` (`page_id`, `component_definition_id`, `is_visible`, `display_order`) VALUES
     (3, 8,  1, 1),
     (3, 9,  1, 2),
     (3, 10, 1, 3),
     (3, 11, 1, 4),
     (3, 12, 1, 5),
-    (3, 7,  1, 6);
+    (3, 7,  1, 6),
+    (3, 15, 0, 7);
 
--- Active style collection setting + tags max count + locale
+-- Nebula collection styles (dark tech bento-grid — all 14 components)
+INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `styles_config`) VALUES
+    (3, 1,  '{"background":"#030712","textColor":"#f1f5f9","layout":"bento-hero"}'),
+    (3, 2,  '{"background":"#030712","textColor":"#f1f5f9","layout":"bento-profile"}'),
+    (3, 3,  '{"background":"#030712","textColor":"#f1f5f9","layout":"bento-grid"}'),
+    (3, 4,  '{"background":"#030712","textColor":"#e2e8f0","layout":"article-dark"}'),
+    (3, 5,  '{"background":"#030712","textColor":"#e2e8f0","layout":"card-dark"}'),
+    (3, 6,  '{"background":"#030712","textColor":"#e2e8f0","layout":"list-dark"}'),
+    (3, 7,  '{"background":"#030712","textColor":"#94a3b8","layout":"inline-dark"}'),
+    (3, 8,  '{"background":"#030712","textColor":"#e2e8f0","layout":"carousel-dark"}'),
+    (3, 9,  '{"background":"#030712","textColor":"#e2e8f0","layout":"card-dark"}'),
+    (3, 10, '{"background":"#030712","textColor":"#e2e8f0","layout":"grid-dark"}'),
+    (3, 11, '{"background":"#030712","textColor":"#e2e8f0","layout":"two-col-dark"}'),
+    (3, 12, '{"background":"#030712","textColor":"#e2e8f0","layout":"carousel-dark"}'),
+    (3, 13, '{"background":"#030712","textColor":"#e2e8f0","layout":"inline-dark","buttonStyle":"outlined"}'),
+    (3, 14, '{"background":"#030712","textColor":"#94a3b8","layout":"cloud-dark"}'),
+    (3, 15, '{"layout":"nebula"}');
+
+-- Active style collection setting + tags max count + locale + app version
 INSERT INTO `settings` (`key`, `value`) VALUES
     ('active_style_collection', 'default'),
     ('tags_max_count', '6'),
-    ('app_locale', 'en')
+    ('app_locale', 'en'),
+    ('app_version', '1.0.0')
 ON DUPLICATE KEY UPDATE `value` = VALUES(`value`);

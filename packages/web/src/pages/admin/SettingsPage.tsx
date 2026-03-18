@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Upload, X, Globe, Palette, ShieldCheck, Languages } from 'lucide-react'
+import { Upload, X, Globe, Paintbrush, ShieldCheck, Languages, Palette } from 'lucide-react'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import { useSettings, useMutateSettings } from '@/hooks/useSettings'
 import { uploadImage } from '@/api/images'
@@ -15,8 +15,11 @@ import type { Settings } from '@/types/api'
 
 const THEME_CLASSES = ['theme-default', 'theme-minimal', 'theme-dark'] as const
 
+type Tab = 'general' | 'style' | 'security'
+
 export default function SettingsPage() {
   const { t } = useTranslation()
+  const [activeTab, setActiveTab] = useState<Tab>('general')
   const { data, isLoading } = useSettings()
   const { mutateAsync: save, isPending: saving } = useMutateSettings()
 
@@ -114,16 +117,41 @@ export default function SettingsPage() {
           <h1 className="text-2xl font-semibold tracking-tight">{t('admin.settings.title')}</h1>
           <p className="text-xs text-muted-foreground mt-0.5">{t('admin.settings.subtitle')}</p>
         </div>
-        <Button onClick={handleSave} disabled={saving}>
-          {saving ? t('common.saving') : t('admin.settings.saveChanges')}
-        </Button>
+        {activeTab !== 'security' && (
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? t('common.saving') : t('admin.settings.saveChanges')}
+          </Button>
+        )}
       </header>
+
+      {/* Tab bar */}
+      <div className="px-8 border-b bg-card/60 flex gap-0 shrink-0">
+        {([
+          { id: 'general'  as Tab, label: t('admin.settings.tabs.general'),  Icon: Globe },
+          { id: 'style'    as Tab, label: t('admin.settings.tabs.style'),    Icon: Paintbrush },
+          { id: 'security' as Tab, label: t('admin.settings.tabs.security'), Icon: ShieldCheck },
+        ]).map(({ id, label, Icon }) => (
+          <button
+            key={id}
+            onClick={() => setActiveTab(id)}
+            className={cn(
+              'flex items-center gap-2 px-5 py-3.5 text-sm font-medium border-b-2 -mb-px transition-colors',
+              activeTab === id
+                ? 'border-primary text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/30',
+            )}
+          >
+            <Icon className="h-4 w-4" />
+            {label}
+          </button>
+        ))}
+      </div>
 
       {/* Content */}
       <div className="p-8 max-w-3xl mx-auto w-full space-y-6">
 
         {/* General */}
-        <div className="rounded-2xl border-2 border-border overflow-hidden">
+        {activeTab === 'general' && <div className="rounded-2xl border-2 border-border overflow-hidden">
           <div className="flex items-center gap-4 px-6 py-4 bg-muted/30 border-b">
             <div className="p-2.5 rounded-xl bg-muted text-muted-foreground shrink-0">
               <Globe className="h-4 w-4" />
@@ -203,9 +231,10 @@ export default function SettingsPage() {
               />
             </div>
           </div>
-        </div>
+        </div>}
 
-        {/* Admin theme */}
+        {/* Style & Language */}
+        {activeTab === 'style' && <>
         <div className="rounded-2xl border-2 border-border overflow-hidden">
           <div className="flex items-center gap-4 px-6 py-4 bg-muted/30 border-b">
             <div className="p-2.5 rounded-xl bg-muted text-muted-foreground shrink-0">
@@ -237,7 +266,7 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Language */}
+        {/* Language (same tab as Style) */}
         <div className="rounded-2xl border-2 border-border overflow-hidden">
           <div className="flex items-center gap-4 px-6 py-4 bg-muted/30 border-b">
             <div className="p-2.5 rounded-xl bg-muted text-muted-foreground shrink-0">
@@ -268,9 +297,10 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
+        </>}
 
         {/* Security */}
-        <div className="rounded-2xl border-2 border-border overflow-hidden">
+        {activeTab === 'security' && <div className="rounded-2xl border-2 border-border overflow-hidden">
           <div className="flex items-center gap-4 px-6 py-4 bg-muted/30 border-b">
             <div className="p-2.5 rounded-xl bg-muted text-muted-foreground shrink-0">
               <ShieldCheck className="h-4 w-4" />
@@ -318,7 +348,7 @@ export default function SettingsPage() {
               {pwdSaving ? t('admin.settings.security.changing') : t('admin.settings.security.change')}
             </Button>
           </div>
-        </div>
+        </div>}
 
       </div>
     </div>

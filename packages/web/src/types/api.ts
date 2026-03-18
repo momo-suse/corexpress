@@ -14,6 +14,7 @@ export interface Post {
   featured_image_id: number | null
   featured_image_url: string | null
   map_embed_url: string | null
+  reading_time: string | null
   status: 'draft' | 'published'
   author_id: number
   created_at: string
@@ -62,8 +63,6 @@ export interface Settings {
   profile_cover_id: string
   profile_cover_url: string
   profile_title: string
-  /** '1' = show availability badge */
-  profile_available: string
   /** JSON array: [{role,company,period,description,tags:[]}] */
   profile_experience: string
   /** JSON array: [{name,skills:[]}] */

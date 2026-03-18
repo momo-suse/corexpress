@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Post extends Model
 {
     protected $table = 'posts';
-    protected $fillable = ['user_id', 'title', 'slug', 'content', 'excerpt', 'tags', 'featured_image_id', 'map_embed_url', 'status'];
+    protected $fillable = ['user_id', 'title', 'slug', 'content', 'excerpt', 'tags', 'featured_image_id', 'map_embed_url', 'reading_time', 'status'];
 
     public function user(): BelongsTo
     {

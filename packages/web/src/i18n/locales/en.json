@@ -82,6 +82,8 @@
       "statusApproved": "Approved",
       "statusSpam": "Spam",
       "popularTags": "Popular tags",
+      "readingTime": "Reading time",
+      "readingTimeHint": "Optional — shown in the post (e.g. \"5 min\")",
       "titleRequired": "Title is required.",
       "postUpdated": "Post updated.",
       "postCreated": "Post created.",
@@ -147,6 +149,11 @@
       "title": "Settings",
       "subtitle": "General configuration for your blog and dashboard.",
       "saveChanges": "Save changes",
+      "tabs": {
+        "general": "General",
+        "style": "Style & Language",
+        "security": "Security"
+      },
       "saved": "Settings saved.",
       "saveFailed": "Failed to save settings.",
       "general": {
@@ -273,8 +280,6 @@
         "jobTitlePlaceholder": "Full-stack Developer",
         "summary": "Summary",
         "summaryPlaceholder": "A short bio or tagline",
-        "availabilityLabel": "Show availability badge",
-        "availabilityHint": "Green \"Available\" badge on profile",
         "extendedDescription": "Extended description",
         "coverImage": "Cover image",
         "coverHint": "(About page banner — 1500 × 500 px)",
@@ -307,6 +312,10 @@
           "title": "Social Links",
           "subtitle": "Social network icons shown at the bottom of /about",
           "editHint": "To edit the social link URLs, go to the Social Links tab."
+        },
+        "download-pdf": {
+          "title": "Download PDF",
+          "subtitle": "Button to download the About page as a PDF with the active collection style"
         }
       },
       "educationLabel": "Education",
@@ -343,7 +352,8 @@
       "updateError": "Error updating style.",
       "descriptions": {
         "default": "Rounded cards, color images and indigo accent. Modern and friendly design.",
-        "classic": "Editorial layout with fixed sidebar, serif typography, grayscale images, and pink accent."
+        "classic": "Editorial layout with fixed sidebar, serif typography, grayscale images, and pink accent.",
+        "nebula": "Dark tech aesthetic with a bento grid layout, glassmorphism cards, and cyan/violet glow accents."
       }
     },
     "editor": {
@@ -514,11 +524,12 @@
       "testimonialPrev": "Previous",
       "testimonialNext": "Next",
       "testimonialItem": "Testimonial {{index}}",
-      "available": "Available",
       "viewProfile": "View full profile →",
       "aboutMe": "About me",
       "galleryTitle": "Projects Gallery",
-      "galleryImage": "Image {{n}}"
+      "galleryImage": "Image {{n}}",
+      "downloadPdf": "Download PDF",
+      "generatingPdf": "Generating..."
     },
     "post": {
       "back": "Back to home",
@@ -529,6 +540,12 @@
       "copyLink": "Copy article link",
       "location": "Location",
       "notFound": "Post not found."
+    },
+    "nebula": {
+      "keepExploring": "Keep exploring",
+      "finishedReading": "Finished reading?",
+      "backToHomeDesc": "Go back to explore more articles.",
+      "backToHome": "BACK TO HOME"
     },
     "footer": {
       "rights": "All rights reserved."

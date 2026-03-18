@@ -10,6 +10,8 @@ import PostEditor from '@/components/admin/PostEditor'
 import { usePosts, useMutatePost } from '@/hooks/usePosts'
 import { useComments, useMutateComment } from '@/hooks/useComments'
 import { useSettings } from '@/hooks/useSettings'
+import { useTags } from '@/hooks/useTags'
+import ChipInput from '@/components/admin/about/ChipInput'
 import { uploadImage } from '@/api/images'
 import { getComments } from '@/api/comments'
 import { toast } from '@/hooks/useToast'
@@ -26,6 +28,7 @@ type View = 'list' | 'editor'
 interface PostForm {
   title: string
   tags: string
+  reading_time: string
   excerpt: string
   content: string
   status: 'draft' | 'published'
@@ -37,7 +40,7 @@ interface PostForm {
 }
 
 const EMPTY_FORM: PostForm = {
-  title: '', tags: '', excerpt: '', content: '', status: 'draft',
+  title: '', tags: '', reading_time: '', excerpt: '', content: '', status: 'draft',
   featured_image_id: null, featured_image_url: null,
   map_embed_url: '',
   _imageFile: null, _imagePreview: null,
@@ -93,6 +96,8 @@ export default function DashboardPage() {
   const qc = useQueryClient()
 
   const saving = create.isPending || update.isPending
+  const { data: popularTagsData } = useTags(6)
+  const popularTags = popularTagsData?.data ?? []
 
   // ── Derived ─────────────────────────────────────────────────────────────────
   const totalPosts = postsData?.meta.total ?? 0
@@ -114,6 +119,7 @@ export default function DashboardPage() {
     setForm({
       title: post.title,
       tags: post.tags ?? '',
+      reading_time: post.reading_time ?? '',
       excerpt: post.excerpt ?? '',
       content: post.content,
       status: post.status,
@@ -173,6 +179,7 @@ export default function DashboardPage() {
       content: form.content,
       excerpt: form.excerpt || null,
       tags: form.tags || null,
+      reading_time: form.reading_time.trim() || null,
       map_embed_url: form.map_embed_url.trim() || null,
       featured_image_id: imageId,
       status,
@@ -401,18 +408,31 @@ export default function DashboardPage() {
                           key={post.id}
                           className="grid grid-cols-12 gap-4 p-4 items-center border-b last:border-b-0 hover:bg-muted/30 transition-colors"
                         >
-                          {/* Title + tags */}
-                          <div className="col-span-6 flex flex-col gap-1.5 pr-4">
-                            <span className="font-medium truncate">{post.title}</span>
-                            {post.tags && (
-                              <div className="flex flex-wrap gap-1">
-                                {post.tags.split(',').map((tag) => (
-                                  <Badge key={tag} variant="outline" className="text-[10px] px-1.5 py-0">
-                                    {tag.trim()}
-                                  </Badge>
-                                ))}
+                          {/* Thumbnail + Title + tags */}
+                          <div className="col-span-6 flex items-center gap-3 pr-4">
+                            {post.featured_image_url ? (
+                              <img
+                                src={post.featured_image_url}
+                                alt=""
+                                className="w-10 h-10 rounded-md object-cover shrink-0 border border-border"
+                              />
+                            ) : (
+                              <div className="w-10 h-10 rounded-md bg-muted border border-border flex items-center justify-center shrink-0">
+                                <FileText className="h-4 w-4 text-muted-foreground" />
                               </div>
                             )}
+                            <div className="flex flex-col gap-1.5 min-w-0">
+                              <span className="font-medium truncate">{post.title}</span>
+                              {post.tags && (
+                                <div className="flex flex-wrap gap-1">
+                                  {post.tags.split(',').map((tag) => (
+                                    <Badge key={tag} variant="outline" className="text-[10px] px-1.5 py-0">
+                                      {tag.trim()}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
                           </div>
 
                           {/* Status badge */}
@@ -516,12 +536,49 @@ export default function DashboardPage() {
               <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 {t('admin.dashboard.tags')}
               </label>
+              <ChipInput
+                value={form.tags.split(',').map((tag) => tag.trim()).filter(Boolean)}
+                onChange={(chips) => setForm((f) => ({ ...f, tags: chips.join(', ') }))}
+                placeholder={t('admin.dashboard.tagsPlaceholder')}
+              />
+              {(() => {
+                const currentChips = form.tags.split(',').map((tag) => tag.trim()).filter(Boolean)
+                const available = popularTags.filter(({ tag }) => !currentChips.includes(tag))
+                if (available.length === 0) return null
+                return (
+                  <div className="space-y-1.5">
+                    <p className="text-xs text-muted-foreground">Popular tags</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {available.map(({ tag }) => (
+                        <button
+                          key={tag}
+                          type="button"
+                          onClick={() => setForm((f) => ({
+                            ...f,
+                            tags: [...currentChips, tag].join(', '),
+                          }))}
+                          className="text-xs px-2.5 py-0.5 rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/80 cursor-pointer transition-colors"
+                        >
+                          {tag}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })()}
+            </div>
+
+            {/* Reading time */}
+            <div className="space-y-2">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                {t('admin.dashboard.readingTime')} <span className="normal-case font-normal opacity-70">({t('admin.dashboard.readingTimeHint')})</span>
+              </label>
               <input
                 type="text"
                 className="w-full px-3 py-2 border rounded-lg bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                placeholder={t('admin.dashboard.tagsPlaceholder')}
-                value={form.tags}
-                onChange={(e) => setForm((f) => ({ ...f, tags: e.target.value }))}
+                placeholder="5 min"
+                value={form.reading_time}
+                onChange={(e) => setForm((f) => ({ ...f, reading_time: e.target.value }))}
               />
             </div>
 
