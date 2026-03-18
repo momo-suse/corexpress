@@ -85,16 +85,6 @@ unzip -q "$ARCHIVE"
 rm "$ARCHIVE"
 ok "Files extracted."
 
-# ── Install PHP dependencies ──────────────────────────────────────────────────
-info "Installing PHP dependencies..."
-if command -v composer >/dev/null 2>&1; then
-    (cd packages/app && composer install --no-dev --optimize-autoloader --quiet)
-    ok "PHP dependencies installed."
-else
-    warn "Composer not found. Run manually before visiting /setup:"
-    warn "  cd packages/app && composer install --no-dev"
-fi
-
 # ── Done ──────────────────────────────────────────────────────────────────────
 echo ""
 echo -e "${GREEN}${BOLD}  Corexpress ${LATEST_TAG} downloaded successfully!${RESET}"

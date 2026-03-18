@@ -36,9 +36,15 @@ jobs:
         working-directory: packages/web
         run: npx vite build
 
-      # ── 5. Package release ZIP ────────────────────────────────────────────────
-      # Includes:   packages/app/ + packages/installer/ + install.sh
-      # Excludes:   packages/web/ (source), node_modules, vendor, config.php,
+      # ── 5. Install PHP dependencies ───────────────────────────────────────────
+      # vendor/ is included in the ZIP so users don't need to run composer
+      - name: Install PHP dependencies
+        working-directory: packages/app
+        run: composer install --no-dev --optimize-autoloader --no-interaction
+
+      # ── 6. Package release ZIP ────────────────────────────────────────────────
+      # Includes:   packages/app/ (with vendor/) + packages/installer/ + install.sh + .htaccess
+      # Excludes:   packages/web/ (source), node_modules, config.php,
       #             dev files (Dockerfile, compose.dev.yml, .claude/, blog*.html)
       - name: Package release ZIP
         run: |
@@ -49,7 +55,6 @@ jobs:
             packages/installer \
             install.sh \
             .htaccess \
-            --exclude "packages/app/vendor/*" \
             --exclude "packages/app/config.php" \
             --exclude "packages/app/public/setup/*" \
             --exclude "packages/web/*" \
@@ -60,7 +65,7 @@ jobs:
           echo "ZIP contents (top level):"
           unzip -l dist/corexpress.zip | head -40
 
-      # ── 6. Create GitHub Release with ZIP attachment ───────────────────────────
+      # ── 7. Create GitHub Release with ZIP attachment ───────────────────────────
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
