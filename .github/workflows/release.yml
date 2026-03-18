@@ -28,7 +28,7 @@ jobs:
       # ── 3. Install frontend dependencies ──────────────────────────────────────
       - name: Install frontend dependencies
         working-directory: packages/web
-        run: npm ci
+        run: npm install
 
       # ── 4. Build React frontend ───────────────────────────────────────────────
       # Output goes to packages/app/public/assets/ (configured in vite.config.ts)
