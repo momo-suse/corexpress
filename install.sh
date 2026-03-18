@@ -14,7 +14,7 @@
 
 set -euo pipefail
 
-REPO="USER/corexpress"
+REPO="momo-suse/corexpress"
 RELEASE_URL="https://api.github.com/repos/${REPO}/releases/latest"
 ARCHIVE="corexpress.zip"
 

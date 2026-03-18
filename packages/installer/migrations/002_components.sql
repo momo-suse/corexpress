@@ -191,9 +191,10 @@ INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `sty
     (3, 14, '{"background":"#030712","textColor":"#94a3b8","layout":"cloud-dark"}'),
     (3, 15, '{"layout":"nebula"}');
 
--- Active style collection setting + tags max count + locale
+-- Active style collection setting + tags max count + locale + app version
 INSERT INTO `settings` (`key`, `value`) VALUES
     ('active_style_collection', 'default'),
     ('tags_max_count', '6'),
-    ('app_locale', 'en')
+    ('app_locale', 'en'),
+    ('app_version', '1.0.0')
 ON DUPLICATE KEY UPDATE `value` = VALUES(`value`);

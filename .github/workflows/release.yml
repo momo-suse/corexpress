@@ -1,0 +1,95 @@
+name: Build & Release
+
+# Triggered by pushing a version tag (e.g. v1.0.0, v1.2.3)
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write   # needed to create GitHub Releases and upload assets
+
+jobs:
+  release:
+    name: Build frontend and publish release
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout ───────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Node.js setup ──────────────────────────────────────────────────────
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: packages/web/package-lock.json
+
+      # ── 3. Install frontend dependencies ──────────────────────────────────────
+      - name: Install frontend dependencies
+        working-directory: packages/web
+        run: npm ci
+
+      # ── 4. Build React frontend ───────────────────────────────────────────────
+      # Output goes to packages/app/public/assets/ (configured in vite.config.ts)
+      - name: Build frontend
+        working-directory: packages/web
+        run: npx vite build
+
+      # ── 5. Package release ZIP ────────────────────────────────────────────────
+      # Includes:   packages/app/ + packages/installer/ + install.sh
+      # Excludes:   packages/web/ (source), node_modules, vendor, config.php,
+      #             dev files (Dockerfile, compose.dev.yml, .claude/, blog*.html)
+      - name: Package release ZIP
+        run: |
+          mkdir -p dist
+
+          zip -r dist/corexpress.zip \
+            packages/app \
+            packages/installer \
+            install.sh \
+            --exclude "packages/app/vendor/*" \
+            --exclude "packages/app/config.php" \
+            --exclude "packages/app/public/setup/*" \
+            --exclude "packages/web/*" \
+            --exclude "node_modules/*" \
+            --exclude ".claude/*" \
+            --exclude "*.log"
+
+          echo "ZIP contents (top level):"
+          unzip -l dist/corexpress.zip | head -40
+
+      # ── 6. Create GitHub Release with ZIP attachment ───────────────────────────
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "Corexpress ${{ github.ref_name }}"
+          body: |
+            ## Corexpress ${{ github.ref_name }}
+
+            ### Installation
+
+            **Option A — SSH one-liner (recommended):**
+            ```bash
+            curl -fsSL https://raw.githubusercontent.com/momo-suse/corexpress/main/install.sh | bash
+            ```
+
+            **Option B — Manual upload:**
+            1. Download `corexpress.zip` below
+            2. Upload and extract to your Hostinger public_html via FTP or File Manager
+            3. Visit `https://yourdomain.com/setup` to complete installation
+
+            ### What's included
+            - PHP backend (Slim 4 + Eloquent ORM)
+            - React frontend (pre-built, no Node.js required on server)
+            - Web installer (6-step wizard)
+
+            > **Requirements:** PHP 8.3+, MySQL 8.0, Apache with mod_rewrite (Hostinger shared hosting)
+          files: dist/corexpress.zip
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}  # v1.0.0-beta → prerelease
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
