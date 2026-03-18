@@ -2,14 +2,9 @@
 
 declare(strict_types=1);
 
-use Corexpress\Bootstrap\Database;
-use Corexpress\Middleware\SessionMiddleware;
-use Slim\Factory\AppFactory;
-
-require __DIR__ . '/../vendor/autoload.php';
-
 // ── Config guard ───────────────────────────────────────────────────────────
-// Return a clear 503 JSON if the installer has not been run yet.
+// Must run BEFORE autoload: vendor/ does not exist on a fresh install
+// (it is excluded from the release ZIP and requires composer install).
 $configPath = __DIR__ . '/../config.php';
 
 if (!file_exists($configPath)) {
@@ -19,6 +14,12 @@ if (!file_exists($configPath)) {
     header('Location: /setup/', true, 302);
     exit;
 }
+
+use Corexpress\Bootstrap\Database;
+use Corexpress\Middleware\SessionMiddleware;
+use Slim\Factory\AppFactory;
+
+require __DIR__ . '/../vendor/autoload.php';
 
 // ── Bootstrap Eloquent ORM ─────────────────────────────────────────────────
 try {
