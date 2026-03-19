@@ -3,15 +3,22 @@
 declare(strict_types=1);
 
 // ── Config guard ───────────────────────────────────────────────────────────
-// Must run BEFORE autoload: vendor/ does not exist on a fresh install
-// (it is excluded from the release ZIP and requires composer install).
+// Must run BEFORE autoload: vendor/ may not exist on a fresh install.
 $configPath = __DIR__ . '/../config.php';
 
 if (!file_exists($configPath)) {
     // Installer hasn't been run — send the browser to the web installer.
-    // API clients hitting /api/* will also land here; the installer page
-    // is a better UX than a raw JSON error for anyone opening the root URL.
-    header('Location: /setup/', true, 302);
+    header('Location: /setup', true, 302);
+    exit;
+}
+
+// ── Vendor guard ──────────────────────────────────────────────────────────
+$autoloadPath = __DIR__ . '/../vendor/autoload.php';
+if (!file_exists($autoloadPath)) {
+    http_response_code(503);
+    header('Content-Type: text/plain');
+    echo "Corexpress: vendor/ directory is missing.\n";
+    echo "Run: cd " . dirname(__DIR__) . " && composer install --no-dev\n";
     exit;
 }
 

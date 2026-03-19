@@ -59,9 +59,29 @@ function t(string $key, array $params = []): string
 }
 
 // ── Constants ──────────────────────────────────────────────────────────────────
-// config.php is written to the app root: /var/www/html/config.php
-// Installer lives at /var/www/html/public/setup/, so dirname up 2 levels:
-define('CONFIG_PATH', dirname(__DIR__, 2) . '/config.php');
+// config.php is written to the APP root: packages/app/config.php
+// From packages/installer/ → go up one level to packages/ → then into app/
+define('CONFIG_PATH', dirname(__DIR__) . '/app/config.php');
+
+// ── Session cookie params (explicit for shared hosting compatibility) ─────────
+// Must be called before EVERY session_start() — sets Secure, HttpOnly, SameSite
+function installerSessionInit(): void
+{
+    static $configured = false;
+    if ($configured && session_status() === PHP_SESSION_ACTIVE) {
+        return;
+    }
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path'     => '/',
+        'secure'   => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+        'httponly'  => true,
+        'samesite'  => 'Lax',
+    ]);
+    session_name('corexpress_installer');
+    session_start();
+    $configured = true;
+}
 
 // Steps: 0=Welcome, 1=Database, 2=Admin, 3=Settings, 4=Review
 // Progress bar tracks steps 1–3 (DB, Admin, Settings)
@@ -72,8 +92,7 @@ $action = $_GET['action'] ?? '';
 
 if ($method === 'POST' && in_array($action, ['test-db', 'install'], true)) {
     header('Content-Type: application/json');
-    session_name('corexpress_installer');
-    session_start();
+    installerSessionInit();
 
     if (!Security::verifyCsrfHeader()) {
         http_response_code(403);
@@ -107,8 +126,7 @@ if (file_exists(CONFIG_PATH)) {
 }
 
 // ── Session ────────────────────────────────────────────────────────────────────
-session_name('corexpress_installer');
-session_start();
+installerSessionInit();
 
 // Prevent browser from caching pages that embed CSRF tokens
 header('Cache-Control: no-store, no-cache, must-revalidate');

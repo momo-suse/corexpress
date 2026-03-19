@@ -5,11 +5,14 @@ Options -Indexes
 RewriteEngine On
 
 # Static assets (React build output + uploaded images)
-RewriteRule ^(assets|img)(/.*)? packages/app/public/$1$2 [L]
+RewriteRule ^(assets|img)(/.*)$ packages/app/public/$1$2 [L]
 
-# Web installer (/setup and /setup/*)
-RewriteCond %{REQUEST_URI} ^/setup(/.*)?$
-RewriteRule ^setup(/.*)?$ packages/installer/index.php [L,QSA]
+# Installer static files (images, CSS) — must come BEFORE the PHP rewrite
+RewriteRule ^setup/(docs/.+)$ packages/installer/$1 [L]
+
+# Web installer (/setup and /setup?...)
+RewriteCond %{REQUEST_URI} ^/setup(/)?$
+RewriteRule ^setup(/)?$ packages/installer/index.php [L,QSA]
 
 # Everything else → Slim 4 front-controller
 RewriteRule ^ packages/app/public/index.php [QSA,L]
