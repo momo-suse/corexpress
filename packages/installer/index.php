@@ -345,7 +345,7 @@ function renderWelcome(): void
     foreach ($results as $r) {
         if (!$r['ok']) { $hasIssue = true; break; }
     }
-    $csrf = Security::generateCsrfToken();
+    $csrf = Security::getCsrfToken();
 
     renderLayout('Welcome', 0, function () use ($results, $allOk, $hasIssue, $csrf): void {
         echo '<div class="card-body welcome-body">';
@@ -395,7 +395,7 @@ function renderDb(): void
     $errors   = $_SESSION['installer']['errors'] ?? [];
     $form     = $_SESSION['installer']['form'] ?? [];
     $saved    = $_SESSION['installer']['db'] ?? [];
-    $csrf     = Security::generateCsrfToken();
+    $csrf     = Security::getCsrfToken();
     unset($_SESSION['installer']['errors'], $_SESSION['installer']['form']);
 
     $defaults = [
@@ -408,7 +408,7 @@ function renderDb(): void
     $csrfEsc = Security::escape($csrf);
 
     renderLayout('Database', 1, function () use ($errors, $defaults, $csrfEsc): void {
-        echo '<div class="step-img-wrap"><div class="step-img-circle"><img src="docs/db.png" alt="" class="step-img"></div></div>';
+        echo '<div class="step-img-wrap"><div class="step-img-circle"><img src="/setup/docs/db.png" alt="" class="step-img"></div></div>';
         echo '<div class="card-body">';
         echo '<h2 class="step-title" style="text-align:center;">Database Configuration</h2>';
         echo '<p class="step-desc" style="text-align:center;">Enter the MySQL credentials provided by your hosting provider.</p>';
@@ -480,11 +480,11 @@ function renderAdmin(): void
     $errors = $_SESSION['installer']['errors'] ?? [];
     $form   = $_SESSION['installer']['form'] ?? [];
     $admin  = $_SESSION['installer']['admin'] ?? [];
-    $csrf   = Security::generateCsrfToken();
+    $csrf   = Security::getCsrfToken();
     unset($_SESSION['installer']['errors'], $_SESSION['installer']['form']);
 
     renderLayout('Admin Account', 2, function () use ($errors, $form, $admin, $csrf): void {
-        echo '<div class="step-img-wrap"><div class="step-img-circle"><img src="docs/user.png" alt="" class="step-img"></div></div>';
+        echo '<div class="step-img-wrap"><div class="step-img-circle"><img src="/setup/docs/user.png" alt="" class="step-img"></div></div>';
         echo '<div class="card-body">';
         echo '<h2 class="step-title" style="text-align:center;">Admin Account</h2>';
         echo '<p class="step-desc" style="text-align:center;">Create the administrator account for your blog.</p>';
@@ -519,7 +519,7 @@ function renderSettings(): void
 {
     $errors        = $_SESSION['installer']['errors'] ?? [];
     $form          = $_SESSION['installer']['form'] ?? $_SESSION['installer']['blog'] ?? [];
-    $csrf          = Security::generateCsrfToken();
+    $csrf          = Security::getCsrfToken();
     $selectedTheme = $form['theme'] ?? 'default';
     unset($_SESSION['installer']['errors'], $_SESSION['installer']['form']);
 
@@ -535,7 +535,7 @@ function renderSettings(): void
     ];
 
     renderLayout('Blog Settings', 3, function () use ($errors, $form, $csrf, $themes, $selectedTheme, $selectedLocale): void {
-        echo '<div class="step-img-wrap"><div class="step-img-circle"><img src="docs/settings.png" alt="" class="step-img"></div></div>';
+        echo '<div class="step-img-wrap"><div class="step-img-circle"><img src="/setup/docs/settings.png" alt="" class="step-img"></div></div>';
         echo '<div class="card-body">';
         echo '<h2 class="step-title" style="text-align:center;">Blog Settings</h2>';
         echo '<p class="step-desc" style="text-align:center;">Personalize your blog. You can change these settings later.</p>';
@@ -629,7 +629,7 @@ function renderReview(): void
     $db    = $_SESSION['installer']['db']    ?? [];
     $admin = $_SESSION['installer']['admin'] ?? [];
     $blog  = $_SESSION['installer']['blog']  ?? [];
-    $csrf  = Security::generateCsrfToken();
+    $csrf  = Security::getCsrfToken();
     $csrfEsc = Security::escape($csrf);
 
     renderLayout('Review', 4, function () use ($db, $admin, $blog, $csrfEsc): void {
@@ -670,7 +670,7 @@ function renderReview(): void
         // ── Install overlay (loading → success) ────────────────────────────
         echo '<div id="install-overlay" class="install-overlay" aria-hidden="true">';
         echo '<div class="install-overlay-inner" id="overlay-inner">';
-        echo '<div class="overlay-spinner"><img src="docs/corexpress.png" alt="Corexpress" class="overlay-logo" id="overlay-logo"></div>';
+        echo '<div class="overlay-spinner"><img src="/setup/docs/corexpress.png" alt="Corexpress" class="overlay-logo" id="overlay-logo"></div>';
         echo '<p class="overlay-msg" id="overlay-msg">Working on your blog…</p>';
         echo '<p class="overlay-sub" id="overlay-sub">This may take a few seconds.</p>';
         echo '</div>';
@@ -764,7 +764,7 @@ function renderLayout(string $pageTitle, int $currentStep, callable $body): void
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Corexpress Installer — <?= $esc($pageTitle) ?></title>
-    <link rel="icon" type="image/png" href="docs/corexpress.png">
+    <link rel="icon" type="image/png" href="/setup/docs/corexpress.png">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1042,7 +1042,7 @@ function renderLayout(string $pageTitle, int $currentStep, callable $body): void
 <div class="page-loader" id="page-loader"></div>
 
 <header class="header">
-    <img src="docs/corexpress.png" alt="Corexpress" class="header-logo">
+    <img src="/setup/docs/corexpress.png" alt="Corexpress" class="header-logo">
     <div class="tagline">Web Installer</div>
 </header>
 
