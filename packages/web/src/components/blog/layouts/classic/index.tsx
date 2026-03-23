@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 import { Linkedin, Instagram, Youtube, Facebook } from 'lucide-react'
 import AdminBar from '@/components/blog/AdminBar'
+import LanguageSwitcher from '@/components/blog/LanguageSwitcher'
 import CommentList from '@/components/blog/CommentList'
 import CommentForm from '@/components/blog/CommentForm'
 import AboutGallery from '@/components/blog/AboutGallery'
@@ -291,6 +292,9 @@ function ClassicSidebar({
               ))}
             </div>
           )}
+          <div className="mb-4">
+            <LanguageSwitcher variant="classic" />
+          </div>
           <p className="text-xs text-gray-400">
             © {new Date().getFullYear()} {blogName}.
           </p>
@@ -354,13 +358,16 @@ function ClassicMobileHeader({ settings, onMenuToggle }: ClassicMobileHeaderProp
             {blogName}
           </span>
         </Link>
-        <button
-          onClick={onMenuToggle}
-          className="text-gray-900 dark:text-white"
-          aria-label={t('blog.nav.openMenu')}
-        >
-          <Menu size={24} />
-        </button>
+        <div className="flex items-center gap-3">
+          <LanguageSwitcher variant="classic" />
+          <button
+            onClick={onMenuToggle}
+            className="text-gray-900 dark:text-white"
+            aria-label={t('blog.nav.openMenu')}
+          >
+            <Menu size={24} />
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -604,6 +611,9 @@ export interface ClassicPostContentProps {
   tags?: TagItem[]
   activeTag?: string
   onTagSelect?: (tag: string) => void
+  availableLocales?: string[]
+  currentLocale?: string
+  onLocaleChange?: (locale: string) => void
 }
 
 export function ClassicPostContent({
@@ -623,6 +633,9 @@ export function ClassicPostContent({
   tags = [],
   activeTag = '',
   onTagSelect,
+  availableLocales = [],
+  currentLocale = 'en',
+  onLocaleChange,
 }: ClassicPostContentProps) {
   const { t, i18n } = useTranslation()
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -679,6 +692,27 @@ export function ClassicPostContent({
                   {copied ? <Check size={18} /> : <Share2 size={18} />}
                 </button>
               </div>
+
+              {/* Language pills — only shown when translations exist */}
+              {availableLocales.length > 1 && onLocaleChange && (
+                <div className="flex items-center gap-2 mb-5">
+                  {availableLocales.map((loc) => (
+                    <button
+                      key={loc}
+                      onClick={() => onLocaleChange(loc)}
+                      aria-pressed={currentLocale === loc}
+                      className={`text-xs font-sans font-bold uppercase tracking-widest transition-colors px-3 py-1 rounded-full border ${
+                        currentLocale === loc
+                          ? 'border-transparent text-white'
+                          : 'border-gray-300 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:border-gray-400'
+                      }`}
+                      style={currentLocale === loc ? { background: 'var(--blog-accent)' } : undefined}
+                    >
+                      {loc}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               {/* All tags above title */}
               {allTags(post.tags).length > 0 && (

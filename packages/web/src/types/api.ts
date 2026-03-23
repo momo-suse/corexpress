@@ -4,6 +4,17 @@ export interface User {
   created_at: string
 }
 
+export interface PostTranslation {
+  id: number
+  post_id: number
+  locale: string
+  title: string
+  content: string
+  excerpt: string | null
+  created_at: string
+  updated_at: string
+}
+
 export interface Post {
   id: number
   title: string
@@ -21,6 +32,14 @@ export interface Post {
   updated_at: string
   comments_count?: number
   comments_pending_count?: number
+  /** Locales that have a translation (e.g. ['es', 'ja']). Present in list() response. */
+  translation_locales?: string[]
+  /** Available locales (base + translated). Only present in show() response. */
+  available_locales?: string[]
+  /** Admin's app_locale at time of fetch. Only present in show() response. */
+  base_locale?: string
+  /** Full translation objects — only present in show() for admins. */
+  translations?: PostTranslation[]
 }
 
 export interface Comment {

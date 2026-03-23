@@ -12,13 +12,13 @@ import { useComments, useMutateComment } from '@/hooks/useComments'
 import { useSettings } from '@/hooks/useSettings'
 import { useTags } from '@/hooks/useTags'
 import ChipInput from '@/components/admin/about/ChipInput'
-import { getPost } from '@/api/posts'
+import { getPost, createTranslation, updateTranslation, deleteTranslation } from '@/api/posts'
 import { uploadImage } from '@/api/images'
 import { getComments } from '@/api/comments'
 import { toast } from '@/hooks/useToast'
 import {
   FileText, MessageCircle, Check, ArrowLeft, Plus, Edit3,
-  Trash2, X, Upload, AlertTriangle,
+  Trash2, X, Upload, AlertTriangle, Languages,
 } from 'lucide-react'
 import type { Post } from '@/types/api'
 
@@ -27,11 +27,8 @@ import type { Post } from '@/types/api'
 type View = 'list' | 'editor'
 
 interface PostForm {
-  title: string
   tags: string
   reading_time: string
-  excerpt: string
-  content: string
   status: 'draft' | 'published'
   featured_image_id: number | null
   featured_image_url: string | null
@@ -40,12 +37,29 @@ interface PostForm {
   _imagePreview: string | null
 }
 
+interface LangEntry {
+  title: string
+  content: string
+  excerpt: string
+}
+
 const EMPTY_FORM: PostForm = {
-  title: '', tags: '', reading_time: '', excerpt: '', content: '', status: 'draft',
+  tags: '', reading_time: '', status: 'draft',
   featured_image_id: null, featured_image_url: null,
   map_embed_url: '',
   _imageFile: null, _imagePreview: null,
 }
+
+const EMPTY_LANG: LangEntry = { title: '', content: '', excerpt: '' }
+
+const LOCALES = [
+  { code: 'en', label: 'English' },
+  { code: 'es', label: 'Español' },
+  { code: 'ja', label: '日本語' },
+] as const
+
+const LANG_LABELS: Record<string, string> = { en: 'English', es: 'Español', ja: '日本語' }
+const SUPPORTED_LOCALES = ['en', 'es', 'ja']
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -67,6 +81,10 @@ export default function DashboardPage() {
   const [postsPage, setPostsPage] = useState(1)
   const [editingPost, setEditingPost] = useState<Post | null>(null)
   const [form, setForm] = useState<PostForm>(EMPTY_FORM)
+
+  // ── Language content state ────────────────────────────────────────────────
+  const [activeLocale, setActiveLocale] = useState<string>('en')
+  const [langContent, setLangContent] = useState<Record<string, LangEntry>>({})
 
   // ── Drawer state ────────────────────────────────────────────────────────────
   const [editLoading, setEditLoading] = useState(false)
@@ -108,11 +126,25 @@ export default function DashboardPage() {
   const pendingComments = pendingCommentsData?.data ?? []
   const displayImage = form._imagePreview ?? form.featured_image_url
   const commentsEnabled = (settingsData?.data.comments_enabled ?? '1') === '1'
+  const baseLocale = editingPost?.base_locale
+    ?? (settingsData?.data as Record<string, string> | undefined)?.app_locale
+    ?? 'en'
+
+  // ── Helpers ─────────────────────────────────────────────────────────────────
+  function updateLangField(locale: string, field: keyof LangEntry, value: string) {
+    setLangContent((prev) => ({
+      ...prev,
+      [locale]: { ...prev[locale] ?? EMPTY_LANG, [field]: value },
+    }))
+  }
 
   // ── Handlers: editor ────────────────────────────────────────────────────────
   function openCreate() {
+    const locale = (settingsData?.data as Record<string, string> | undefined)?.app_locale ?? 'en'
     setEditingPost(null)
     setForm(EMPTY_FORM)
+    setLangContent({ [locale]: { ...EMPTY_LANG } })
+    setActiveLocale(locale)
     setView('editor')
   }
 
@@ -121,13 +153,12 @@ export default function DashboardPage() {
     try {
       const result = await getPost(post.slug)
       const full = result.data
+      const appLocale = (settingsData?.data as Record<string, string> | undefined)?.app_locale ?? 'en'
+      const postBaseLocale = full.base_locale ?? appLocale
       setEditingPost(full)
       setForm({
-        title: full.title,
         tags: full.tags ?? '',
         reading_time: full.reading_time ?? '',
-        excerpt: full.excerpt ?? '',
-        content: full.content,
         status: full.status,
         featured_image_id: full.featured_image_id,
         featured_image_url: full.featured_image_url,
@@ -135,6 +166,13 @@ export default function DashboardPage() {
         _imageFile: null,
         _imagePreview: null,
       })
+      const lc: Record<string, LangEntry> = {}
+      lc[postBaseLocale] = { title: full.title, content: full.content, excerpt: full.excerpt ?? '' }
+      for (const tr of full.translations ?? []) {
+        lc[tr.locale] = { title: tr.title, content: tr.content, excerpt: tr.excerpt ?? '' }
+      }
+      setLangContent(lc)
+      setActiveLocale(appLocale)
       setView('editor')
     } catch {
       toast({ title: t('admin.dashboard.failedToLoad'), variant: 'destructive' })
@@ -147,6 +185,8 @@ export default function DashboardPage() {
     setView('list')
     setEditingPost(null)
     setForm(EMPTY_FORM)
+    setLangContent({})
+    setActiveLocale('en')
   }
 
   function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
@@ -168,7 +208,12 @@ export default function DashboardPage() {
   }
 
   async function handleSave(status: 'draft' | 'published') {
-    if (!form.title.trim()) {
+    const locale = editingPost?.base_locale
+      ?? (settingsData?.data as Record<string, string> | undefined)?.app_locale
+      ?? 'en'
+    const baseLang = langContent[locale] ?? EMPTY_LANG
+
+    if (!baseLang.title.trim()) {
       toast({ title: t('admin.dashboard.titleRequired'), variant: 'destructive' })
       return
     }
@@ -186,9 +231,9 @@ export default function DashboardPage() {
     }
 
     const payload = {
-      title: form.title,
-      content: form.content,
-      excerpt: form.excerpt || null,
+      title: baseLang.title,
+      content: baseLang.content,
+      excerpt: baseLang.excerpt || null,
       tags: form.tags || null,
       reading_time: form.reading_time.trim() || null,
       map_embed_url: form.map_embed_url.trim() || null,
@@ -197,13 +242,35 @@ export default function DashboardPage() {
     }
 
     try {
+      let postId: number
       if (editingPost) {
         await update.mutateAsync({ id: editingPost.id, data: payload })
+        postId = editingPost.id
         toast({ title: t('admin.dashboard.postUpdated') })
       } else {
-        await create.mutateAsync(payload)
+        const result = await create.mutateAsync(payload)
+        postId = result.data.id
         toast({ title: t('admin.dashboard.postCreated') })
       }
+
+      // Save / delete non-base locale translations
+      for (const loc of SUPPORTED_LOCALES) {
+        if (loc === locale) continue
+        const tr = langContent[loc]
+        const existingTr = editingPost?.translations?.find((x) => x.locale === loc)
+        const hasContent = !!(tr?.title?.trim() && tr?.content?.trim())
+
+        if (hasContent) {
+          if (existingTr) {
+            await updateTranslation(postId, loc, { title: tr.title, content: tr.content, excerpt: tr.excerpt || null })
+          } else {
+            await createTranslation(postId, { locale: loc, title: tr.title, content: tr.content, excerpt: tr.excerpt || null })
+          }
+        } else if (existingTr) {
+          await deleteTranslation(postId, loc)
+        }
+      }
+
       closeEditor()
     } catch {
       toast({ title: t('admin.dashboard.failedToSave'), variant: 'destructive' })
@@ -314,238 +381,334 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* ── SCROLLABLE CONTENT ─────────────────────────────────────────────── */}
-      <div className="p-8 max-w-5xl mx-auto w-full space-y-8 pb-12">
+      {/* ── LIST VIEW ──────────────────────────────────────────────────────── */}
+      {view === 'list' && (
+        <div className="p-8 max-w-5xl mx-auto w-full space-y-8 pb-12">
 
-        {/* ===== LIST VIEW ===== */}
-        {view === 'list' && (
-          <>
-            {/* Stats */}
-            <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="p-5 flex flex-col gap-2 rounded-xl border bg-card shadow-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-muted-foreground">{t('admin.dashboard.totalPosts')}</span>
-                  <FileText className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <span className="text-3xl font-bold">{totalPosts}</span>
+          {/* Stats */}
+          <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="p-5 flex flex-col gap-2 rounded-xl border bg-card shadow-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-muted-foreground">{t('admin.dashboard.totalPosts')}</span>
+                <FileText className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="p-5 flex flex-col gap-2 rounded-xl border bg-card shadow-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-muted-foreground">{t('admin.dashboard.published')}</span>
-                  <Check className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <span className="text-3xl font-bold">{publishedPosts}</span>
+              <span className="text-3xl font-bold">{totalPosts}</span>
+            </div>
+            <div className="p-5 flex flex-col gap-2 rounded-xl border bg-card shadow-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-muted-foreground">{t('admin.dashboard.published')}</span>
+                <Check className="h-4 w-4 text-muted-foreground" />
               </div>
-              <div className="p-5 flex flex-col gap-2 rounded-xl border bg-card shadow-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-muted-foreground">{t('admin.dashboard.pendingComments')}</span>
-                  <MessageCircle className={`h-4 w-4 ${commentsEnabled ? 'text-muted-foreground' : 'text-amber-500'}`} />
-                </div>
-                <span className="text-3xl font-bold">{pendingCount}</span>
-                {!commentsEnabled && (
-                  <a
-                    href="/cx-admin/settings"
-                    className="text-xs text-amber-500 hover:text-amber-600 transition-colors -mt-1"
-                  >
-                    {t('admin.dashboard.disabledEnableSettings')}
-                  </a>
-                )}
+              <span className="text-3xl font-bold">{publishedPosts}</span>
+            </div>
+            <div className="p-5 flex flex-col gap-2 rounded-xl border bg-card shadow-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-muted-foreground">{t('admin.dashboard.pendingComments')}</span>
+                <MessageCircle className={`h-4 w-4 ${commentsEnabled ? 'text-muted-foreground' : 'text-amber-500'}`} />
               </div>
-            </section>
+              <span className="text-3xl font-bold">{pendingCount}</span>
+              {!commentsEnabled && (
+                <a
+                  href="/cx-admin/settings"
+                  className="text-xs text-amber-500 hover:text-amber-600 transition-colors -mt-1"
+                >
+                  {t('admin.dashboard.disabledEnableSettings')}
+                </a>
+              )}
+            </div>
+          </section>
 
-            {/* Quick Actions: Pending Comments */}
-            {commentsEnabled && pendingComments.length > 0 && (
-              <section>
-                <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">
-                  {t('admin.dashboard.quickActionPending')}
-                </h2>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  {pendingComments.map((comment) => (
-                    <div key={comment.id} className="p-4 flex flex-col gap-3 rounded-xl border bg-card shadow-sm">
-                      <div>
-                        <p className="text-sm font-semibold">{comment.author_name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          on <span className="font-medium">"{comment.post?.title ?? `Post #${comment.post_id}`}"</span>
-                        </p>
-                      </div>
-                      <p className="text-sm italic border-l-2 border-border pl-3 py-1">
-                        "{comment.content}"
-                      </p>
-                      <div className="flex items-center justify-end gap-2 mt-1">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="h-7 text-xs gap-1.5 text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
-                          onClick={() => askDelete('comment', comment.id)}
-                        >
-                          <X className="h-3.5 w-3.5" /> {t('admin.dashboard.reject')}
-                        </Button>
-                        <Button
-                          size="sm"
-                          className="h-7 text-xs gap-1.5"
-                          onClick={() => handleApproveComment(comment.id)}
-                        >
-                          <Check className="h-3.5 w-3.5" /> {t('admin.dashboard.approve')}
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Posts Table */}
+          {/* Quick Actions: Pending Comments */}
+          {commentsEnabled && pendingComments.length > 0 && (
             <section>
               <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">
-                {t('admin.dashboard.yourPosts')}
+                {t('admin.dashboard.quickActionPending')}
               </h2>
-
-              {postsLoading && <LoadingSpinner className="py-12" />}
-
-              {postsData && (
-                <>
-                  <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
-                    {/* Table header */}
-                    <div className="grid grid-cols-12 gap-4 p-4 border-b text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      <div className="col-span-6">{t('admin.dashboard.titleCol')}</div>
-                      <div className="col-span-2">{t('admin.dashboard.statusCol')}</div>
-                      <div className="col-span-2">{t('admin.dashboard.commentsCol')}</div>
-                      <div className="col-span-2 text-right">{t('admin.dashboard.actionsCol')}</div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {pendingComments.map((comment) => (
+                  <div key={comment.id} className="p-4 flex flex-col gap-3 rounded-xl border bg-card shadow-sm">
+                    <div>
+                      <p className="text-sm font-semibold">{comment.author_name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        on <span className="font-medium">"{comment.post?.title ?? `Post #${comment.post_id}`}"</span>
+                      </p>
                     </div>
-
-                    <div className="flex flex-col">
-                      {postsData.data.map((post) => (
-                        <div
-                          key={post.id}
-                          className="grid grid-cols-12 gap-4 p-4 items-center border-b last:border-b-0 hover:bg-muted/30 transition-colors"
-                        >
-                          {/* Thumbnail + Title + tags */}
-                          <div className="col-span-6 flex items-center gap-3 pr-4">
-                            {post.featured_image_url ? (
-                              <img
-                                src={post.featured_image_url}
-                                alt=""
-                                className="w-10 h-10 rounded-md object-cover shrink-0 border border-border"
-                              />
-                            ) : (
-                              <div className="w-10 h-10 rounded-md bg-muted border border-border flex items-center justify-center shrink-0">
-                                <FileText className="h-4 w-4 text-muted-foreground" />
-                              </div>
-                            )}
-                            <div className="flex flex-col gap-1.5 min-w-0">
-                              <span className="font-medium truncate">{post.title}</span>
-                              {post.tags && (
-                                <div className="flex flex-wrap gap-1">
-                                  {post.tags.split(',').map((tag) => (
-                                    <Badge key={tag} variant="outline" className="text-[10px] px-1.5 py-0">
-                                      {tag.trim()}
-                                    </Badge>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Status badge */}
-                          <div className="col-span-2">
-                            <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
-                              {post.status === 'published' ? t('admin.dashboard.statusPublished') : t('admin.dashboard.statusDraft')}
-                            </Badge>
-                          </div>
-
-                          {/* Comments count → opens drawer */}
-                          <div className="col-span-2">
-                            <button
-                              onClick={() => openDrawer(post.id, post.title)}
-                              className="flex items-center gap-1.5 px-2 py-1 -ml-2 rounded-lg transition-colors hover:bg-muted text-muted-foreground hover:text-foreground"
-                              title={t('admin.dashboard.viewComments')}
-                            >
-                              <MessageCircle className="h-4 w-4" />
-                              <span className="text-sm font-medium">{post.comments_count ?? 0}</span>
-                              {(post.comments_pending_count ?? 0) > 0 && (
-                                <span className="h-2 w-2 rounded-full bg-red-500" />
-                              )}
-                            </button>
-                          </div>
-
-                          {/* Actions */}
-                          <div className="col-span-2 flex items-center justify-end gap-1">
-                            <button
-                              onClick={() => openEdit(post)}
-                              disabled={editLoading}
-                              className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-50"
-                              title={t('common.edit')}
-                            >
-                              <Edit3 className="h-4 w-4" />
-                            </button>
-                            <button
-                              onClick={() => askDelete('post', post.id)}
-                              className="p-1.5 rounded-lg text-muted-foreground hover:bg-red-50 hover:text-red-600 transition-colors"
-                              title={t('common.delete')}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-
-                      {postsData.data.length === 0 && (
-                        <div className="p-10 text-center text-sm text-muted-foreground">
-                          {t('admin.dashboard.noPostsYet')}
-                        </div>
-                      )}
+                    <p className="text-sm italic border-l-2 border-border pl-3 py-1">
+                      "{comment.content}"
+                    </p>
+                    <div className="flex items-center justify-end gap-2 mt-1">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-xs gap-1.5 text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
+                        onClick={() => askDelete('comment', comment.id)}
+                      >
+                        <X className="h-3.5 w-3.5" /> {t('admin.dashboard.reject')}
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="h-7 text-xs gap-1.5"
+                        onClick={() => handleApproveComment(comment.id)}
+                      >
+                        <Check className="h-3.5 w-3.5" /> {t('admin.dashboard.approve')}
+                      </Button>
                     </div>
                   </div>
-
-                  {/* Pagination */}
-                  {postsData.meta.last_page > 1 && (
-                    <div className="flex justify-center gap-2 mt-4">
-                      <Button
-                        variant="outline" size="sm"
-                        disabled={postsPage <= 1}
-                        onClick={() => setPostsPage((p) => p - 1)}
-                      >
-                        {t('common.previous')}
-                      </Button>
-                      <span className="flex items-center text-sm px-2">
-                        {postsPage} / {postsData.meta.last_page}
-                      </span>
-                      <Button
-                        variant="outline" size="sm"
-                        disabled={postsPage >= postsData.meta.last_page}
-                        onClick={() => setPostsPage((p) => p + 1)}
-                      >
-                        {t('common.next')}
-                      </Button>
-                    </div>
-                  )}
-                </>
-              )}
+                ))}
+              </div>
             </section>
-          </>
-        )}
+          )}
 
-        {/* ===== EDITOR VIEW ===== */}
-        {view === 'editor' && (
-          <div className="max-w-4xl mx-auto space-y-8">
+          {/* Posts Table */}
+          <section>
+            <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">
+              {t('admin.dashboard.yourPosts')}
+            </h2>
 
-            {/* Title */}
-            <div className="space-y-2">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                {t('admin.dashboard.titleCol')}
-              </label>
+            {postsLoading && <LoadingSpinner className="py-12" />}
+
+            {postsData && (
+              <>
+                <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
+                  {/* Table header */}
+                  <div className="grid grid-cols-12 gap-4 p-4 border-b text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    <div className="col-span-6">{t('admin.dashboard.titleCol')}</div>
+                    <div className="col-span-2">{t('admin.dashboard.statusCol')}</div>
+                    <div className="col-span-2">{t('admin.dashboard.commentsCol')}</div>
+                    <div className="col-span-2 text-right">{t('admin.dashboard.actionsCol')}</div>
+                  </div>
+
+                  <div className="flex flex-col">
+                    {postsData.data.map((post) => (
+                      <div
+                        key={post.id}
+                        className="grid grid-cols-12 gap-4 p-4 items-center border-b last:border-b-0 hover:bg-muted/30 transition-colors"
+                      >
+                        {/* Thumbnail + Title + tags */}
+                        <div className="col-span-6 flex items-center gap-3 pr-4">
+                          {post.featured_image_url ? (
+                            <img
+                              src={post.featured_image_url}
+                              alt=""
+                              className="w-10 h-10 rounded-md object-cover shrink-0 border border-border"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-md bg-muted border border-border flex items-center justify-center shrink-0">
+                              <FileText className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                          )}
+                          <div className="flex flex-col gap-1.5 min-w-0">
+                            <span className="font-medium truncate">{post.title}</span>
+                            <div className="flex flex-wrap gap-1">
+                              {post.tags && post.tags.split(',').map((tag) => (
+                                <Badge key={tag} variant="outline" className="text-[10px] px-1.5 py-0">
+                                  {tag.trim()}
+                                </Badge>
+                              ))}
+                              {(post.translation_locales ?? []).map((loc) => (
+                                <span
+                                  key={loc}
+                                  className="inline-flex items-center px-1.5 py-0 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                                >
+                                  {loc}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Status badge */}
+                        <div className="col-span-2">
+                          <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
+                            {post.status === 'published' ? t('admin.dashboard.statusPublished') : t('admin.dashboard.statusDraft')}
+                          </Badge>
+                        </div>
+
+                        {/* Comments count → opens drawer */}
+                        <div className="col-span-2">
+                          <button
+                            onClick={() => openDrawer(post.id, post.title)}
+                            className="flex items-center gap-1.5 px-2 py-1 -ml-2 rounded-lg transition-colors hover:bg-muted text-muted-foreground hover:text-foreground"
+                            title={t('admin.dashboard.viewComments')}
+                          >
+                            <MessageCircle className="h-4 w-4" />
+                            <span className="text-sm font-medium">{post.comments_count ?? 0}</span>
+                            {(post.comments_pending_count ?? 0) > 0 && (
+                              <span className="h-2 w-2 rounded-full bg-red-500" />
+                            )}
+                          </button>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="col-span-2 flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => openEdit(post)}
+                            disabled={editLoading}
+                            className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-50"
+                            title={t('common.edit')}
+                          >
+                            <Edit3 className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => askDelete('post', post.id)}
+                            className="p-1.5 rounded-lg text-muted-foreground hover:bg-red-50 hover:text-red-600 transition-colors"
+                            title={t('common.delete')}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+
+                    {postsData.data.length === 0 && (
+                      <div className="p-10 text-center text-sm text-muted-foreground">
+                        {t('admin.dashboard.noPostsYet')}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Pagination */}
+                {postsData.meta.last_page > 1 && (
+                  <div className="flex justify-center gap-2 mt-4">
+                    <Button
+                      variant="outline" size="sm"
+                      disabled={postsPage <= 1}
+                      onClick={() => setPostsPage((p) => p - 1)}
+                    >
+                      {t('common.previous')}
+                    </Button>
+                    <span className="flex items-center text-sm px-2">
+                      {postsPage} / {postsData.meta.last_page}
+                    </span>
+                    <Button
+                      variant="outline" size="sm"
+                      disabled={postsPage >= postsData.meta.last_page}
+                      onClick={() => setPostsPage((p) => p + 1)}
+                    >
+                      {t('common.next')}
+                    </Button>
+                  </div>
+                )}
+              </>
+            )}
+          </section>
+        </div>
+      )}
+
+      {/* ── EDITOR VIEW (two-column) ────────────────────────────────────────── */}
+      {view === 'editor' && (
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_360px] lg:divide-x divide-border">
+
+          {/* Left: editor panel */}
+          <section className="p-8 lg:p-12 pb-24 space-y-8 overflow-y-auto">
+
+            {/* Language tabs */}
+            <div className="flex items-center gap-1 bg-muted p-1 rounded-lg w-fit">
+              {LOCALES.map(({ code, label }) => (
+                <button
+                  key={code}
+                  onClick={() => setActiveLocale(code)}
+                  className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                    activeLocale === code
+                      ? 'bg-card text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Languages size={14} />
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {/* Large title */}
+            <div>
               <input
                 type="text"
-                className="w-full px-3 py-3 text-lg font-medium border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                placeholder={t('admin.dashboard.titlePlaceholder')}
-                value={form.title}
-                onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+                placeholder={`${t('admin.dashboard.titlePlaceholder')} (${activeLocale.toUpperCase()})…`}
+                value={langContent[activeLocale]?.title ?? ''}
+                onChange={(e) => updateLangField(activeLocale, 'title', e.target.value)}
+                className="w-full text-3xl lg:text-4xl font-bold border-none focus:ring-0 p-0 mb-4 bg-transparent outline-none text-foreground placeholder:text-muted-foreground/30"
+              />
+              <div className="h-0.5 w-12 bg-border" />
+            </div>
+
+            {/* Content editor */}
+            <div>
+              <div onKeyDown={(e) => e.stopPropagation()}>
+                <PostEditor
+                  key={`${editingPost?.id ?? 'new'}-${activeLocale}`}
+                  content={langContent[activeLocale]?.content ?? ''}
+                  onChange={(html) => updateLangField(activeLocale, 'content', html)}
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Right: metadata sidebar */}
+          <aside className="p-6 space-y-6 border-t lg:border-t-0 overflow-y-auto">
+
+            {/* Featured image */}
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                {t('admin.dashboard.featuredImage')} <span className="normal-case font-normal opacity-70">({t('admin.dashboard.featuredImageHint')})</span>
+              </label>
+              <div className="rounded-xl border bg-card">
+                {displayImage ? (
+                  <div className="relative p-3">
+                    <img src={displayImage} alt="Featured" className="w-full aspect-video rounded-lg object-cover" />
+                    <button
+                      type="button"
+                      onClick={removeImage}
+                      className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-0.5"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <div
+                    className="w-full aspect-video rounded-xl border-2 border-dashed border-muted-foreground/30 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-muted/30 transition-colors"
+                    onClick={() => imageInputRef.current?.click()}
+                  >
+                    <Upload className="h-6 w-6 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground font-medium">{t('admin.dashboard.uploadFeaturedImage')}</span>
+                  </div>
+                )}
+                <input
+                  ref={imageInputRef}
+                  type="file"
+                  accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/avif,.jpg,.jpeg,.png,.gif,.webp,.avif"
+                  className="hidden"
+                  onChange={handleImageSelect}
+                />
+                {displayImage && (
+                  <div
+                    className="px-3 pb-3 pt-1 text-xs text-muted-foreground text-center cursor-pointer hover:text-foreground transition-colors"
+                    onClick={() => imageInputRef.current?.click()}
+                  >
+                    {t('common.change')}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Excerpt — per language */}
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                {t('admin.dashboard.excerpt')} <span className="normal-case font-normal opacity-70">({t('common.optional')})</span>
+              </label>
+              <textarea
+                rows={3}
+                placeholder={t('admin.dashboard.excerptPlaceholder')}
+                value={langContent[activeLocale]?.excerpt ?? ''}
+                onChange={(e) => updateLangField(activeLocale, 'excerpt', e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
               />
             </div>
 
-            {/* Tags */}
-            <div className="space-y-2">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            {/* Tags — shared */}
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
                 {t('admin.dashboard.tags')}
               </label>
               <ChipInput
@@ -558,8 +721,8 @@ export default function DashboardPage() {
                 const available = popularTags.filter(({ tag }) => !currentChips.includes(tag))
                 if (available.length === 0) return null
                 return (
-                  <div className="space-y-1.5">
-                    <p className="text-xs text-muted-foreground">Popular tags</p>
+                  <div className="mt-2 space-y-1.5">
+                    <p className="text-xs text-muted-foreground">{t('admin.dashboard.popularTags')}</p>
                     <div className="flex flex-wrap gap-1.5">
                       {available.map(({ tag }) => (
                         <button
@@ -580,9 +743,9 @@ export default function DashboardPage() {
               })()}
             </div>
 
-            {/* Reading time */}
-            <div className="space-y-2">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            {/* Reading time — shared */}
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
                 {t('admin.dashboard.readingTime')} <span className="normal-case font-normal opacity-70">({t('admin.dashboard.readingTimeHint')})</span>
               </label>
               <input
@@ -594,89 +757,66 @@ export default function DashboardPage() {
               />
             </div>
 
-            {/* Excerpt */}
-            <div className="space-y-2">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                {t('admin.dashboard.excerpt')} <span className="normal-case font-normal opacity-70">({t('common.optional')})</span>
-              </label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 border rounded-lg bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                placeholder={t('admin.dashboard.excerptPlaceholder')}
-                value={form.excerpt}
-                onChange={(e) => setForm((f) => ({ ...f, excerpt: e.target.value }))}
-              />
-            </div>
-
-            {/* Featured Image */}
-            <div className="space-y-2">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                {t('admin.dashboard.featuredImage')} <span className="normal-case font-normal opacity-70">({t('admin.dashboard.featuredImageHint')})</span>
-              </label>
-              <div className="p-4 rounded-xl border bg-card shadow-sm">
-                {displayImage ? (
-                  <div className="relative inline-block">
-                    <img src={displayImage} alt="Featured" className="max-h-32 rounded-lg object-cover" />
-                    <button
-                      type="button"
-                      onClick={removeImage}
-                      className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-0.5"
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                ) : (
-                  <div
-                    className="w-full h-32 rounded-lg border-2 border-dashed border-muted-foreground/30 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-muted/30 transition-colors"
-                    onClick={() => imageInputRef.current?.click()}
-                  >
-                    <Upload className="h-6 w-6 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground font-medium">{t('admin.dashboard.uploadFeaturedImage')}</span>
-                  </div>
-                )}
-                <input
-                  ref={imageInputRef}
-                  type="file"
-                  accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/avif,.jpg,.jpeg,.png,.gif,.webp,.avif"
-                  className="hidden"
-                  onChange={handleImageSelect}
-                />
-              </div>
-            </div>
-
-            {/* Content */}
-            <div className="space-y-2">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                {t('admin.dashboard.content')}
-              </label>
-              <div onKeyDown={(e) => e.stopPropagation()}>
-                <PostEditor
-                  key={editingPost?.id ?? 'new'}
-                  content={form.content}
-                  onChange={(html) => setForm((f) => ({ ...f, content: html }))}
-                />
-              </div>
-            </div>
-
-            {/* Map embed URL */}
-            <div className="space-y-2">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            {/* Map embed URL — shared */}
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
                 {t('admin.dashboard.mapEmbedUrl')} <span className="normal-case font-normal opacity-70">({t('common.optional')})</span>
               </label>
               <input
                 type="url"
-                className="w-full px-3 py-2 border rounded-lg bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                placeholder="https://www.google.com/maps/embed?pb=..."
+                className="w-full px-3 py-2 border rounded-lg bg-background text-foreground text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                placeholder="https://www.google.com/maps/embed?pb=…"
                 value={form.map_embed_url}
                 onChange={(e) => setForm((f) => ({ ...f, map_embed_url: e.target.value }))}
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="mt-1.5 text-[11px] text-muted-foreground italic">
                 {t('admin.dashboard.mapEmbedUrlHint')}
               </p>
             </div>
-          </div>
-        )}
-      </div>
+
+            {/* Language progress panel */}
+            <div className="p-4 bg-muted/40 rounded-xl border border-border">
+              <h4 className="text-[10px] font-bold text-muted-foreground uppercase mb-3 flex items-center gap-2">
+                <Languages size={14} /> {t('admin.dashboard.translations')}
+              </h4>
+              <div className="space-y-2">
+                {LOCALES.map(({ code, label }) => {
+                  const isBase = code === baseLocale
+                  const hasSavedContent = isBase
+                    ? !!editingPost
+                    : !!editingPost?.translations?.find((tr) => tr.locale === code)
+                  return (
+                    <div key={code} className="flex items-center justify-between text-[11px]">
+                      <span className="text-foreground font-medium">
+                        {label}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] ${
+                        hasSavedContent
+                          ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                          : 'bg-muted text-muted-foreground'
+                      }`}>
+                        {hasSavedContent ? t('common.ready') : t('common.empty')}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+          </aside>
+        </div>
+      )}
+
+      {/* ── EDITOR FOOTER ──────────────────────────────────────────────────── */}
+      {view === 'editor' && (
+        <footer className="sticky bottom-0 z-10 bg-card border-t px-6 py-2 flex justify-between items-center text-[10px] text-muted-foreground uppercase font-bold tracking-widest shrink-0">
+          <span>{t('admin.dashboard.editing')}: {LANG_LABELS[activeLocale] ?? activeLocale}</span>
+          <span>
+            {(langContent[activeLocale]?.content ?? '').replace(/<[^>]+>/g, '').length}{' '}
+            {t('admin.dashboard.characters')}
+          </span>
+        </footer>
+      )}
 
       {/* ── DRAWER OVERLAY ─────────────────────────────────────────────────── */}
       {isDrawerOpen && (
@@ -749,13 +889,13 @@ export default function DashboardPage() {
                   </span>
                 </div>
 
-                <p className="text-sm mb-4">{comment.content}</p>
+                <p className="text-sm text-muted-foreground mb-3 leading-relaxed">{comment.content}</p>
 
-                <div className="flex items-center gap-2 pt-3 border-t">
+                <div className="flex items-center gap-2 justify-end">
                   {comment.status !== 'approved' && (
                     <Button
                       size="sm"
-                      className="flex-1 h-8 text-xs gap-1.5"
+                      className="h-7 text-xs gap-1.5"
                       onClick={() => handleApproveComment(comment.id)}
                     >
                       <Check className="h-3.5 w-3.5" /> {t('admin.dashboard.approve')}
@@ -765,7 +905,7 @@ export default function DashboardPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="flex-1 h-8 text-xs gap-1.5 text-amber-600 border-amber-200 hover:bg-amber-50"
+                      className="h-7 text-xs gap-1.5 text-amber-600 border-amber-300/50 hover:bg-amber-50"
                       onClick={() => handleSpamComment(comment.id)}
                     >
                       <AlertTriangle className="h-3.5 w-3.5" /> {t('admin.dashboard.spam')}
@@ -774,10 +914,10 @@ export default function DashboardPage() {
                   <Button
                     size="sm"
                     variant="outline"
-                    className="h-8 px-3 text-xs text-destructive border-destructive/30 hover:bg-destructive/10"
+                    className="h-7 text-xs gap-1.5 text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
                     onClick={() => askDelete('comment', comment.id)}
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
+                    <Trash2 className="h-3.5 w-3.5" /> {t('common.delete')}
                   </Button>
                 </div>
               </div>
@@ -786,15 +926,16 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ── DELETE CONFIRMATION ─────────────────────────────────────────────── */}
+      {/* ── CONFIRM DIALOG ─────────────────────────────────────────────────── */}
       <ConfirmDialog
         open={confirmOpen}
         title={confirmType === 'post' ? t('admin.dashboard.deletePostTitle') : t('admin.dashboard.deleteCommentTitle')}
         description={confirmType === 'post' ? t('admin.dashboard.deletePostDescription') : t('admin.dashboard.deleteCommentDescription')}
         confirmLabel={t('common.delete')}
         onConfirm={executeDelete}
-        onCancel={() => { setConfirmOpen(false); setConfirmId(null) }}
+        onCancel={() => setConfirmOpen(false)}
       />
+
     </div>
   )
 }

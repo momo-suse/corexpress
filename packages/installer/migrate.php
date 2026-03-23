@@ -80,9 +80,9 @@ if (file_exists($versionFile)) {
     if ($newVersion !== '') {
         $stmt = $pdo->prepare(
             "INSERT INTO `settings` (`key`, `value`) VALUES ('app_version', :v)
-             ON DUPLICATE KEY UPDATE `value` = :v"
+             ON DUPLICATE KEY UPDATE `value` = :v2"
         );
-        $stmt->execute([':v' => $newVersion]);
+        $stmt->execute([':v' => $newVersion, ':v2' => $newVersion]);
         echo "Version updated to {$newVersion}.\n";
     }
 }

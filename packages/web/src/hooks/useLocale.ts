@@ -20,9 +20,13 @@ export function useLocale() {
 
   useEffect(() => {
     const locale = (data?.data as Record<string, string> | undefined)?.app_locale
-    if (locale && locale !== i18n.language) {
+    if (!locale) return
+    // Only apply the DB setting on first visit — if the visitor has already
+    // chosen a language (cx_locale exists in localStorage), respect their choice.
+    const hasVisitorPref = !!localStorage.getItem('cx_locale')
+    if (!hasVisitorPref && locale !== i18n.language) {
       i18n.changeLanguage(locale)
-      localStorage.setItem('cx_locale', locale)
+      // i18next caches automatically in cx_locale via the 'caches' config
     }
   }, [data, i18n])
 }

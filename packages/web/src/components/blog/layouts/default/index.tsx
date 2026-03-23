@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { Linkedin, Instagram, Youtube, Facebook } from 'lucide-react'
 import AdminBar from '@/components/blog/AdminBar'
+import BlogHeader from '@/components/blog/BlogHeader'
 import HeroSection from '@/components/blog/HeroSection'
 import ProfileSection from '@/components/blog/ProfileSection'
 import PostList from '@/components/blog/PostList'
@@ -111,6 +112,9 @@ export function DefaultBlogHome({
     <div className={`blog-collection-${activeCollection} min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300`}>
       {/* Admin bar — only shown to authenticated users */}
       {user && <AdminBar />}
+
+      {/* Sticky top bar with blog name + language switcher */}
+      <BlogHeader settings={settings} adminBarVisible={user} />
 
       <main className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 ${user ? 'mt-9' : ''}`}>
         {/* Hero */}
@@ -218,6 +222,9 @@ export interface DefaultPostContentProps {
   profileVisible: boolean
   socialVisible: boolean
   onCommentSubmitted: () => void
+  availableLocales?: string[]
+  currentLocale?: string
+  onLocaleChange?: (locale: string) => void
 }
 
 export function DefaultPostContent({
@@ -229,6 +236,9 @@ export function DefaultPostContent({
   profileVisible,
   socialVisible,
   onCommentSubmitted,
+  availableLocales = [],
+  currentLocale = 'en',
+  onLocaleChange,
 }: DefaultPostContentProps) {
   const { t, i18n } = useTranslation()
   const activeCollection = settings.active_style_collection ?? 'default'
@@ -238,6 +248,9 @@ export function DefaultPostContent({
     <div className={`blog-collection-${activeCollection} min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300`}>
       {/* Admin bar — only for authenticated users */}
       {user && <AdminBar />}
+
+      {/* Sticky top bar with blog name + language switcher */}
+      <BlogHeader settings={settings} adminBarVisible={user} />
 
       <main className={`max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-10 md:py-14 ${user ? 'mt-9' : ''}`}>
         <div className={`grid grid-cols-1 ${hasSidebar ? 'lg:grid-cols-12' : ''} gap-10 lg:gap-14`}>
@@ -318,7 +331,13 @@ export function DefaultPostContent({
               className="bg-white dark:bg-gray-900 shadow-md border border-gray-200 dark:border-gray-700 p-4 md:p-6 mb-8"
               style={{ borderRadius: 'var(--blog-radius-card)' }}
             >
-              <PostDetail post={post} settings={settings} />
+              <PostDetail
+                post={post}
+                settings={settings}
+                availableLocales={availableLocales}
+                currentLocale={currentLocale}
+                onLocaleChange={onLocaleChange}
+              />
             </div>
 
             {/* Comments — only rendered when enabled */}
@@ -387,6 +406,9 @@ export function DefaultAboutContent({
   return (
     <div className={`blog-collection-${activeCollection} min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300`}>
       {user && <AdminBar />}
+
+      {/* Sticky top bar with blog name + language switcher */}
+      <BlogHeader settings={settings} adminBarVisible={user} />
 
       <main className={`max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 ${user ? 'mt-9' : ''}`}>
 

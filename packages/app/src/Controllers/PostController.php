@@ -6,6 +6,8 @@ namespace Corexpress\Controllers;
 
 use Corexpress\Models\Image;
 use Corexpress\Models\Post;
+use Corexpress\Models\PostTranslation;
+use Corexpress\Models\Setting;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -13,6 +15,7 @@ class PostController extends Controller
 {
     private const DEFAULT_PER_PAGE = 10;
     private const MAX_PER_PAGE = 50;
+    private const SUPPORTED_LOCALES = ['en', 'es', 'ja'];
 
     /**
      * GET /api/v1/posts
@@ -60,6 +63,7 @@ class PostController extends Controller
                 'comments as comments_count',
                 'comments as comments_pending_count' => static fn ($q) => $q->where('status', 'pending'),
             ])
+            ->with(['translations:id,post_id,locale'])
             ->skip(($page - 1) * $perPage)
             ->take($perPage)
             ->get()
@@ -73,6 +77,9 @@ class PostController extends Controller
                 }
                 // Content is never returned in list — use the show endpoint to fetch a single post for editing
                 unset($data['content']);
+                // Include only the locale codes of existing translations
+                $data['translation_locales'] = $post->translations->pluck('locale')->values()->all();
+                unset($data['translations']);
                 return $data;
             });
 
@@ -88,25 +95,153 @@ class PostController extends Controller
     }
 
     /**
-     * GET /api/v1/posts/{slug}
+     * GET /api/v1/posts/{slug}[?locale=XX]
      * Returns a single published post with its comment count (public).
+     * When ?locale= is provided, content fields may be overridden by a translation.
      */
     public function show(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
         $isAdmin = !empty($_SESSION['user_id']);
         $post = $isAdmin
-            ? Post::where('slug', $args['slug'])->first()
-            : Post::published()->where('slug', $args['slug'])->first();
+            ? Post::where('slug', $args['slug'])->with('translations')->first()
+            : Post::published()->where('slug', $args['slug'])->with('translations')->first();
 
         if ($post === null) {
             return $this->error($response, 'Post not found.', 404);
         }
 
+        $baseLocale = $post->base_locale ?? 'en';
+        $translations = $post->translations->keyBy('locale');
+        $translationLocales = $translations->keys()->all();
+        $availableLocales = array_values(array_unique(array_merge([$baseLocale], $translationLocales)));
+
         $data = $post->toArray();
+        unset($data['translations']); // don't expose full translation objects in show
+
         $data['comment_count'] = $post->comments()->where('status', 'approved')->count();
         $data['featured_image_url'] = $this->resolveFeaturedImageUrl($post->featured_image_id);
+        $data['base_locale'] = $baseLocale;
+        $data['available_locales'] = $availableLocales;
+
+        // Apply locale override when a specific locale is requested
+        $params = $request->getQueryParams();
+        $requestedLocale = trim((string)($params['locale'] ?? ''));
+
+        if ($requestedLocale !== '' && $requestedLocale !== $baseLocale) {
+            // Use the requested locale's translation; if not available fall back to base content (already in $data)
+            $translation = $translations->get($requestedLocale);
+
+            if ($translation !== null) {
+                $data['title'] = $translation->title;
+                $data['content'] = $translation->content;
+                $data['excerpt'] = $translation->excerpt;
+            }
+        }
+
+        // Admins also receive the full translation list for the editor
+        if ($isAdmin) {
+            $data['translations'] = $translations->values()->toArray();
+        }
 
         return $this->json($response, ['data' => $data]);
+    }
+
+    /**
+     * POST /api/v1/posts/{id}/translations   [Admin + CSRF]
+     */
+    public function storeTranslation(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
+    {
+        $post = Post::find((int)$args['id']);
+        if ($post === null) {
+            return $this->error($response, 'Post not found.', 404);
+        }
+
+        $body = (array)($request->getParsedBody() ?? []);
+        $locale = trim((string)($body['locale'] ?? ''));
+        $title = trim((string)($body['title'] ?? ''));
+        $content = trim((string)($body['content'] ?? ''));
+
+        $baseLocale = $post->base_locale ?? 'en';
+        $errors = $this->validateTranslationBody($body, $locale, $baseLocale);
+        if ($errors !== []) {
+            return $this->json($response, ['error' => 'Validation failed', 'fields' => $errors], 422);
+        }
+
+        // Upsert — replace if locale already exists
+        $translation = PostTranslation::updateOrCreate(
+            ['post_id' => $post->id, 'locale' => $locale],
+            [
+                'title'   => $title,
+                'content' => $content,
+                'excerpt' => isset($body['excerpt']) && $body['excerpt'] !== '' ? trim((string)$body['excerpt']) : null,
+            ]
+        );
+
+        return $this->json($response, ['data' => $translation->fresh()->toArray()], 201);
+    }
+
+    /**
+     * PUT /api/v1/posts/{id}/translations/{locale}   [Admin + CSRF]
+     */
+    public function updateTranslation(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
+    {
+        $post = Post::find((int)$args['id']);
+        if ($post === null) {
+            return $this->error($response, 'Post not found.', 404);
+        }
+
+        $locale = trim((string)($args['locale'] ?? ''));
+        $translation = PostTranslation::where('post_id', $post->id)->where('locale', $locale)->first();
+        if ($translation === null) {
+            return $this->error($response, 'Translation not found.', 404);
+        }
+
+        $body = (array)($request->getParsedBody() ?? []);
+
+        if (isset($body['title'])) {
+            $title = trim((string)$body['title']);
+            if ($title === '') {
+                return $this->json($response, ['error' => 'Validation failed', 'fields' => ['title' => 'Title cannot be empty.']], 422);
+            }
+            $translation->title = $title;
+        }
+
+        if (isset($body['content'])) {
+            $content = trim((string)$body['content']);
+            if ($content === '') {
+                return $this->json($response, ['error' => 'Validation failed', 'fields' => ['content' => 'Content cannot be empty.']], 422);
+            }
+            $translation->content = $content;
+        }
+
+        if (array_key_exists('excerpt', $body)) {
+            $translation->excerpt = $body['excerpt'] !== null && $body['excerpt'] !== '' ? trim((string)$body['excerpt']) : null;
+        }
+
+        $translation->save();
+
+        return $this->json($response, ['data' => $translation->fresh()->toArray()]);
+    }
+
+    /**
+     * DELETE /api/v1/posts/{id}/translations/{locale}   [Admin + CSRF]
+     */
+    public function destroyTranslation(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
+    {
+        $post = Post::find((int)$args['id']);
+        if ($post === null) {
+            return $this->error($response, 'Post not found.', 404);
+        }
+
+        $locale = trim((string)($args['locale'] ?? ''));
+        $translation = PostTranslation::where('post_id', $post->id)->where('locale', $locale)->first();
+        if ($translation === null) {
+            return $this->error($response, 'Translation not found.', 404);
+        }
+
+        $translation->delete();
+
+        return $response->withStatus(204);
     }
 
     /**
@@ -132,10 +267,13 @@ class PostController extends Controller
             }
         }
 
+        $baseLocale = Setting::where('key', 'app_locale')->value('value') ?? 'en';
+
         $post = Post::create([
             'user_id' => $userId,
             'title' => trim((string)$body['title']),
             'slug' => $this->generateSlug(trim((string)$body['title'])),
+            'base_locale' => $baseLocale,
             'content' => trim((string)$body['content']),
             'excerpt' => isset($body['excerpt']) ? trim((string)$body['excerpt']) : null,
             'tags' => isset($body['tags']) && $body['tags'] !== '' ? trim((string)$body['tags']) : null,
@@ -271,6 +409,35 @@ class PostController extends Controller
     }
 
     // ── Private helpers ────────────────────────────────────────────────────
+
+    /**
+     * @param  array<string, mixed> $body
+     * @return array<string, string>
+     */
+    private function validateTranslationBody(array $body, string $locale, string $baseLocale): array
+    {
+        $errors = [];
+
+        if (!in_array($locale, self::SUPPORTED_LOCALES, true)) {
+            $errors['locale'] = 'Locale must be one of: ' . implode(', ', self::SUPPORTED_LOCALES) . '.';
+        } elseif ($locale === $baseLocale) {
+            $errors['locale'] = 'Cannot create a translation for the base locale.';
+        }
+
+        $title = trim((string)($body['title'] ?? ''));
+        if ($title === '') {
+            $errors['title'] = 'Title is required.';
+        } elseif (mb_strlen($title) > 500) {
+            $errors['title'] = 'Title must be 500 characters or fewer.';
+        }
+
+        $content = trim((string)($body['content'] ?? ''));
+        if ($content === '') {
+            $errors['content'] = 'Content is required.';
+        }
+
+        return $errors;
+    }
 
     /**
      * @param  array<string, mixed> $body

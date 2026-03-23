@@ -8,9 +8,12 @@ import { formatTimeAgo } from '@/lib/utils'
 interface PostDetailProps {
   post: Post
   settings?: Record<string, string>
+  availableLocales?: string[]
+  currentLocale?: string
+  onLocaleChange?: (locale: string) => void
 }
 
-export default function PostDetail({ post, settings = {} }: PostDetailProps) {
+export default function PostDetail({ post, settings = {}, availableLocales = [], currentLocale = 'en', onLocaleChange }: PostDetailProps) {
   const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
 
@@ -58,6 +61,27 @@ export default function PostDetail({ post, settings = {} }: PostDetailProps) {
             {copied ? t('blog.post.copied') : t('blog.post.share')}
           </button>
         </div>
+
+        {/* Language pills — only shown when translations exist */}
+        {availableLocales.length > 1 && onLocaleChange && (
+          <div className="flex items-center gap-2 mb-5">
+            {availableLocales.map((loc) => (
+              <button
+                key={loc}
+                onClick={() => onLocaleChange(loc)}
+                aria-pressed={currentLocale === loc}
+                className={`px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full border transition-colors ${
+                  currentLocale === loc
+                    ? 'border-transparent text-white'
+                    : 'border-gray-300 dark:border-gray-700 text-muted-foreground hover:border-gray-400 dark:hover:border-gray-500'
+                }`}
+                style={currentLocale === loc ? { background: 'var(--blog-accent)' } : undefined}
+              >
+                {loc}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Meta row: tags + reading time + date */}
         <div className="flex items-center flex-wrap gap-3 mb-5">

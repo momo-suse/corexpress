@@ -17,7 +17,7 @@ i18n
     fallbackLng: 'en',
     supportedLngs: ['en', 'es', 'ja'],
     detection: {
-      order: ['localStorage'],
+      order: ['localStorage', 'navigator'],
       lookupLocalStorage: 'cx_locale',
       caches: ['localStorage'],
     },

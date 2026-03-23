@@ -20,7 +20,7 @@ const THEME_CLASSES = ['theme-default', 'theme-minimal', 'theme-dark'] as const
 type Tab = 'general' | 'style' | 'security' | 'updates'
 
 export default function SettingsPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [activeTab, setActiveTab] = useState<Tab>('general')
   const { data, isLoading } = useSettings()
   const { mutateAsync: save, isPending: saving } = useMutateSettings()
@@ -60,6 +60,14 @@ export default function SettingsPage() {
     document.body.classList.remove(...THEME_CLASSES)
     document.body.classList.add(`theme-${theme}`)
   }, [form.blog_theme])
+
+  // Live language preview — apply immediately when user selects a different locale.
+  useEffect(() => {
+    const locale = (form.app_locale as string) ?? 'en'
+    if (locale !== i18n.language) {
+      i18n.changeLanguage(locale)
+    }
+  }, [form.app_locale]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function set(key: keyof Settings, value: string) {
     setForm(f => ({ ...f, [key]: value }))
@@ -118,6 +126,9 @@ export default function SettingsPage() {
         setLogoPreview(null)
       }
       await save(payload as never)
+      if (form.app_locale && form.app_locale !== i18n.language) {
+        i18n.changeLanguage(form.app_locale)
+      }
       toast({ title: t('admin.settings.saved') })
     } catch {
       toast({ title: t('admin.settings.saveFailed'), variant: 'destructive' })

@@ -19,6 +19,10 @@
     "next": "Siguiente",
     "change": "Cambiar",
     "upload": "Subir",
+    "language": "Idioma",
+    "changeLanguage": "Cambiar idioma",
+    "ready": "Listo",
+    "empty": "Vacío",
     "time": {
       "justNow": "ahora mismo",
       "minutesAgo": "hace {{count}} min",
@@ -122,7 +126,17 @@
       "failedToSave": "Error al guardar el post.",
       "failedToApprove": "Error al aprobar el comentario.",
       "failedToUpdate": "Error al actualizar el comentario.",
-      "commentDeleted": "Comentario eliminado."
+      "commentDeleted": "Comentario eliminado.",
+      "translations": "Versiones de idioma",
+      "addTranslation": "Agregar versión en {{lang}}",
+      "deleteTranslation": "Eliminar versión",
+      "translationSaved": "Traducción guardada.",
+      "translationDeleted": "Traducción eliminada.",
+      "translationFailedSave": "Error al guardar la traducción.",
+      "translationFailedDelete": "Error al eliminar la traducción.",
+      "baseLanguage": "Contenido base ({{lang}})",
+      "editing": "Editando",
+      "characters": "Caracteres"
     },
     "comments": {
       "title": "Comentarios",

@@ -71,6 +71,11 @@ $app->group('/api/v1', function (\Slim\Routing\RouteCollectorProxy $group) use (
     $group->put('/posts/{id}',    [PostController::class, 'update'])->add($csrfMiddleware)->add($authMiddleware);
     $group->delete('/posts/{id}', [PostController::class, 'destroy'])->add($csrfMiddleware)->add($authMiddleware);
 
+    // Admin: post translations (must be before /posts/{id} slug routes to avoid collision)
+    $group->post('/posts/{id}/translations',              [PostController::class, 'storeTranslation'])->add($csrfMiddleware)->add($authMiddleware);
+    $group->put('/posts/{id}/translations/{locale}',      [PostController::class, 'updateTranslation'])->add($csrfMiddleware)->add($authMiddleware);
+    $group->delete('/posts/{id}/translations/{locale}',   [PostController::class, 'destroyTranslation'])->add($csrfMiddleware)->add($authMiddleware);
+
     // ── Comments ───────────────────────────────────────────────────────────────
 
     // Public (CSRF protected): submit a comment — stored with status=pending

@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 import { Linkedin, Instagram, Youtube, Facebook } from 'lucide-react'
 import AdminBar from '@/components/blog/AdminBar'
+import LanguageSwitcher from '@/components/blog/LanguageSwitcher'
 import CommentList from '@/components/blog/CommentList'
 import CommentForm from '@/components/blog/CommentForm'
 import AboutGallery from '@/components/blog/AboutGallery'
@@ -145,6 +146,11 @@ function NebulaFloatingNav({ settings, currentPage, profileVisible }: NebulaFloa
           </div>
         )}
 
+        {/* Language switcher (desktop) */}
+        <div className="hidden sm:flex items-center pr-1">
+          <LanguageSwitcher variant="nebula" />
+        </div>
+
         {/* Mobile menu toggle */}
         <button
           className="sm:hidden p-2 mr-2 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
@@ -178,6 +184,9 @@ function NebulaFloatingNav({ settings, currentPage, profileVisible }: NebulaFloa
               {t('blog.nav.about')}
             </Link>
           )}
+          <div className="flex items-center px-1">
+            <LanguageSwitcher variant="nebula" />
+          </div>
         </div>
       )}
     </div>
@@ -570,6 +579,9 @@ interface NebulaPostContentProps {
   profileVisible: boolean
   socialVisible: boolean
   onCommentSubmitted: () => void
+  availableLocales?: string[]
+  currentLocale?: string
+  onLocaleChange?: (locale: string) => void
 }
 
 export function NebulaPostContent({
@@ -580,6 +592,9 @@ export function NebulaPostContent({
   commentsEnabled,
   profileVisible,
   onCommentSubmitted,
+  availableLocales = [],
+  currentLocale = 'en',
+  onLocaleChange,
 }: NebulaPostContentProps) {
   const { t } = useTranslation()
   const related = relatedPosts.slice(0, 2)
@@ -610,6 +625,26 @@ export function NebulaPostContent({
                 {(post as Post & { reading_time?: string }).reading_time ?? readingTime(post.content || '')}
               </span>
             </div>
+
+            {/* Language pills — only shown when translations exist */}
+            {availableLocales.length > 1 && onLocaleChange && (
+              <div className="flex items-center gap-2 mb-6">
+                {availableLocales.map((loc) => (
+                  <button
+                    key={loc}
+                    onClick={() => onLocaleChange(loc)}
+                    aria-pressed={currentLocale === loc}
+                    className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 ${
+                      currentLocale === loc
+                        ? 'bg-cyan-400/20 text-cyan-400 ring-1 ring-cyan-400/50'
+                        : 'border border-white/10 text-slate-400 hover:text-white hover:bg-white/10'
+                    }`}
+                  >
+                    {loc}
+                  </button>
+                ))}
+              </div>
+            )}
 
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-tight mb-6">
               {post.title}
