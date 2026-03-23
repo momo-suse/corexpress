@@ -91,11 +91,14 @@ $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
 
 if ($method === 'POST' && in_array($action, ['test-db', 'install'], true)) {
+    ini_set('display_errors', '0'); // prevent PHP errors from corrupting JSON
+    ob_start();                      // buffer all output; cleared before each echo
     header('Content-Type: application/json');
     installerSessionInit();
 
     if (!Security::verifyCsrfHeader()) {
         http_response_code(403);
+        ob_end_clean();
         echo json_encode(['ok' => false, 'error' => 'Invalid CSRF token.']);
         exit;
     }
@@ -109,6 +112,7 @@ if ($method === 'POST' && in_array($action, ['test-db', 'install'], true)) {
             'user'     => trim((string)($body['user'] ?? '')),
             'password' => (string)($body['password'] ?? ''),
         ];
+        ob_end_clean();
         echo json_encode(Database::test($config));
         exit;
     }
@@ -296,6 +300,7 @@ function handleInstallAjax(): void
     $blog  = $_SESSION['installer']['blog']  ?? null;
 
     if (!$db || !$admin || !$blog) {
+        ob_end_clean();
         echo json_encode(['ok' => false, 'error' => t('session.expired')]);
         return;
     }
@@ -327,8 +332,10 @@ function handleInstallAjax(): void
         writeConfig($db, $blog, Security::generateSessionKey(), detectDomain());
         session_destroy();
 
+        ob_end_clean();
         echo json_encode(['ok' => true]);
     } catch (\Throwable $e) {
+        ob_end_clean();
         echo json_encode(['ok' => false, 'error' => Security::escape($e->getMessage())]);
     }
 }

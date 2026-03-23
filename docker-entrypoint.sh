@@ -15,19 +15,16 @@ done
 echo "✓ MySQL is ready."
 
 # ── Install Composer dependencies if vendor/ is missing ───────────────────────
-if [ -f "/var/www/html/composer.json" ] && [ ! -d "/var/www/html/vendor" ]; then
+if [ -f "/var/www/html/packages/app/composer.json" ] && [ ! -d "/var/www/html/packages/app/vendor" ]; then
   echo "→ Installing Composer dependencies..."
-  cd /var/www/html && composer install --no-interaction --prefer-dist --optimize-autoloader
+  cd /var/www/html/packages/app && composer install --no-interaction --prefer-dist --optimize-autoloader
   echo "✓ Composer dependencies installed."
 fi
 
-# ── Ensure public/ directory exists (DocumentRoot) ────────────────────────────
-mkdir -p /var/www/html/public
-
-# ── Allow www-data to write to the app root (installer writes config.php) ────
+# ── Allow www-data to write to packages/app/ (installer writes config.php) ───
 # The entrypoint runs as root, so we can set permissions before Apache starts.
 # This mirrors Hostinger shared hosting where the web user owns the files.
-chmod o+w /var/www/html
+chmod o+w /var/www/html/packages/app
 
 # ── Welcome message ───────────────────────────────────────────────────────────
 echo ""

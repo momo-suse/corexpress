@@ -18,7 +18,16 @@
     "previous": "Previous",
     "next": "Next",
     "change": "Change",
-    "upload": "Upload"
+    "upload": "Upload",
+    "time": {
+      "justNow": "Just now",
+      "minutesAgo": "{{count}} min ago",
+      "hoursAgo": "{{count}} h ago",
+      "daysAgo": "{{count}} d ago",
+      "weeksAgo": "{{count}} w ago",
+      "monthsAgo": "{{count}} mo ago",
+      "yearsAgo": "{{count}} yr ago"
+    }
   },
   "admin": {
     "login": {
@@ -109,6 +118,7 @@
       "mapEmbedUrlHint": "In Google Maps: Share → Embed a map → copy the src URL from the iframe code.",
       "viewingPost": "Viewing:",
       "failedToDelete": "Failed to delete.",
+      "failedToLoad": "Failed to load post.",
       "failedToSave": "Failed to save post.",
       "failedToApprove": "Failed to approve comment.",
       "failedToUpdate": "Failed to update comment.",
@@ -152,7 +162,8 @@
       "tabs": {
         "general": "General",
         "style": "Style & Language",
-        "security": "Security"
+        "security": "Security",
+        "updates": "Updates"
       },
       "saved": "Settings saved.",
       "saveFailed": "Failed to save settings.",
@@ -174,6 +185,22 @@
       "locale": {
         "title": "Language",
         "subtitle": "Language displayed to blog visitors"
+      },
+      "updates": {
+        "title": "Updates",
+        "subtitle": "Check for new versions of Corexpress",
+        "checkButton": "Check for updates",
+        "checking": "Checking…",
+        "currentVersion": "Installed version",
+        "available": "New version available",
+        "alreadyLatest": "You are running the latest version.",
+        "applyButton": "Update now",
+        "applying": "Updating…",
+        "applyingHint": "This may take up to 30 seconds. Do not close this page.",
+        "success": "Updated to version {{version}} successfully.",
+        "upToDate": "Corexpress is up to date.",
+        "checkFailed": "Could not check for updates.",
+        "applyFailed": "Update failed. Please try again or update via SSH."
       },
       "security": {
         "title": "Security",

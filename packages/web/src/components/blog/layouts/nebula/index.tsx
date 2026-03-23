@@ -17,7 +17,6 @@ import {
   X,
   Zap,
   Code2,
-  Search,
 } from 'lucide-react'
 import { Linkedin, Instagram, Youtube, Facebook } from 'lucide-react'
 import AdminBar from '@/components/blog/AdminBar'
@@ -312,15 +311,12 @@ function NebulaSidebar({
       {/* Search */}
       {searchVisible && (
         <div className="rounded-2xl bg-white/[0.03] border border-white/10 p-4">
-          <div className="relative">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-            <SearchBar
-              variant="default"
-              onSearch={onSearch}
-              initialQuery={searchQuery}
-              styles={{ buttonStyle: 'nebula' }}
-            />
-          </div>
+          <SearchBar
+            variant="default"
+            onSearch={onSearch}
+            initialQuery={searchQuery}
+            styles={{ buttonStyle: 'nebula' }}
+          />
         </div>
       )}
 

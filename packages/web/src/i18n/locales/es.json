@@ -18,7 +18,16 @@
     "previous": "Anterior",
     "next": "Siguiente",
     "change": "Cambiar",
-    "upload": "Subir"
+    "upload": "Subir",
+    "time": {
+      "justNow": "ahora mismo",
+      "minutesAgo": "hace {{count}} min",
+      "hoursAgo": "hace {{count}} h",
+      "daysAgo": "hace {{count}} d",
+      "weeksAgo": "hace {{count}} sem",
+      "monthsAgo": "hace {{count}} mes",
+      "yearsAgo": "hace {{count}} año"
+    }
   },
   "admin": {
     "login": {
@@ -109,6 +118,7 @@
       "mapEmbedUrlHint": "En Google Maps: Compartir → Insertar un mapa → copia la URL src del código iframe.",
       "viewingPost": "Viendo:",
       "failedToDelete": "Error al eliminar.",
+      "failedToLoad": "Error al cargar el post.",
       "failedToSave": "Error al guardar el post.",
       "failedToApprove": "Error al aprobar el comentario.",
       "failedToUpdate": "Error al actualizar el comentario.",
@@ -152,7 +162,8 @@
       "tabs": {
         "general": "General",
         "style": "Estilo & Idioma",
-        "security": "Seguridad"
+        "security": "Seguridad",
+        "updates": "Actualizaciones"
       },
       "saved": "Configuración guardada.",
       "saveFailed": "Error al guardar la configuración.",
@@ -174,6 +185,22 @@
       "locale": {
         "title": "Idioma",
         "subtitle": "Idioma que verán los visitantes del blog"
+      },
+      "updates": {
+        "title": "Actualizaciones",
+        "subtitle": "Comprueba si hay nuevas versiones de Corexpress",
+        "checkButton": "Buscar actualizaciones",
+        "checking": "Verificando…",
+        "currentVersion": "Versión instalada",
+        "available": "Nueva versión disponible",
+        "alreadyLatest": "Ya tienes la versión más reciente instalada.",
+        "applyButton": "Actualizar ahora",
+        "applying": "Actualizando…",
+        "applyingHint": "Esto puede tardar hasta 30 segundos. No cierres esta página.",
+        "success": "Actualizado a la versión {{version}} correctamente.",
+        "upToDate": "Corexpress está al día.",
+        "checkFailed": "No se pudo verificar las actualizaciones.",
+        "applyFailed": "La actualización falló. Inténtalo de nuevo o actualiza vía SSH."
       },
       "security": {
         "title": "Seguridad",

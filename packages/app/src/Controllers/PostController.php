@@ -71,7 +71,7 @@ class PostController extends Controller
                     $words = str_word_count(strip_tags((string) $data['content']));
                     $data['reading_time'] = max(1, (int) round($words / 200)) . ' min';
                 }
-                // Don't expose full content in list endpoint
+                // Content is never returned in list — use the show endpoint to fetch a single post for editing
                 unset($data['content']);
                 return $data;
             });
@@ -93,7 +93,10 @@ class PostController extends Controller
      */
     public function show(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
-        $post = Post::published()->where('slug', $args['slug'])->first();
+        $isAdmin = !empty($_SESSION['user_id']);
+        $post = $isAdmin
+            ? Post::where('slug', $args['slug'])->first()
+            : Post::published()->where('slug', $args['slug'])->first();
 
         if ($post === null) {
             return $this->error($response, 'Post not found.', 404);

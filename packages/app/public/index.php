@@ -2,6 +2,12 @@
 
 declare(strict_types=1);
 
+// ── Output safety ──────────────────────────────────────────────────────────
+// PHP warnings/notices go to the error log, never to the HTTP response body.
+// Critical for JSON API correctness — a stray warning breaks response.json().
+ini_set('display_errors', '0');
+ini_set('display_startup_errors', '0');
+
 // ── Config guard ───────────────────────────────────────────────────────────
 // Must run BEFORE autoload: vendor/ may not exist on a fresh install.
 $configPath = __DIR__ . '/../config.php';

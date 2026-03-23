@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { getSettings } from '@/api/settings'
 import { useAboutPage } from '@/hooks/useBlogPage'
+import { useBlogMeta } from '@/hooks/useBlogMeta'
 import { useAuthStore } from '@/store/auth'
 import { useTranslation } from 'react-i18next'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
@@ -20,6 +21,7 @@ export default function AboutPage() {
   })
 
   const { data: pageData, isLoading: pageLoading } = useAboutPage()
+  useBlogMeta(settingsData?.data as unknown as Record<string, string> | undefined)
 
   if (settingsLoading || pageLoading) {
     return <LoadingSpinner className="min-h-screen" size="lg" />

@@ -18,7 +18,16 @@
     "previous": "前へ",
     "next": "次へ",
     "change": "変更",
-    "upload": "アップロード"
+    "upload": "アップロード",
+    "time": {
+      "justNow": "たった今",
+      "minutesAgo": "{{count}}分前",
+      "hoursAgo": "{{count}}時間前",
+      "daysAgo": "{{count}}日前",
+      "weeksAgo": "{{count}}週間前",
+      "monthsAgo": "{{count}}ヶ月前",
+      "yearsAgo": "{{count}}年前"
+    }
   },
   "admin": {
     "login": {
@@ -109,6 +118,7 @@
       "mapEmbedUrlHint": "Google マップ: 共有 → 地図を埋め込む → iframeコードのsrc URLをコピー。",
       "viewingPost": "表示中：",
       "failedToDelete": "削除に失敗しました。",
+      "failedToLoad": "投稿の読み込みに失敗しました。",
       "failedToSave": "投稿の保存に失敗しました。",
       "failedToApprove": "コメントの承認に失敗しました。",
       "failedToUpdate": "コメントの更新に失敗しました。",
@@ -152,7 +162,8 @@
       "tabs": {
         "general": "一般",
         "style": "スタイルと言語",
-        "security": "セキュリティ"
+        "security": "セキュリティ",
+        "updates": "アップデート"
       },
       "saved": "設定を保存しました。",
       "saveFailed": "設定の保存に失敗しました。",
@@ -174,6 +185,22 @@
       "locale": {
         "title": "言語",
         "subtitle": "ブログ訪問者に表示される言語"
+      },
+      "updates": {
+        "title": "アップデート",
+        "subtitle": "Corexpressの新しいバージョンを確認",
+        "checkButton": "アップデートを確認",
+        "checking": "確認中…",
+        "currentVersion": "インストール済みバージョン",
+        "available": "新しいバージョンが利用可能",
+        "alreadyLatest": "最新バージョンを使用しています。",
+        "applyButton": "今すぐ更新",
+        "applying": "更新中…",
+        "applyingHint": "最大30秒かかる場合があります。このページを閉じないでください。",
+        "success": "バージョン{{version}}に正常にアップデートしました。",
+        "upToDate": "Corexpressは最新です。",
+        "checkFailed": "アップデートを確認できませんでした。",
+        "applyFailed": "アップデートに失敗しました。再試行するかSSH経由で更新してください。"
       },
       "security": {
         "title": "セキュリティ",

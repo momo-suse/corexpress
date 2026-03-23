@@ -12,6 +12,7 @@ import { useComments, useMutateComment } from '@/hooks/useComments'
 import { useSettings } from '@/hooks/useSettings'
 import { useTags } from '@/hooks/useTags'
 import ChipInput from '@/components/admin/about/ChipInput'
+import { getPost } from '@/api/posts'
 import { uploadImage } from '@/api/images'
 import { getComments } from '@/api/comments'
 import { toast } from '@/hooks/useToast'
@@ -68,6 +69,7 @@ export default function DashboardPage() {
   const [form, setForm] = useState<PostForm>(EMPTY_FORM)
 
   // ── Drawer state ────────────────────────────────────────────────────────────
+  const [editLoading, setEditLoading] = useState(false)
   const [drawerPostId, setDrawerPostId] = useState<number | null>(null)
   const [drawerPostTitle, setDrawerPostTitle] = useState('')
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
@@ -114,22 +116,31 @@ export default function DashboardPage() {
     setView('editor')
   }
 
-  function openEdit(post: Post) {
-    setEditingPost(post)
-    setForm({
-      title: post.title,
-      tags: post.tags ?? '',
-      reading_time: post.reading_time ?? '',
-      excerpt: post.excerpt ?? '',
-      content: post.content,
-      status: post.status,
-      featured_image_id: post.featured_image_id,
-      featured_image_url: post.featured_image_url,
-      map_embed_url: post.map_embed_url ?? '',
-      _imageFile: null,
-      _imagePreview: null,
-    })
-    setView('editor')
+  async function openEdit(post: Post) {
+    setEditLoading(true)
+    try {
+      const result = await getPost(post.slug)
+      const full = result.data
+      setEditingPost(full)
+      setForm({
+        title: full.title,
+        tags: full.tags ?? '',
+        reading_time: full.reading_time ?? '',
+        excerpt: full.excerpt ?? '',
+        content: full.content,
+        status: full.status,
+        featured_image_id: full.featured_image_id,
+        featured_image_url: full.featured_image_url,
+        map_embed_url: full.map_embed_url ?? '',
+        _imageFile: null,
+        _imagePreview: null,
+      })
+      setView('editor')
+    } catch {
+      toast({ title: t('admin.dashboard.failedToLoad'), variant: 'destructive' })
+    } finally {
+      setEditLoading(false)
+    }
   }
 
   function closeEditor() {
@@ -461,7 +472,8 @@ export default function DashboardPage() {
                           <div className="col-span-2 flex items-center justify-end gap-1">
                             <button
                               onClick={() => openEdit(post)}
-                              className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                              disabled={editLoading}
+                              className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-50"
                               title={t('common.edit')}
                             >
                               <Edit3 className="h-4 w-4" />

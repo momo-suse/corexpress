@@ -100,8 +100,14 @@ async function request<T>(
   }
 
   // 401 = session gone; 403 after retry = unrecoverable → re-login
+  // Only force re-login if the user had an active session; unauthenticated visitors
+  // on public blog pages must never be redirected to the admin login screen.
   if (response.status === 401 || response.status === 403) {
-    forceLogin(response.status, isMutation)
+    if (useAuthStore.getState().user) {
+      forceLogin(response.status, isMutation)
+    } else {
+      throw new ApiError(response.status, 'Unauthorized')
+    }
   }
 
   if (response.status === 204) {

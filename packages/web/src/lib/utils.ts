@@ -7,29 +7,29 @@ export function cn(...inputs: ClassValue[]) {
 
 export function applyComponentStyles(styles: Record<string, string>): React.CSSProperties {
   const cssProps: React.CSSProperties = {}
-  if (styles.background) cssProps.background = styles.background
+  // background is managed at layout level via CSS classes; only apply text color here
   if (styles.textColor) cssProps.color = styles.textColor
   return cssProps
 }
 
-export function formatTimeAgo(dateString: string): string {
-  const date = new Date(dateString)
-  const now = new Date()
+export function formatTimeAgo(
+  dateString: string,
+  t: (key: string, opts?: { count: number }) => string,
+): string {
+  const diffMs = Date.now() - new Date(dateString).getTime()
+  const sec = Math.floor(diffMs / 1000)
+  const min = Math.floor(sec / 60)
+  const hrs = Math.floor(min / 60)
+  const days = Math.floor(hrs / 24)
+  const weeks = Math.floor(days / 7)
+  const months = Math.floor(days / 30)
+  const years = Math.floor(days / 365)
 
-  // Remove time component to compare exact days
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-  const postDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
-
-  if (postDate.getTime() === today.getTime()) {
-    // It's from today. Calculate hours ago.
-    const diffMs = now.getTime() - date.getTime()
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
-
-    if (diffHours < 1) return 'Hace menos de una hora'
-    if (diffHours === 1) return 'Hace 1 hora'
-    return `Hace ${diffHours} horas`
-  }
-
-  // Older than today: "1 de marzo"
-  return date.toLocaleDateString('es-MX', { day: 'numeric', month: 'long' })
+  if (sec < 60)     return t('common.time.justNow')
+  if (min < 60)     return t('common.time.minutesAgo', { count: min })
+  if (hrs < 24)     return t('common.time.hoursAgo',   { count: hrs })
+  if (days < 7)     return t('common.time.daysAgo',    { count: days })
+  if (weeks <= 3)   return t('common.time.weeksAgo',   { count: weeks })
+  if (months < 12)  return t('common.time.monthsAgo',  { count: months })
+  return t('common.time.yearsAgo', { count: years })
 }

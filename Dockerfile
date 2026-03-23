@@ -26,7 +26,7 @@ LABEL maintainer="corexpress"
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+ENV APACHE_DOCUMENT_ROOT=/var/www/html
 
 # ── System tools + build dependencies for PHP extensions ─────────────────────
 RUN apt-get update && apt-get install -y \

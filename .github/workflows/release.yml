@@ -42,6 +42,13 @@ jobs:
         working-directory: packages/app
         run: composer install --no-dev --optimize-autoloader --no-interaction
 
+      # ── 5b. Write VERSION file from the git tag ───────────────────────────────
+      # Strips the leading 'v' from the tag (v1.2.3 → 1.2.3) and writes VERSION.
+      # This file is included in the ZIP so update.sh and UpdateController can
+      # determine the installed version without querying the database.
+      - name: Write VERSION file
+        run: echo "${GITHUB_REF_NAME#v}" > VERSION
+
       # ── 6. Package release ZIP ────────────────────────────────────────────────
       # Includes:   packages/app/ (with vendor/) + packages/installer/ + install.sh + .htaccess
       # Excludes:   packages/web/ (source), node_modules, config.php,
@@ -54,8 +61,11 @@ jobs:
             packages/app \
             packages/installer \
             install.sh \
+            update.sh \
+            VERSION \
             .htaccess \
             --exclude "packages/app/config.php" \
+            --exclude "packages/app/public/img/*" \
             --exclude "packages/app/public/setup/*" \
             --exclude "packages/web/*" \
             --exclude "node_modules/*" \
@@ -85,6 +95,15 @@ jobs:
             1. Download `corexpress.zip` below
             2. Upload and extract to your Hostinger public_html via FTP or File Manager
             3. Visit `https://yourdomain.com/setup` to complete installation
+
+            ### Update an existing installation
+
+            **From the admin panel:** Settings → Updates → "Check for updates"
+
+            **Via SSH:**
+            ```bash
+            bash update.sh
+            ```
 
             ### What's included
             - PHP backend (Slim 4 + Eloquent ORM)

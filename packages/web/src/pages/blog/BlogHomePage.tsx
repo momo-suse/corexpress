@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Navigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useBlogPage } from '@/hooks/useBlogPage'
+import { useBlogMeta } from '@/hooks/useBlogMeta'
 import { useTags } from '@/hooks/useTags'
 import { getSettings } from '@/api/settings'
 import { useAuthStore } from '@/store/auth'
@@ -28,6 +29,7 @@ export default function BlogHomePage() {
   // Must be called before any conditional returns (Rules of Hooks)
   const tagsLimit = parseInt((settingsData?.data as Record<string, string> | undefined)?.tags_max_count ?? '6', 10)
   const { data: tagsData } = useTags(tagsLimit)
+  useBlogMeta(settingsData?.data as unknown as Record<string, string> | undefined)
 
   if (settingsLoading) return <LoadingSpinner className="min-h-screen" size="lg" />
   if (settingsError) return <Navigate to="/setup" replace />

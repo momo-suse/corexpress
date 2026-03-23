@@ -94,15 +94,3 @@ npm run dev
 ```
 
 > Node.js is strictly used for the development environment. Upon creating a release, the frontend code is compiled using Vite and stored in the backend's public folder (`packages/app/public/assets`).
-
----
-
-## 📖 Architecture and Advanced Details
-
-For more details on component separation, system routes, development phases, or strict security rules, be sure to review the internal documentation in [`CLAUDE.md`](./CLAUDE.md).
-
----
-
-## 📄 License
-
-Corexpress is distributed freely. See the `LICENSE` file in the project root for more details.

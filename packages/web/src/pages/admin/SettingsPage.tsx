@@ -2,11 +2,13 @@ import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Upload, X, Globe, Paintbrush, ShieldCheck, Languages, Palette } from 'lucide-react'
+import { Upload, X, Globe, Paintbrush, ShieldCheck, Languages, Palette, RefreshCw } from 'lucide-react'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import { useSettings, useMutateSettings } from '@/hooks/useSettings'
 import { uploadImage } from '@/api/images'
 import { changePassword } from '@/api/auth'
+import { checkUpdate, applyUpdate } from '@/api/update'
+import type { UpdateCheckResult } from '@/api/update'
 import { toast } from '@/hooks/useToast'
 import { cn } from '@/lib/utils'
 import { ApiError } from '@/api/client'
@@ -15,7 +17,7 @@ import type { Settings } from '@/types/api'
 
 const THEME_CLASSES = ['theme-default', 'theme-minimal', 'theme-dark'] as const
 
-type Tab = 'general' | 'style' | 'security'
+type Tab = 'general' | 'style' | 'security' | 'updates'
 
 export default function SettingsPage() {
   const { t } = useTranslation()
@@ -24,6 +26,12 @@ export default function SettingsPage() {
   const { mutateAsync: save, isPending: saving } = useMutateSettings()
 
   const [form, setForm] = useState<Partial<Settings>>({})
+
+  // Update state
+  const [updateInfo, setUpdateInfo]       = useState<UpdateCheckResult | null>(null)
+  const [checking, setChecking]           = useState(false)
+  const [applying, setApplying]           = useState(false)
+  const [updateDone, setUpdateDone]       = useState(false)
 
   // Change-password state
   const [currentPwd, setCurrentPwd] = useState('')
@@ -66,6 +74,38 @@ export default function SettingsPage() {
       r.readAsDataURL(file)
     } else setLogoPreview(null)
     e.target.value = ''
+  }
+
+  async function handleCheckUpdate() {
+    setChecking(true)
+    setUpdateInfo(null)
+    setUpdateDone(false)
+    try {
+      const result = await checkUpdate()
+      setUpdateInfo(result)
+    } catch {
+      toast({ title: t('admin.settings.updates.checkFailed'), variant: 'destructive' })
+    } finally {
+      setChecking(false)
+    }
+  }
+
+  async function handleApplyUpdate() {
+    setApplying(true)
+    try {
+      const result = await applyUpdate()
+      if (result.success) {
+        setUpdateDone(true)
+        setUpdateInfo(null)
+        toast({ title: t('admin.settings.updates.success', { version: result.new_version }) })
+      } else {
+        toast({ title: result.error ?? t('admin.settings.updates.applyFailed'), variant: 'destructive' })
+      }
+    } catch {
+      toast({ title: t('admin.settings.updates.applyFailed'), variant: 'destructive' })
+    } finally {
+      setApplying(false)
+    }
   }
 
   async function handleSave() {
@@ -117,7 +157,7 @@ export default function SettingsPage() {
           <h1 className="text-2xl font-semibold tracking-tight">{t('admin.settings.title')}</h1>
           <p className="text-xs text-muted-foreground mt-0.5">{t('admin.settings.subtitle')}</p>
         </div>
-        {activeTab !== 'security' && (
+        {activeTab !== 'security' && activeTab !== 'updates' && (
           <Button onClick={handleSave} disabled={saving}>
             {saving ? t('common.saving') : t('admin.settings.saveChanges')}
           </Button>
@@ -130,6 +170,7 @@ export default function SettingsPage() {
           { id: 'general'  as Tab, label: t('admin.settings.tabs.general'),  Icon: Globe },
           { id: 'style'    as Tab, label: t('admin.settings.tabs.style'),    Icon: Paintbrush },
           { id: 'security' as Tab, label: t('admin.settings.tabs.security'), Icon: ShieldCheck },
+          { id: 'updates'  as Tab, label: t('admin.settings.tabs.updates'),  Icon: RefreshCw },
         ]).map(({ id, label, Icon }) => (
           <button
             key={id}
@@ -298,6 +339,65 @@ export default function SettingsPage() {
           </div>
         </div>
         </>}
+
+        {/* Updates */}
+        {activeTab === 'updates' && <div className="rounded-2xl border-2 border-border overflow-hidden">
+          <div className="flex items-center gap-4 px-6 py-4 bg-muted/30 border-b">
+            <div className="p-2.5 rounded-xl bg-muted text-muted-foreground shrink-0">
+              <RefreshCw className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold">{t('admin.settings.updates.title')}</p>
+              <p className="text-xs text-muted-foreground">{t('admin.settings.updates.subtitle')}</p>
+            </div>
+          </div>
+          <div className="px-6 py-5 space-y-4">
+
+            {updateDone && (
+              <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400 font-medium">
+                <span>✓</span>
+                <span>{t('admin.settings.updates.upToDate')}</span>
+              </div>
+            )}
+
+            {!updateDone && (
+              <Button onClick={handleCheckUpdate} disabled={checking} variant="outline">
+                {checking ? t('admin.settings.updates.checking') : t('admin.settings.updates.checkButton')}
+              </Button>
+            )}
+
+            {updateInfo && !updateDone && (
+              <div className="space-y-3">
+                <div className="text-sm text-muted-foreground">
+                  {t('admin.settings.updates.currentVersion')}: <span className="font-mono font-medium text-foreground">{updateInfo.current}</span>
+                </div>
+
+                {updateInfo.error && (
+                  <p className="text-sm text-destructive">{updateInfo.error}</p>
+                )}
+
+                {!updateInfo.error && !updateInfo.has_update && (
+                  <p className="text-sm text-muted-foreground">{t('admin.settings.updates.alreadyLatest')}</p>
+                )}
+
+                {!updateInfo.error && updateInfo.has_update && (
+                  <div className="space-y-3">
+                    <p className="text-sm">
+                      {t('admin.settings.updates.available')}: <span className="font-mono font-medium text-primary">{updateInfo.latest}</span>
+                    </p>
+                    <Button onClick={handleApplyUpdate} disabled={applying}>
+                      {applying ? t('admin.settings.updates.applying') : t('admin.settings.updates.applyButton')}
+                    </Button>
+                    {applying && (
+                      <p className="text-xs text-muted-foreground">{t('admin.settings.updates.applyingHint')}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+          </div>
+        </div>}
 
         {/* Security */}
         {activeTab === 'security' && <div className="rounded-2xl border-2 border-border overflow-hidden">

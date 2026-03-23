@@ -12,11 +12,10 @@ services:
     ports:
       - "8080:80"     # Apache HTTP (8080 → rootless Podman can't bind port 80)
     volumes:
-      # Mount the PHP app as if it were uploaded to the hosting root
+      # Mount the repo root as the site root — mirrors Hostinger's public_html/
+      # The root .htaccess routes /setup → packages/installer/index.php
       # :z relabels for SELinux (required on Fedora with Podman rootless)
-      - ./packages/app:/var/www/html:z
-      # Mount the installer separately so it can be accessed at /setup
-      - ./packages/installer:/var/www/html/public/setup:z
+      - ./:/var/www/html:z
     environment:
       - APP_ENV=development
       - DB_HOST=mysql

@@ -8,11 +8,6 @@ interface PostCardProps {
   post: Post
 }
 
-function readingTime(content: string): string {
-  const words = content.replace(/<[^>]+>/g, '').split(/\s+/).filter(Boolean).length
-  return `${Math.max(1, Math.round(words / 200))} min`
-}
-
 function firstTag(tags: string | null): string | null {
   if (!tags) return null
   const t = tags.split(',')[0]?.trim()
@@ -22,8 +17,6 @@ function firstTag(tags: string | null): string | null {
 /** Regular post card — displayed in the "Últimos Artículos" 2-column grid. */
 export default function PostCard({ post }: PostCardProps) {
   const { t } = useTranslation()
-  const date = formatTimeAgo(post.created_at)
-  const time = readingTime(post.content || post.excerpt || '')
   const hasImage = Boolean(post.featured_image_url)
   const tag = firstTag(post.tags)
 
@@ -66,11 +59,9 @@ export default function PostCard({ post }: PostCardProps) {
         )}
 
         <div className={`flex items-center text-xs text-muted-foreground mb-3 font-medium gap-2 ${!hasImage ? 'justify-center' : ''}`}>
-          <span>{date}</span>
-          <span>•</span>
           <span className="flex items-center gap-1">
             <Clock size={12} />
-            {time}
+            {formatTimeAgo(post.created_at, t)}
           </span>
         </div>
 
@@ -109,8 +100,6 @@ export default function PostCard({ post }: PostCardProps) {
 /** Featured (Destacado) post card — large 2-column card for the most recent post. */
 export function FeaturedPostCard({ post }: PostCardProps) {
   const { t } = useTranslation()
-  const date = formatTimeAgo(post.created_at)
-  const time = readingTime(post.content || post.excerpt || '')
   const hasImage = Boolean(post.featured_image_url)
   const tag = firstTag(post.tags)
 
@@ -148,11 +137,9 @@ export function FeaturedPostCard({ post }: PostCardProps) {
           )}
 
           <div className="flex items-center gap-3 mb-4 text-sm text-muted-foreground">
-            <span>{date}</span>
-            <span>•</span>
             <span className="flex items-center gap-1">
               <Clock size={14} />
-              {time}
+              {formatTimeAgo(post.created_at, t)}
             </span>
           </div>
 

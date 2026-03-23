@@ -9,6 +9,7 @@ use Corexpress\Controllers\PageController;
 use Corexpress\Controllers\PostController;
 use Corexpress\Controllers\SettingController;
 use Corexpress\Controllers\StyleCollectionController;
+use Corexpress\Controllers\UpdateController;
 use Corexpress\Middleware\AuthMiddleware;
 use Corexpress\Middleware\CsrfMiddleware;
 use Corexpress\Middleware\JsonResponseMiddleware;
@@ -133,6 +134,17 @@ $app->group('/api/v1', function (\Slim\Routing\RouteCollectorProxy $group) use (
 
     // Admin + CSRF: bulk update settings
     $group->put('/settings', [SettingController::class, 'update'])
+          ->add($csrfMiddleware)
+          ->add($authMiddleware);
+
+    // ── Updates ────────────────────────────────────────────────────────────────
+
+    // Admin: check if a newer version is available on GitHub
+    $group->get('/admin/update/check', [UpdateController::class, 'check'])
+          ->add($authMiddleware);
+
+    // Admin + CSRF: download and apply the latest release
+    $group->post('/admin/update/apply', [UpdateController::class, 'apply'])
           ->add($csrfMiddleware)
           ->add($authMiddleware);
 

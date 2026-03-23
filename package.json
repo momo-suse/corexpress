@@ -8,6 +8,10 @@
     "podman:down": "podman compose -f compose.dev.yml down -v",
     "podman:logs": "podman compose -f compose.dev.yml logs -f",
     "podman:rebuild": "podman compose -f compose.dev.yml build --no-cache",
+    "docker:up": "docker compose -f compose.dev.yml up -d",
+    "docker:down": "docker compose -f compose.dev.yml down -v",
+    "docker:logs": "docker compose -f compose.dev.yml logs -f",
+    "docker:rebuild": "docker compose -f compose.dev.yml build --no-cache",
     "frontend:build": "npm run build --workspace=packages/web",
     "frontend:install": "npm install && npm run build --workspace=packages/web",
     "test:web": "npm run test --workspace=packages/web"

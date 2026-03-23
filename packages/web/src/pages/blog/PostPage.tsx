@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { usePost, usePosts } from '@/hooks/usePosts'
 import { getSettings } from '@/api/settings'
 import { useBlogPage } from '@/hooks/useBlogPage'
+import { useBlogMeta } from '@/hooks/useBlogMeta'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import { Link } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
@@ -29,6 +30,7 @@ export default function PostPage() {
   const { data: pageData } = useBlogPage()
 
   const settings = (settingsData?.data ?? {}) as unknown as Record<string, string>
+  useBlogMeta(settings, data?.data?.title)
 
   // Recent posts for sidebar (max 4, exclude current)
   const { data: recentData } = usePosts(1)

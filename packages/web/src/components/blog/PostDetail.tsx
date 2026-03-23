@@ -14,7 +14,7 @@ export default function PostDetail({ post, settings = {} }: PostDetailProps) {
   const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
 
-  const date = formatTimeAgo(post.created_at)
+  const date = formatTimeAgo(post.created_at, t)
   const tags = post.tags ? post.tags.split(',').map((t) => t.trim()).filter(Boolean) : []
 
   // settings kept in props for future use (e.g. branding)
