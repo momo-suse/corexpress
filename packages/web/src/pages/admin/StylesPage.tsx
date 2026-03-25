@@ -13,6 +13,7 @@ function CollectionPreview({ name }: { name: string }) {
   const isClassic = name === 'classic'
   const isNebula  = name === 'nebula'
   const isZen     = name === 'zen'
+  const isSonic   = name === 'sonic'
 
   if (isZen) {
     return (
@@ -77,6 +78,46 @@ function CollectionPreview({ name }: { name: string }) {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (isSonic) {
+    return (
+      <div
+        className="blog-collection-sonic pointer-events-none select-none overflow-hidden"
+        style={{ background: 'var(--blog-bg, #09090b)', padding: '10px' }}
+      >
+        {/* Mini nav bar */}
+        <div className="flex justify-between items-center mb-3 px-1">
+          <div className="flex gap-2">
+            <div className="h-1.5 w-6 bg-zinc-600" />
+            <div className="h-1.5 w-6 bg-zinc-700" />
+          </div>
+          <div className="h-2 w-10 bg-zinc-100 opacity-80" />
+          <div className="flex gap-1">
+            <div className="h-1.5 w-3 rounded-full bg-zinc-600" />
+            <div className="h-1.5 w-3 rounded-full bg-zinc-600" />
+          </div>
+        </div>
+        {/* Featured post with fuchsia shadow offset */}
+        <div className="relative mb-3">
+          <div className="absolute inset-0 translate-x-1 translate-y-1" style={{ background: 'var(--blog-accent)' }} />
+          <div className="relative h-10 bg-zinc-800 border border-zinc-700 flex items-end p-1.5 gap-2">
+            <div className="h-1.5 w-1/3 bg-zinc-100 opacity-90" />
+            <div className="h-1 w-1/4 opacity-60" style={{ background: 'var(--blog-accent-secondary)' }} />
+          </div>
+        </div>
+        {/* 3-col post grid */}
+        <div className="grid grid-cols-3 gap-1.5">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="bg-zinc-800 border border-zinc-700 p-1.5 flex flex-col gap-1">
+              <div className="h-5 bg-zinc-700 mb-1" />
+              <div className="h-1 w-2/3 opacity-70" style={{ background: 'var(--blog-accent)' }} />
+              <div className="h-1.5 w-full bg-zinc-600 opacity-60" />
+            </div>
+          ))}
         </div>
       </div>
     )

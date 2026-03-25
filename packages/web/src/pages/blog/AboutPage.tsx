@@ -9,6 +9,7 @@ import { DefaultAboutContent } from '@/components/blog/layouts/default'
 import { ClassicAboutContent } from '@/components/blog/layouts/classic'
 import { NebulaAboutContent } from '@/components/blog/layouts/nebula'
 import { ZenAboutContent } from '@/components/blog/layouts/zen'
+import { SonicAboutContent } from '@/components/blog/layouts/sonic'
 import type { PageComponent } from '@/types/api'
 
 export default function AboutPage() {
@@ -44,6 +45,23 @@ export default function AboutPage() {
   const testimonialsVisible = isVisible('about-testimonials')
   const socialVisible       = isVisible('social-links')
   const downloadPdfVisible  = isVisible('download-pdf')
+
+  // Sonic layout — brutalista musical
+  if (activeCollection === 'sonic') {
+    return (
+      <SonicAboutContent
+        settings={settings}
+        user={!!user}
+        galleryVisible={galleryVisible}
+        experienceVisible={experienceVisible}
+        skillsVisible={skillsVisible}
+        educationVisible={educationVisible}
+        testimonialsVisible={testimonialsVisible}
+        socialVisible={socialVisible}
+        downloadPdfVisible={downloadPdfVisible}
+      />
+    )
+  }
 
   // Zen layout — warm minimalist
   if (activeCollection === 'zen') {

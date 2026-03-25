@@ -15,6 +15,7 @@ import { DefaultPostContent } from '@/components/blog/layouts/default'
 import { ClassicPostContent } from '@/components/blog/layouts/classic'
 import { NebulaPostContent } from '@/components/blog/layouts/nebula'
 import { ZenPostContent } from '@/components/blog/layouts/zen'
+import { SonicPostContent } from '@/components/blog/layouts/sonic'
 import type { PageComponent, Post } from '@/types/api'
 
 export default function PostPage() {
@@ -115,6 +116,23 @@ export default function PostPage() {
     availableLocales,
     currentLocale: localeFetching ? viewLocale : (localizedPost ? viewLocale : baseLocale),
     onLocaleChange: setViewLocale,
+  }
+
+  // Sonic layout — brutalista musical
+  if (activeCollection === 'sonic') {
+    return (
+      <SonicPostContent
+        post={post}
+        relatedPosts={recentPosts}
+        settings={settings}
+        user={!!user}
+        commentsEnabled={commentsEnabled}
+        profileVisible={profileVisible}
+        socialVisible={socialVisible}
+        onCommentSubmitted={handleCommentSubmitted}
+        {...localeProps}
+      />
+    )
   }
 
   // Nebula layout — dark tech bento-grid

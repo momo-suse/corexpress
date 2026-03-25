@@ -401,7 +401,8 @@
         "default": "Rounded cards, color images and indigo accent. Modern and friendly design.",
         "classic": "Editorial layout with fixed sidebar, serif typography, grayscale images, and pink accent.",
         "nebula": "Dark tech aesthetic with a bento grid layout, glassmorphism cards, and cyan/violet glow accents.",
-        "zen": "Warm minimalist design with a cream palette and terracotta accents. Serif headings, rounded images."
+        "zen": "Warm minimalist design with a cream palette and terracotta accents. Serif headings, rounded images.",
+        "sonic": "Brutalista musical: dark background, aggressive uppercase typography, fuchsia and cyan accents."
       }
     },
     "editor": {
@@ -598,6 +599,10 @@
     "zen": {
       "relatedReads": "Other readings",
       "backToJournal": "Back to journal"
+    },
+    "sonic": {
+      "nextInPlaylist": "Next in the playlist",
+      "backToStart": "Back to start"
     },
     "footer": {
       "rights": "All rights reserved."

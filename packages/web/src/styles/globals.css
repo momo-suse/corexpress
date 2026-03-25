@@ -254,3 +254,25 @@
   --blog-bg:          #F7F5F0;             /* cream */
   --blog-text:        #2D2B2A;             /* warm near-black */
 }
+
+/* Sonic: brutalista musical, fondo zinc-950, acento fuchsia/cyan, bordes afilados, B&W images */
+.blog-collection-sonic {
+  --blog-accent:           #d946ef;              /* fuchsia-500 — CTA primario, sombras, hover titles */
+  --blog-accent-soft:      rgba(217, 70, 239, 0.12); /* fuchsia tenue — badge bg */
+  --blog-radius-card:      0px;                  /* brutalista, sin redondez */
+  --blog-img-filter:       grayscale(100%);      /* imágenes B&W por defecto */
+  --blog-bg:               #09090b;              /* zinc-950 */
+  --blog-text:             #f4f4f5;              /* zinc-100 */
+  --blog-accent-secondary: #22d3ee;              /* cyan-400 — categorías, blockquotes */
+}
+
+/* Sonic: shared About components hardcode text-gray-900 — override for dark background */
+.blog-collection-sonic section h2 {
+  color: #f4f4f5;            /* zinc-100 */
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.025em;
+}
+.blog-collection-sonic section .flex-grow.h-px {
+  background-color: #3f3f46; /* zinc-700 — separator line */
+}

@@ -12,6 +12,7 @@ import { DefaultBlogHome } from '@/components/blog/layouts/default'
 import { ClassicBlogHome } from '@/components/blog/layouts/classic'
 import { NebulaBlogHome } from '@/components/blog/layouts/nebula'
 import { ZenBlogHome } from '@/components/blog/layouts/zen'
+import { SonicBlogHome } from '@/components/blog/layouts/sonic'
 import type { PageComponent } from '@/types/api'
 
 export default function BlogHomePage() {
@@ -65,6 +66,27 @@ export default function BlogHomePage() {
   const socialVisible = isVisible('social-links')
   const searchVisible = isVisible('search')
   const tagCloudVisible = isVisible('tag-cloud')
+
+  // Sonic layout — brutalista musical
+  if (activeCollection === 'sonic') {
+    return (
+      <SonicBlogHome
+        settings={settings}
+        user={!!user}
+        heroVisible={heroVisible}
+        postListVisible={postListVisible}
+        profileVisible={profileVisible}
+        socialVisible={socialVisible}
+        searchVisible={searchVisible}
+        tagCloudVisible={tagCloudVisible}
+        searchQuery={searchQuery}
+        onSearch={setSearchQuery}
+        tags={tags}
+        activeTag={activeTag}
+        onTagSelect={setActiveTag}
+      />
+    )
+  }
 
   // Nebula layout — dark tech bento-grid
   if (activeCollection === 'nebula') {
