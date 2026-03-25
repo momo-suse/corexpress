@@ -91,6 +91,12 @@
       "reject": "Rechazar",
       "statusPublished": "Publicado",
       "statusDraft": "Borrador",
+      "statusHidden": "Oculto",
+      "hidePost": "Ocultar post",
+      "showPost": "Mostrar post",
+      "saveAndHide": "Guardar y ocultar",
+      "languagesCol": "Idiomas",
+      "tagsCol": "Tags",
       "statusPending": "Pendiente",
       "statusApproved": "Aprobado",
       "statusSpam": "Spam",
@@ -394,7 +400,8 @@
       "descriptions": {
         "default": "Tarjetas redondeadas, imágenes a color y acento índigo. Diseño moderno y amigable.",
         "classic": "Layout editorial con sidebar fijo, tipografía serif, imágenes en escala de grises y acento rosa.",
-        "nebula": "Estética dark tech con cuadrícula bento, tarjetas glassmorphism y acentos de luz en cyan y violeta."
+        "nebula": "Estética dark tech con cuadrícula bento, tarjetas glassmorphism y acentos de luz en cyan y violeta.",
+        "zen": "Diseño minimalista cálido con paleta crema y acentos terracota. Títulos serif, imágenes redondeadas."
       }
     },
     "editor": {
@@ -587,6 +594,10 @@
       "finishedReading": "¿Terminaste de leer?",
       "backToHomeDesc": "Vuelve al inicio para explorar más artículos.",
       "backToHome": "VOLVER AL INICIO"
+    },
+    "zen": {
+      "relatedReads": "Otras lecturas",
+      "backToJournal": "Volver al diario"
     },
     "footer": {
       "rights": "Todos los derechos reservados."

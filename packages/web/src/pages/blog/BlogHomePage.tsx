@@ -11,6 +11,7 @@ import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import { DefaultBlogHome } from '@/components/blog/layouts/default'
 import { ClassicBlogHome } from '@/components/blog/layouts/classic'
 import { NebulaBlogHome } from '@/components/blog/layouts/nebula'
+import { ZenBlogHome } from '@/components/blog/layouts/zen'
 import type { PageComponent } from '@/types/api'
 
 export default function BlogHomePage() {
@@ -69,6 +70,27 @@ export default function BlogHomePage() {
   if (activeCollection === 'nebula') {
     return (
       <NebulaBlogHome
+        settings={settings}
+        user={!!user}
+        profileVisible={profileVisible}
+        socialVisible={socialVisible}
+        postListVisible={postListVisible}
+        heroVisible={heroVisible}
+        searchVisible={searchVisible}
+        tagCloudVisible={tagCloudVisible}
+        searchQuery={searchQuery}
+        onSearch={setSearchQuery}
+        tags={tags}
+        activeTag={activeTag}
+        onTagSelect={setActiveTag}
+      />
+    )
+  }
+
+  // Zen layout — warm minimalist
+  if (activeCollection === 'zen') {
+    return (
+      <ZenBlogHome
         settings={settings}
         user={!!user}
         profileVisible={profileVisible}

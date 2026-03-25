@@ -91,6 +91,12 @@
       "reject": "却下",
       "statusPublished": "公開済み",
       "statusDraft": "下書き",
+      "statusHidden": "非表示",
+      "hidePost": "非表示にする",
+      "showPost": "表示する",
+      "saveAndHide": "保存して非表示",
+      "languagesCol": "言語",
+      "tagsCol": "タグ",
       "statusPending": "承認待ち",
       "statusApproved": "承認済み",
       "statusSpam": "スパム",
@@ -394,7 +400,8 @@
       "descriptions": {
         "default": "角丸カード、カラー画像、インディゴアクセント。モダンでフレンドリーなデザイン。",
         "classic": "固定サイドバー、セリフ体、グレースケール画像、ピンクアクセントのエディトリアルレイアウト。",
-        "nebula": "ベントグリッドレイアウト、ガラスモーフィズムカード、シアン/バイオレットのグロー効果を持つダークテックデザイン。"
+        "nebula": "ベントグリッドレイアウト、ガラスモーフィズムカード、シアン/バイオレットのグロー効果を持つダークテックデザイン。",
+        "zen": "クリーム色のパレットとテラコッタのアクセントを使ったミニマリストデザイン。セリフ見出し、丸い画像。"
       }
     },
     "editor": {
@@ -587,6 +594,10 @@
       "finishedReading": "読み終わりましたか？",
       "backToHomeDesc": "他の記事を探しにホームへ戻りましょう。",
       "backToHome": "ホームに戻る"
+    },
+    "zen": {
+      "relatedReads": "他の記事",
+      "backToJournal": "日記に戻る"
     },
     "footer": {
       "rights": "全著作権所有。"

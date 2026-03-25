@@ -56,24 +56,41 @@ class PostController extends Controller
             );
         }
 
+        $requestedLocale = trim((string)($params['locale'] ?? ''));
+
         $total = $query->count();
         $posts = (clone $query)
-            ->select(['id', 'title', 'slug', 'excerpt', 'tags', 'reading_time', 'content', 'featured_image_id', 'status', 'created_at', 'updated_at'])
+            ->select(['id', 'title', 'slug', 'excerpt', 'tags', 'reading_time', 'content', 'featured_image_id', 'status', 'created_at', 'updated_at', 'base_locale'])
             ->withCount([
                 'comments as comments_count',
                 'comments as comments_pending_count' => static fn ($q) => $q->where('status', 'pending'),
             ])
-            ->with(['translations:id,post_id,locale'])
+            ->with(['translations:id,post_id,locale,title,excerpt'])
             ->skip(($page - 1) * $perPage)
             ->take($perPage)
             ->get()
-            ->map(function (Post $post) {
+            ->map(function (Post $post) use ($requestedLocale) {
                 $data = $post->toArray();
                 $data['featured_image_url'] = $this->resolveFeaturedImageUrl($post->featured_image_id);
                 // Compute reading_time from content when not manually set
                 if (empty($data['reading_time']) && !empty($data['content'])) {
                     $words = str_word_count(strip_tags((string) $data['content']));
                     $data['reading_time'] = max(1, (int) round($words / 200)) . ' min';
+                }
+                // Apply locale override for title/excerpt — fallback chain: requested → EN → first
+                $postBaseLocale = $post->base_locale ?? 'en';
+                if ($requestedLocale !== '' && $requestedLocale !== $postBaseLocale) {
+                    $translation = $post->translations->firstWhere('locale', $requestedLocale);
+                    if ($translation === null && $requestedLocale !== 'en' && $postBaseLocale !== 'en') {
+                        $translation = $post->translations->firstWhere('locale', 'en');
+                    }
+                    if ($translation === null) {
+                        $translation = $post->translations->first();
+                    }
+                    if ($translation !== null) {
+                        if ($translation->title)   $data['title']   = $translation->title;
+                        if ($translation->excerpt) $data['excerpt'] = $translation->excerpt;
+                    }
                 }
                 // Content is never returned in list — use the show endpoint to fetch a single post for editing
                 unset($data['content']);
@@ -280,7 +297,7 @@ class PostController extends Controller
             'featured_image_id' => $featuredImageId,
             'map_embed_url' => $this->sanitizeMapUrl($body['map_embed_url'] ?? null),
             'reading_time' => isset($body['reading_time']) && $body['reading_time'] !== '' ? trim((string)$body['reading_time']) : null,
-            'status' => in_array($body['status'] ?? '', ['draft', 'published'], true)
+            'status' => in_array($body['status'] ?? '', ['draft', 'published', 'hidden'], true)
             ? $body['status']
             : 'draft',
         ]);
@@ -328,7 +345,7 @@ class PostController extends Controller
             $post->tags = $body['tags'] !== null && $body['tags'] !== '' ? trim((string)$body['tags']) : null;
         }
 
-        if (isset($body['status']) && in_array($body['status'], ['draft', 'published'], true)) {
+        if (isset($body['status']) && in_array($body['status'], ['draft', 'published', 'hidden'], true)) {
             $post->status = $body['status'];
         }
 

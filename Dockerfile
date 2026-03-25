@@ -37,12 +37,14 @@ RUN apt-get update && apt-get install -y \
     git \
     default-mysql-client \
     libonig-dev \
+    libsqlite3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # ── PHP extensions common on Hostinger shared hosting ────────────────────────
 RUN docker-php-ext-install \
     pdo \
     pdo_mysql \
+    pdo_sqlite \
     mysqli \
     mbstring \
     opcache

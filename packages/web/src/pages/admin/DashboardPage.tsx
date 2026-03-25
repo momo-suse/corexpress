@@ -18,7 +18,7 @@ import { getComments } from '@/api/comments'
 import { toast } from '@/hooks/useToast'
 import {
   FileText, MessageCircle, Check, ArrowLeft, Plus, Edit3,
-  Trash2, X, Upload, AlertTriangle, Languages,
+  Trash2, X, Upload, AlertTriangle, Languages, Eye, EyeOff,
 } from 'lucide-react'
 import type { Post } from '@/types/api'
 
@@ -207,7 +207,7 @@ export default function DashboardPage() {
     }))
   }
 
-  async function handleSave(status: 'draft' | 'published') {
+  async function handleSave(status: 'draft' | 'published' | 'hidden') {
     const locale = editingPost?.base_locale
       ?? (settingsData?.data as Record<string, string> | undefined)?.app_locale
       ?? 'en'
@@ -369,9 +369,16 @@ export default function DashboardPage() {
           )}
           {view === 'editor' && (
             <>
-              <Button variant="outline" size="sm" onClick={() => handleSave('draft')} disabled={saving}>
-                {t('admin.dashboard.saveDraft')}
-              </Button>
+              {(editingPost?.status === 'published' || editingPost?.status === 'hidden') ? (
+                <Button variant="outline" size="sm" onClick={() => handleSave('hidden')} disabled={saving} className="gap-2">
+                  <EyeOff className="h-4 w-4" />
+                  {t('admin.dashboard.saveAndHide')}
+                </Button>
+              ) : (
+                <Button variant="outline" size="sm" onClick={() => handleSave('draft')} disabled={saving}>
+                  {t('admin.dashboard.saveDraft')}
+                </Button>
+              )}
               <Button size="sm" onClick={() => handleSave('published')} disabled={saving} className="gap-2">
                 <Check className="h-4 w-4" />
                 {t('admin.dashboard.publish')}
@@ -472,9 +479,11 @@ export default function DashboardPage() {
                 <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
                   {/* Table header */}
                   <div className="grid grid-cols-12 gap-4 p-4 border-b text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    <div className="col-span-6">{t('admin.dashboard.titleCol')}</div>
-                    <div className="col-span-2">{t('admin.dashboard.statusCol')}</div>
-                    <div className="col-span-2">{t('admin.dashboard.commentsCol')}</div>
+                    <div className="col-span-4">{t('admin.dashboard.titleCol')}</div>
+                    <div className="col-span-2">{t('admin.dashboard.languagesCol')}</div>
+                    <div className="col-span-2">{t('admin.dashboard.tagsCol')}</div>
+                    <div className="col-span-1">{t('admin.dashboard.statusCol')}</div>
+                    <div className="col-span-1">{t('admin.dashboard.commentsCol')}</div>
                     <div className="col-span-2 text-right">{t('admin.dashboard.actionsCol')}</div>
                   </div>
 
@@ -482,10 +491,10 @@ export default function DashboardPage() {
                     {postsData.data.map((post) => (
                       <div
                         key={post.id}
-                        className="grid grid-cols-12 gap-4 p-4 items-center border-b last:border-b-0 hover:bg-muted/30 transition-colors"
+                        className={`grid grid-cols-12 gap-4 p-4 items-center border-b last:border-b-0 transition-colors ${post.status === 'hidden' ? 'opacity-50 bg-muted/40 hover:bg-muted/50' : 'hover:bg-muted/30'}`}
                       >
-                        {/* Thumbnail + Title + tags */}
-                        <div className="col-span-6 flex items-center gap-3 pr-4">
+                        {/* Thumbnail + Title */}
+                        <div className="col-span-4 flex items-center gap-3 min-w-0">
                           {post.featured_image_url ? (
                             <img
                               src={post.featured_image_url}
@@ -497,38 +506,54 @@ export default function DashboardPage() {
                               <FileText className="h-4 w-4 text-muted-foreground" />
                             </div>
                           )}
-                          <div className="flex flex-col gap-1.5 min-w-0">
-                            <span className="font-medium truncate">{post.title}</span>
-                            <div className="flex flex-wrap gap-1">
-                              {post.tags && post.tags.split(',').map((tag) => (
+                          <span className="font-medium truncate">{post.title}</span>
+                        </div>
+
+                        {/* Languages column — base locale + translations */}
+                        <div className="col-span-2 flex flex-wrap gap-1">
+                          {post.base_locale && (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                              {post.base_locale}
+                            </span>
+                          )}
+                          {(post.translation_locales ?? []).map((loc) => (
+                            <span
+                              key={loc}
+                              className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                            >
+                              {loc}
+                            </span>
+                          ))}
+                        </div>
+
+                        {/* Tags column */}
+                        <div className="col-span-2 flex flex-wrap gap-1">
+                          {post.tags
+                            ? post.tags.split(',').map((tag) => (
                                 <Badge key={tag} variant="outline" className="text-[10px] px-1.5 py-0">
                                   {tag.trim()}
                                 </Badge>
-                              ))}
-                              {(post.translation_locales ?? []).map((loc) => (
-                                <span
-                                  key={loc}
-                                  className="inline-flex items-center px-1.5 py-0 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
-                                >
-                                  {loc}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
+                              ))
+                            : <span className="text-[11px] text-muted-foreground">—</span>
+                          }
                         </div>
 
                         {/* Status badge */}
-                        <div className="col-span-2">
+                        <div className="col-span-1 flex items-center">
                           <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
-                            {post.status === 'published' ? t('admin.dashboard.statusPublished') : t('admin.dashboard.statusDraft')}
+                            {post.status === 'published'
+                              ? t('admin.dashboard.statusPublished')
+                              : post.status === 'hidden'
+                              ? t('admin.dashboard.statusHidden')
+                              : t('admin.dashboard.statusDraft')}
                           </Badge>
                         </div>
 
                         {/* Comments count → opens drawer */}
-                        <div className="col-span-2">
+                        <div className="col-span-1 flex items-center">
                           <button
                             onClick={() => openDrawer(post.id, post.title)}
-                            className="flex items-center gap-1.5 px-2 py-1 -ml-2 rounded-lg transition-colors hover:bg-muted text-muted-foreground hover:text-foreground"
+                            className="flex items-center gap-1.5 px-2 py-1 rounded-lg transition-colors hover:bg-muted text-muted-foreground hover:text-foreground"
                             title={t('admin.dashboard.viewComments')}
                           >
                             <MessageCircle className="h-4 w-4" />
@@ -549,6 +574,18 @@ export default function DashboardPage() {
                           >
                             <Edit3 className="h-4 w-4" />
                           </button>
+                          {(post.status === 'published' || post.status === 'hidden') && (
+                            <button
+                              onClick={() => update.mutate({ id: post.id, data: { status: post.status === 'hidden' ? 'published' : 'hidden' } })}
+                              className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                              title={post.status === 'hidden' ? t('admin.dashboard.showPost') : t('admin.dashboard.hidePost')}
+                            >
+                              {post.status === 'hidden'
+                                ? <Eye className="h-4 w-4" />
+                                : <EyeOff className="h-4 w-4" />
+                              }
+                            </button>
+                          )}
                           <button
                             onClick={() => askDelete('post', post.id)}
                             className="p-1.5 rounded-lg text-muted-foreground hover:bg-red-50 hover:text-red-600 transition-colors"

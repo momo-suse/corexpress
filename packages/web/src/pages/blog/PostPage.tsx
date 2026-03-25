@@ -14,6 +14,7 @@ import { useAuthStore } from '@/store/auth'
 import { DefaultPostContent } from '@/components/blog/layouts/default'
 import { ClassicPostContent } from '@/components/blog/layouts/classic'
 import { NebulaPostContent } from '@/components/blog/layouts/nebula'
+import { ZenPostContent } from '@/components/blog/layouts/zen'
 import type { PageComponent, Post } from '@/types/api'
 
 export default function PostPage() {
@@ -120,6 +121,23 @@ export default function PostPage() {
   if (activeCollection === 'nebula') {
     return (
       <NebulaPostContent
+        post={post}
+        relatedPosts={recentPosts}
+        settings={settings}
+        user={!!user}
+        commentsEnabled={commentsEnabled}
+        profileVisible={profileVisible}
+        socialVisible={socialVisible}
+        onCommentSubmitted={handleCommentSubmitted}
+        {...localeProps}
+      />
+    )
+  }
+
+  // Zen layout — warm minimalist
+  if (activeCollection === 'zen') {
+    return (
+      <ZenPostContent
         post={post}
         relatedPosts={recentPosts}
         settings={settings}

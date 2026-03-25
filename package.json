@@ -14,7 +14,10 @@
     "docker:rebuild": "docker compose -f compose.dev.yml build --no-cache",
     "frontend:build": "npm run build --workspace=packages/web",
     "frontend:install": "npm install && npm run build --workspace=packages/web",
-    "test:web": "npm run test --workspace=packages/web"
+    "test:web": "npm run test --workspace=packages/web",
+    "test:php": "docker exec corexpress-hosting bash -c 'cd /var/www/html/packages/app && vendor/bin/phpunit --no-coverage'",
+    "test:php:coverage": "docker exec corexpress-hosting bash -c 'cd /var/www/html/packages/app && vendor/bin/phpunit'",
+    "test:php:podman": "podman exec corexpress-hosting bash -c 'cd /var/www/html/packages/app && vendor/bin/phpunit --no-coverage'"
   },
   "workspaces": [
     "packages/web"

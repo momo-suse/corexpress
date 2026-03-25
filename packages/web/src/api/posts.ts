@@ -1,11 +1,12 @@
 import { api } from './client'
 import type { ApiResponse, PaginatedResponse, Post, PostTranslation } from '@/types/api'
 
-export function getPosts(page = 1, all = false, search = '', tag = '') {
+export function getPosts(page = 1, all = false, search = '', tag = '', locale = '') {
   const params = new URLSearchParams({ page: String(page) })
   if (all) params.set('all', '1')
   if (search) params.set('search', search)
   if (tag) params.set('tag', tag)
+  if (locale) params.set('locale', locale)
   return api.get<PaginatedResponse<Post>>(`/posts?${params}`)
 }
 
