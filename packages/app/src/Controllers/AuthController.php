@@ -65,7 +65,9 @@ class AuthController extends Controller
 
         // Successful login — reset rate limit, regenerate session
         $_SESSION['login_attempts'] = 0;
-        session_regenerate_id(true);
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_regenerate_id(true);
+        }
 
         $_SESSION['user_id'] = $user->id;
         $csrfToken = $this->regenerateCsrfToken();
@@ -243,20 +245,22 @@ class AuthController extends Controller
     {
         $_SESSION = [];
 
-        if (ini_get('session.use_cookies')) {
-            $params = session_get_cookie_params();
-            setcookie(
-                session_name(),
-                '',
-                time() - 42000,
-                $params['path'],
-                $params['domain'],
-                $params['secure'],
-                $params['httponly']
-            );
-        }
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            if (ini_get('session.use_cookies')) {
+                $params = session_get_cookie_params();
+                setcookie(
+                    session_name(),
+                    '',
+                    time() - 42000,
+                    $params['path'],
+                    $params['domain'],
+                    $params['secure'],
+                    $params['httponly']
+                );
+            }
 
-        session_destroy();
+            session_destroy();
+        }
 
         return $response->withStatus(204);
     }

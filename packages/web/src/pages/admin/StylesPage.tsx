@@ -12,6 +12,37 @@ function CollectionPreview({ name }: { name: string }) {
   const { t } = useTranslation()
   const isClassic = name === 'classic'
   const isNebula  = name === 'nebula'
+  const isZen     = name === 'zen'
+
+  if (isZen) {
+    return (
+      <div
+        className="blog-collection-zen pointer-events-none select-none rounded-[2rem] overflow-hidden"
+        style={{ background: 'var(--blog-bg, #F7F5F0)', padding: '14px' }}
+      >
+        {/* Mini two-column hero */}
+        <div className="flex gap-3 mb-3">
+          <div className="flex-1 flex flex-col justify-center gap-2">
+            <div className="h-2 w-4/5 rounded-sm bg-current opacity-80" />
+            <div className="h-1.5 w-3/5 rounded-sm bg-current opacity-30" />
+            <div className="h-3 w-14 rounded-full mt-1" style={{ background: 'var(--blog-accent-soft)' }} />
+          </div>
+          <div
+            className="w-16 aspect-square rounded-[1rem] shrink-0"
+            style={{ background: 'var(--blog-accent-soft)' }}
+          />
+        </div>
+        {/* Mini featured card */}
+        <div className="rounded-[1rem] overflow-hidden flex bg-white/60">
+          <div className="w-[55%] h-10" style={{ background: 'var(--blog-accent-soft)' }} />
+          <div className="flex-1 p-2 flex flex-col justify-center gap-1">
+            <div className="h-1 w-2/3 rounded-sm opacity-70" style={{ background: 'var(--blog-accent)' }} />
+            <div className="h-1.5 w-full rounded-sm bg-current opacity-50" />
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   if (isNebula) {
     return (

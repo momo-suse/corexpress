@@ -244,3 +244,13 @@
   --blog-bg:               #030712;  /* near-black base */
   --blog-accent-secondary: #8b5cf6;  /* violet-500 — secondary hover/labels */
 }
+
+/* Zen: warm minimalist, cream background, terracotta accent, serif headings, 2rem radius */
+.blog-collection-zen {
+  --blog-accent:      #A8624A;              /* terracotta */
+  --blog-accent-soft: rgba(168, 98, 74, 0.08);
+  --blog-radius-card: 2rem;
+  --blog-img-filter:  none;
+  --blog-bg:          #F7F5F0;             /* cream */
+  --blog-text:        #2D2B2A;             /* warm near-black */
+}
