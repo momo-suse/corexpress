@@ -10,6 +10,7 @@ import { ClassicAboutContent } from '@/components/blog/layouts/classic'
 import { NebulaAboutContent } from '@/components/blog/layouts/nebula'
 import { ZenAboutContent } from '@/components/blog/layouts/zen'
 import { SonicAboutContent } from '@/components/blog/layouts/sonic'
+import { AtlasAboutContent } from '@/components/blog/layouts/atlas'
 import type { PageComponent } from '@/types/api'
 
 export default function AboutPage() {
@@ -45,6 +46,23 @@ export default function AboutPage() {
   const testimonialsVisible = isVisible('about-testimonials')
   const socialVisible       = isVisible('social-links')
   const downloadPdfVisible  = isVisible('download-pdf')
+
+  // Atlas layout — travel/explorer journal
+  if (activeCollection === 'atlas') {
+    return (
+      <AtlasAboutContent
+        settings={settings}
+        user={!!user}
+        galleryVisible={galleryVisible}
+        experienceVisible={experienceVisible}
+        skillsVisible={skillsVisible}
+        educationVisible={educationVisible}
+        testimonialsVisible={testimonialsVisible}
+        socialVisible={socialVisible}
+        downloadPdfVisible={downloadPdfVisible}
+      />
+    )
+  }
 
   // Sonic layout — brutalista musical
   if (activeCollection === 'sonic') {

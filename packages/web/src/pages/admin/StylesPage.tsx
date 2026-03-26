@@ -14,6 +14,7 @@ function CollectionPreview({ name }: { name: string }) {
   const isNebula  = name === 'nebula'
   const isZen     = name === 'zen'
   const isSonic   = name === 'sonic'
+  const isAtlas   = name === 'atlas'
 
   if (isZen) {
     return (
@@ -78,6 +79,48 @@ function CollectionPreview({ name }: { name: string }) {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (isAtlas) {
+    return (
+      <div
+        className="blog-collection-atlas pointer-events-none select-none"
+        style={{ background: 'var(--blog-bg, #fafaf9)', padding: '14px' }}
+      >
+        {/* Mini nav: stone bar with serif brand centered */}
+        <div className="flex justify-between items-center mb-3 border-b border-stone-300 pb-2">
+          <div className="flex gap-2">
+            <div className="h-1 w-8 bg-stone-400 opacity-50" />
+            <div className="h-1 w-8 bg-stone-400 opacity-30" />
+          </div>
+          <div className="h-3 w-12 bg-stone-800 opacity-70" style={{ fontFamily: 'serif' }} />
+          <div className="flex gap-1">
+            <div className="h-1.5 w-3 rounded-full bg-stone-400 opacity-40" />
+            <div className="h-1.5 w-3 rounded-full bg-stone-400 opacity-40" />
+          </div>
+        </div>
+        {/* Mini featured: image 3/5 + text 2/5 */}
+        <div className="flex gap-2 mb-3">
+          <div className="w-[55%] h-12" style={{ background: 'var(--blog-accent-soft)', filter: 'var(--blog-img-filter)' }} />
+          <div className="flex-1 flex flex-col justify-center gap-1 pl-1">
+            <div className="h-1 w-1/2 bg-stone-800 opacity-50" />
+            <div className="h-2 w-full bg-stone-800 opacity-80" />
+            <div className="h-1 w-2/3 bg-stone-500 opacity-40" />
+            <div className="h-1.5 w-1/3 mt-1" style={{ background: 'var(--blog-accent)', opacity: 0.7 }} />
+          </div>
+        </div>
+        {/* Mini 3-col grid */}
+        <div className="grid grid-cols-3 gap-1.5">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="flex flex-col gap-1">
+              <div className="h-8 bg-stone-300 opacity-60" style={{ filter: 'var(--blog-img-filter)' }} />
+              <div className="h-1.5 w-2/3 bg-stone-800 opacity-60" />
+              <div className="h-1 w-full bg-stone-400 opacity-30" />
+            </div>
+          ))}
         </div>
       </div>
     )

@@ -402,7 +402,8 @@
         "classic": "Layout editorial con sidebar fijo, tipografía serif, imágenes en escala de grises y acento rosa.",
         "nebula": "Estética dark tech con cuadrícula bento, tarjetas glassmorphism y acentos de luz en cyan y violeta.",
         "zen": "Diseño minimalista cálido con paleta crema y acentos terracota. Títulos serif, imágenes redondeadas.",
-        "sonic": "Brutalismo musical: fondo oscuro, tipografía agresiva en mayúsculas, acentos fuchsia y cyan."
+        "sonic": "Brutalismo musical: fondo oscuro, tipografía agresiva en mayúsculas, acentos fuchsia y cyan.",
+        "atlas": "Diario de viajes: paleta stone cálida, tipografía serif, acentos ámbar y fotografía desaturada."
       }
     },
     "editor": {
@@ -603,6 +604,19 @@
     "sonic": {
       "nextInPlaylist": "Siguiente en la lista",
       "backToStart": "Volver al inicio"
+    },
+    "atlas": {
+      "journalLabel": "Diario",
+      "logbook": "Bitácora",
+      "photographer": "El Fotógrafo",
+      "chronicles": "Crónicas de un mundo ancho",
+      "readChronicle": "Leer crónica",
+      "backToJournal": "Volver a la bitácora",
+      "continueExploring": "Continuar explorando",
+      "recentDispatches": "Despachos recientes",
+      "postalStamp": "Sello Postal",
+      "leaveDispatch": "Dejar un despacho",
+      "readerMail": "Correos del lector"
     },
     "footer": {
       "rights": "Todos los derechos reservados."

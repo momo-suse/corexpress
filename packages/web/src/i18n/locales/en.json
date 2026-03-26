@@ -402,7 +402,8 @@
         "classic": "Editorial layout with fixed sidebar, serif typography, grayscale images, and pink accent.",
         "nebula": "Dark tech aesthetic with a bento grid layout, glassmorphism cards, and cyan/violet glow accents.",
         "zen": "Warm minimalist design with a cream palette and terracotta accents. Serif headings, rounded images.",
-        "sonic": "Brutalista musical: dark background, aggressive uppercase typography, fuchsia and cyan accents."
+        "sonic": "Brutalista musical: dark background, aggressive uppercase typography, fuchsia and cyan accents.",
+        "atlas": "Travel journal: warm stone palette, serif typography, amber accents and desaturated photography."
       }
     },
     "editor": {
@@ -603,6 +604,19 @@
     "sonic": {
       "nextInPlaylist": "Next in the playlist",
       "backToStart": "Back to start"
+    },
+    "atlas": {
+      "journalLabel": "Journal",
+      "logbook": "Logbook",
+      "photographer": "The Photographer",
+      "chronicles": "Chronicles of a wide world",
+      "readChronicle": "Read chronicle",
+      "backToJournal": "Back to the journal",
+      "continueExploring": "Continue exploring",
+      "recentDispatches": "Recent dispatches",
+      "postalStamp": "Postal Stamp",
+      "leaveDispatch": "Leave a dispatch",
+      "readerMail": "Reader mail"
     },
     "footer": {
       "rights": "All rights reserved."

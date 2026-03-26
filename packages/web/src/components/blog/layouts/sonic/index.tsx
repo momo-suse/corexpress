@@ -705,7 +705,7 @@ export function SonicAboutContent({
           {profileImage && (
             <div className="md:w-5/12 relative">
               <div className="absolute inset-0 bg-cyan-400 translate-x-3 translate-y-3 -z-10" />
-              <div className="aspect-[3/4] overflow-hidden border-2 border-zinc-800 bg-zinc-900 h-full">
+              <div className="overflow-hidden border-2 border-zinc-800 bg-zinc-900 h-full min-h-72">
                 <img
                   src={profileImage}
                   alt={profileName}
