@@ -375,7 +375,8 @@
       "comments": {
         "description": "個別の投稿ページにコメントを表示するかどうかを制御します。",
         "globalTitle": "コメントをグローバルに有効化",
-        "globalSubtitle": "マスタースイッチ — 無効にするとすべてのコメントセクションが非表示になります"
+        "globalSubtitle": "マスタースイッチ — 無効にするとすべてのコメントセクションが非表示になります",
+        "captchaNote": "スパムボットからコメントを保護するには、<settingsLink>設定 → セキュリティ</settingsLink> で Google reCAPTCHA を設定してください。"
       },
       "search": {
         "cardTitle": "検索",

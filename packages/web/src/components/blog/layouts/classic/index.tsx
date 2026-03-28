@@ -33,6 +33,7 @@ import AboutPdfButton from '@/components/blog/AboutPdfButton'
 import SearchBar from '@/components/blog/SearchBar'
 import TagCloud from '@/components/blog/TagCloud'
 import { usePosts } from '@/hooks/usePosts'
+import { sanitizeHtml } from '@/lib/sanitize'
 import type { Post, TagItem } from '@/types/api'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -761,7 +762,7 @@ export function ClassicPostContent({
             {/* Article body */}
             <div
               className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-serif prose-p:font-light [&_a]:![color:var(--blog-accent)] [&_blockquote]:!border-l-[2px] [&_blockquote]:![border-left-color:var(--blog-accent)] mb-20"
-              dangerouslySetInnerHTML={{ __html: post.content }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
             />
 
             {/* Related posts */}
@@ -816,7 +817,7 @@ export function ClassicPostContent({
           {commentsEnabled && (
             <div className="mt-16 pt-10 border-t border-gray-200 dark:border-gray-800 space-y-12">
               <CommentList postId={post.id} />
-              <CommentForm postId={post.id} onSubmitted={onCommentSubmitted} />
+              <CommentForm postId={post.id} onSubmitted={onCommentSubmitted} recaptchaSiteKey={settings.recaptcha_site_key} />
             </div>
           )}
         </div>
@@ -959,7 +960,7 @@ export function ClassicAboutContent({
               {description && (
                 <div
                   className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-serif font-light [&_a]:![color:var(--blog-accent)]"
-                  dangerouslySetInnerHTML={{ __html: description }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }}
                 />
               )}
             </section>

@@ -375,7 +375,8 @@
       "comments": {
         "description": "Control whether comments appear on individual post pages.",
         "globalTitle": "Comments globally enabled",
-        "globalSubtitle": "Master switch — disabling hides all comment sections"
+        "globalSubtitle": "Master switch — disabling hides all comment sections",
+        "captchaNote": "To protect comments from spam bots, configure Google reCAPTCHA in <settingsLink>Settings → Security</settingsLink>."
       },
       "search": {
         "cardTitle": "Search",

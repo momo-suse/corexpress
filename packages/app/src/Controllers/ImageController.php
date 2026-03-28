@@ -11,7 +11,8 @@ use Psr\Http\Message\UploadedFileInterface;
 
 class ImageController extends Controller
 {
-    private const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+    private const MAX_FILE_SIZE  = 10 * 1024 * 1024; // 10 MB
+    private const MAX_DIMENSION  = 8192; // px
     private const ALLOWED_MIMES = [
         'image/jpeg',
         'image/jpg', // alias on some systems
@@ -76,9 +77,23 @@ class ImageController extends Controller
             return $this->json($response, ['error' => 'Unsupported format. Use JPEG, PNG, GIF, WebP or AVIF.'], 422);
         }
 
+        $dimensions = @getimagesize($tempName);
+        if ($dimensions !== false) {
+            [$width, $height] = $dimensions;
+            if ($width > self::MAX_DIMENSION || $height > self::MAX_DIMENSION) {
+                unlink($tempName);
+                return $this->json($response, [
+                    'error' => sprintf('Image too large. Maximum dimensions are %dx%d pixels.', self::MAX_DIMENSION, self::MAX_DIMENSION),
+                ], 422);
+            }
+        }
+
         $ext = self::MIME_EXTENSION[$mimeType];
         $filename = bin2hex(random_bytes(16)) . '.' . $ext;
-        rename($tempName, $imgDir . '/' . $filename);
+        $finalPath = $imgDir . '/' . $filename;
+        rename($tempName, $finalPath);
+
+        $this->stripMetadata($finalPath, $mimeType);
 
         // Optional post_id from form body
         $body = (array)($request->getParsedBody() ?? []);
@@ -139,10 +154,10 @@ class ImageController extends Controller
     {
         $dir = dirname(__DIR__, 2) . '/public/img';
         if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
+            mkdir($dir, 0755, true);
         }
         elseif (!is_writable($dir)) {
-            chmod($dir, 0777);
+            chmod($dir, 0755);
         }
         return $dir;
     }
@@ -162,5 +177,36 @@ class ImageController extends Controller
             'url' => '/img/' . $image->filename,
             'created_at' => $image->created_at,
         ];
+    }
+
+    private function stripMetadata(string $path, string $mime): void
+    {
+        if (!extension_loaded('gd')) {
+            return;
+        }
+
+        $image = match ($mime) {
+            'image/jpeg', 'image/jpg' => @imagecreatefromjpeg($path),
+            'image/png' => @imagecreatefrompng($path),
+            'image/gif' => @imagecreatefromgif($path),
+            'image/webp' => @imagecreatefromwebp($path),
+            'image/avif' => function_exists('imagecreatefromavif') ? @imagecreatefromavif($path) : null,
+            default => null,
+        };
+
+        if ($image === null || $image === false) {
+            return;
+        }
+
+        match ($mime) {
+            'image/jpeg', 'image/jpg' => imagejpeg($image, $path, 90),
+            'image/png' => imagepng($image, $path, 6),
+            'image/gif' => imagegif($image, $path),
+            'image/webp' => imagewebp($image, $path, 85),
+            'image/avif' => function_exists('imageavif') ? imageavif($image, $path, 60) : null,
+            default => null,
+        };
+
+        imagedestroy($image);
     }
 }

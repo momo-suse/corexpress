@@ -253,9 +253,11 @@ final class UpdateController extends Controller
                 $this->copyDirectory($imgBackupDir, $this->imgDir);
             }
 
+            error_log('Corexpress update failed: ' . $e->getMessage());
+
             return $this->json($response, [
                 'success' => false,
-                'error'   => $e->getMessage(),
+                'error'   => 'Update failed. Please check the server logs or try again later.',
             ], 500);
 
         } finally {
@@ -322,12 +324,28 @@ final class UpdateController extends Controller
         if (!is_array($assets)) {
             return '';
         }
+
+        $trustedPrefixes = [
+            'https://github.com/',
+            'https://github-releases.githubusercontent.com/',
+        ];
+
         foreach ($assets as $asset) {
-            if (
-                isset($asset['browser_download_url']) &&
-                str_ends_with((string) $asset['browser_download_url'], '.zip')
-            ) {
-                return (string) $asset['browser_download_url'];
+            $url = (string) ($asset['browser_download_url'] ?? '');
+            if ($url === '' || !str_ends_with($url, '.zip')) {
+                continue;
+            }
+
+            $trusted = false;
+            foreach ($trustedPrefixes as $prefix) {
+                if (str_starts_with($url, $prefix)) {
+                    $trusted = true;
+                    break;
+                }
+            }
+
+            if ($trusted) {
+                return $url;
             }
         }
         return '';
@@ -441,10 +459,10 @@ final class UpdateController extends Controller
             $newVersion = $this->readCurrentVersion();
             if ($newVersion !== 'unknown') {
                 $stmt = $pdo->prepare(
-                    "INSERT INTO `settings` (`key`, `value`) VALUES ('app_version', :v)
-                     ON DUPLICATE KEY UPDATE `value` = :v"
+                    "INSERT INTO `settings` (`key`, `value`) VALUES ('app_version', :v1)
+                     ON DUPLICATE KEY UPDATE `value` = :v2"
                 );
-                $stmt->execute([':v' => $newVersion]);
+                $stmt->execute([':v1' => $newVersion, ':v2' => $newVersion]);
             }
 
             // Success: backup is no longer needed
@@ -518,7 +536,7 @@ final class UpdateController extends Controller
 
         $lines[] = 'SET FOREIGN_KEY_CHECKS = 1;';
 
-        if (file_put_contents($outputFile, implode("\n", $lines)) === false) {
+        if (file_put_contents($outputFile, implode("\n", $lines) . "\n") === false) {
             throw new \RuntimeException('Could not write database backup to: ' . $outputFile);
         }
     }
@@ -535,10 +553,12 @@ final class UpdateController extends Controller
             throw new \RuntimeException('Could not read backup file: ' . $backupFile);
         }
 
-        // Strip line comments, split on ; and execute each statement
+        // Strip line comments, split on ";\n" to avoid breaking on semicolons inside quoted strings
+        // (e.g. HTML content with CSS like `style="text-align: justify;"`).
+        // backupDatabase() guarantees one statement per line ending with ";\n".
         $sql        = preg_replace('/--[^\n]*/', '', $sql);
         $statements = array_filter(
-            array_map('trim', explode(';', $sql)),
+            array_map('trim', explode(";\n", $sql)),
             static fn(string $s) => $s !== ''
         );
 

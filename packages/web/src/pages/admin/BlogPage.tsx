@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
+import { useTranslation, Trans } from 'react-i18next'
 import {
   ImageIcon,
   User,
   Share2,
   MessageSquare,
+  Info,
   Upload,
   X,
   Briefcase,
@@ -729,6 +731,24 @@ export default function BlogPage() {
                   onCheckedChange={(v) => setField('comments_enabled' as keyof Settings, v ? '1' : '0')}
                 />
               </div>
+            </div>
+
+            <div className="flex items-start gap-2 rounded-xl border border-border bg-muted/40 px-4 py-3 text-xs text-muted-foreground">
+              <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary/70" />
+              <p>
+                <Trans
+                  i18nKey="admin.blog.comments.captchaNote"
+                  components={{
+                    settingsLink: (
+                      <Link
+                        to="/cx-admin/settings"
+                        state={{ tab: 'security' }}
+                        className="font-medium text-primary underline underline-offset-2 hover:text-primary/80"
+                      />
+                    ),
+                  }}
+                />
+              </p>
             </div>
 
           </>

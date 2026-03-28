@@ -6,6 +6,7 @@ namespace Corexpress\Controllers;
 
 use Corexpress\Models\Setting;
 use Corexpress\Models\User;
+use Corexpress\Services\RateLimiter;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -13,6 +14,13 @@ class AuthController extends Controller
 {
     private const MAX_ATTEMPTS     = 5;
     private const WINDOW_SECONDS   = 15 * 60; // 15 minutes
+
+    private RateLimiter $rateLimiter;
+
+    public function __construct()
+    {
+        $this->rateLimiter = new RateLimiter();
+    }
 
     // ── Public endpoints ───────────────────────────────────────────────────
 
@@ -31,6 +39,11 @@ class AuthController extends Controller
      */
     public function login(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        if ($this->rateLimiter->tooManyAttempts('login:' . $ip, self::MAX_ATTEMPTS, self::WINDOW_SECONDS)) {
+            return $this->error($response, 'Too many login attempts. Try again later.', 429);
+        }
+
         if (!$this->checkRateLimit()) {
             return $this->error($response, sprintf(
                 'Too many login attempts. Try again in %d minute(s).',
@@ -60,11 +73,12 @@ class AuthController extends Controller
 
         if ($user === null || !password_verify($password, (string) $user->password_hash)) {
             $this->incrementLoginAttempts();
+            $this->rateLimiter->increment('login:' . $ip, self::WINDOW_SECONDS);
             return $this->error($response, 'Invalid credentials.', 401);
         }
 
-        // Successful login — reset rate limit, regenerate session
         $_SESSION['login_attempts'] = 0;
+        $this->rateLimiter->reset('login:' . $ip);
         if (session_status() === PHP_SESSION_ACTIVE) {
             session_regenerate_id(true);
         }
@@ -87,7 +101,11 @@ class AuthController extends Controller
      */
     public function forgotPassword(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        // Rate limit: 3 requests / 15 min per session
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        if ($this->rateLimiter->tooManyAttempts('reset:' . $ip, 3, self::WINDOW_SECONDS)) {
+            return $this->error($response, 'Demasiadas solicitudes. Inténtalo de nuevo en unos minutos.', 429);
+        }
+
         if (!$this->checkResetRateLimit()) {
             return $this->error($response, 'Demasiadas solicitudes. Inténtalo de nuevo en unos minutos.', 429);
         }
@@ -111,14 +129,17 @@ class AuthController extends Controller
             $user->reset_token_expires = $expires;
             $user->save();
 
-            $scheme = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-            $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
-            $link   = "{$scheme}://{$host}/cx-admin/reset-password?token={$token}";
+            $configPath = dirname(__DIR__, 2) . '/config.php';
+            $config     = file_exists($configPath) ? require $configPath : [];
+            $domain     = parse_url($config['app']['domain'] ?? '', PHP_URL_HOST) ?: 'localhost';
+            $domain     = str_replace(["\r", "\n"], '', $domain);
+            $scheme     = parse_url($config['app']['domain'] ?? '', PHP_URL_SCHEME) ?: 'https';
+            $link       = "{$scheme}://{$domain}/cx-admin/reset-password?token={$token}";
 
             $blogName = \Corexpress\Models\Setting::where('key', 'blog_name')->value('value') ?? 'Corexpress';
             $subject  = "Recupera tu acceso a {$blogName}";
             $body     = "<!DOCTYPE html><html><body style='font-family:sans-serif;'>" .
-                "<p>Alguien solicitó restablecer la contraseña de tu cuenta en <strong>{$host}</strong>.</p>" .
+                "<p>Alguien solicitó restablecer la contraseña de tu cuenta en <strong>{$domain}</strong>.</p>" .
                 "<p><a href='{$link}' style='background:#1e293b;color:#fff;padding:10px 20px;text-decoration:none;border-radius:6px;display:inline-block;'>Restablecer contraseña</a></p>" .
                 "<p style='color:#6b7280;font-size:13px;'>El enlace es válido por 10 minutos. Si no fuiste tú, ignora este correo.</p>" .
                 "<p style='color:#6b7280;font-size:12px;'>O copia este enlace: {$link}</p>" .
@@ -126,7 +147,7 @@ class AuthController extends Controller
 
             $headers  = "MIME-Version: 1.0\r\n";
             $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
-            $headers .= "From: noreply@{$host}\r\n";
+            $headers .= "From: noreply@{$domain}\r\n";
 
             $mailSent = @mail($email, $subject, $body, $headers);
 
@@ -140,6 +161,7 @@ class AuthController extends Controller
         }
 
         $this->incrementResetAttempts();
+        $this->rateLimiter->increment('reset:' . $ip, self::WINDOW_SECONDS);
 
         return $this->json($response, [
             'message'    => 'Si ese correo existe, recibirás un enlace en breve.',

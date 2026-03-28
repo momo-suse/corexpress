@@ -56,6 +56,8 @@ class SettingController extends Controller
             $settings['profile_cover_url'] = $settings['profile_cover_url'] ?? '';
         }
 
+        unset($settings['recaptcha_secret_key']);
+
         return $this->json($response, ['data' => $settings]);
     }
 

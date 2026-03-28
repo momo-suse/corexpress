@@ -4,6 +4,7 @@ import { Clock, ArrowLeft, Share2, Check, MapPin } from 'lucide-react'
 import type { Post } from '@/types/api'
 import { useTranslation } from 'react-i18next'
 import { formatTimeAgo } from '@/lib/utils'
+import { sanitizeHtml } from '@/lib/sanitize'
 
 interface PostDetailProps {
   post: Post
@@ -130,7 +131,7 @@ export default function PostDetail({ post, settings = {}, availableLocales = [],
       {/* Body */}
       <div
         className="prose prose-lg prose-neutral dark:prose-invert max-w-none prose-headings:font-bold prose-img:shadow-md prose-blockquote:rounded-r-lg prose-blockquote:py-2 mb-12 [&_a]:![color:var(--blog-accent)] [&_blockquote]:![border-left-color:var(--blog-accent)] [&_blockquote]:![background-color:var(--blog-accent-soft)]"
-        dangerouslySetInnerHTML={{ __html: post.content }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
       />
 
       {/* Optional map embed */}
@@ -149,7 +150,7 @@ export default function PostDetail({ post, settings = {}, availableLocales = [],
             style={{ height: '400px', minHeight: '260px' }}
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
-            sandbox="allow-scripts allow-same-origin"
+            sandbox="allow-scripts"
           />
         </div>
       )}

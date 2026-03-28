@@ -31,6 +31,7 @@ import AboutSkills from '@/components/blog/AboutSkills'
 import AboutEducation from '@/components/blog/AboutEducation'
 import AboutTestimonials from '@/components/blog/AboutTestimonials'
 import AboutPdfButton from '@/components/blog/AboutPdfButton'
+import { sanitizeHtml } from '@/lib/sanitize'
 import type { Post, TagItem } from '@/types/api'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -353,7 +354,7 @@ export function DefaultPostContent({
                   className="bg-white dark:bg-gray-900 shadow-md border border-gray-200 dark:border-gray-700 p-4 md:p-6"
                   style={{ borderRadius: 'var(--blog-radius-card)' }}
                 >
-                  <CommentForm postId={post.id} onSubmitted={onCommentSubmitted} />
+                  <CommentForm postId={post.id} onSubmitted={onCommentSubmitted} recaptchaSiteKey={settings.recaptcha_site_key} />
                 </div>
               </>
             )}
@@ -450,7 +451,7 @@ export function DefaultAboutContent({
             {description && (
               <div
                 className="prose prose-gray dark:prose-invert max-w-none text-gray-600 dark:text-gray-300 [&_a]:[color:var(--blog-accent)]"
-                dangerouslySetInnerHTML={{ __html: description }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }}
               />
             )}
           </section>

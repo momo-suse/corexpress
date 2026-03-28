@@ -29,6 +29,7 @@ if (!file_exists($autoloadPath)) {
 }
 
 use Corexpress\Bootstrap\Database;
+use Corexpress\Middleware\SecurityHeadersMiddleware;
 use Corexpress\Middleware\SessionMiddleware;
 use Slim\Factory\AppFactory;
 
@@ -55,6 +56,8 @@ $app->addRoutingMiddleware();
 
 // Session middleware — starts the PHP session before any route handler executes
 $app->add(new SessionMiddleware());
+
+$app->add(new SecurityHeadersMiddleware());
 
 // Error middleware — outermost; show error details only in development
 $displayErrors = (getenv('APP_ENV') ?: 'production') === 'development';

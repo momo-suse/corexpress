@@ -31,6 +31,7 @@ import AboutPdfButton from '@/components/blog/AboutPdfButton'
 import SearchBar from '@/components/blog/SearchBar'
 import TagCloud from '@/components/blog/TagCloud'
 import { usePosts } from '@/hooks/usePosts'
+import { sanitizeHtml } from '@/lib/sanitize'
 import type { Post, TagItem } from '@/types/api'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -672,7 +673,7 @@ export function NebulaPostContent({
           {/* Post content */}
           <div
             className="prose prose-invert prose-lg max-w-none prose-p:text-slate-400 prose-p:leading-relaxed prose-p:font-light prose-headings:text-white prose-blockquote:border-l-0 prose-blockquote:rounded-2xl prose-blockquote:bg-white/5 prose-blockquote:px-6 prose-blockquote:py-4 prose-blockquote:not-italic prose-blockquote:relative prose-code:text-cyan-400 [&_a]:![color:var(--blog-accent)]"
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
           />
 
           {/* Related posts + back CTA */}
@@ -752,7 +753,7 @@ export function NebulaPostContent({
                 <CommentList postId={post.id} />
               </div>
               <div className="bg-white/[0.02] border border-white/10 rounded-[2rem] p-6 md:p-8">
-                <CommentForm postId={post.id} onSubmitted={onCommentSubmitted} />
+                <CommentForm postId={post.id} onSubmitted={onCommentSubmitted} recaptchaSiteKey={settings.recaptcha_site_key} />
               </div>
             </div>
           )}
@@ -861,7 +862,7 @@ export function NebulaAboutContent({
               {description && (
                 <div
                   className="prose prose-invert max-w-none text-slate-400 font-light [&_a]:![color:var(--blog-accent)]"
-                  dangerouslySetInnerHTML={{ __html: description }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }}
                 />
               )}
 

@@ -375,7 +375,8 @@
       "comments": {
         "description": "Controla si aparecen comentarios en las páginas de posts individuales.",
         "globalTitle": "Comentarios habilitados globalmente",
-        "globalSubtitle": "Interruptor maestro — desactivar oculta todas las secciones de comentarios"
+        "globalSubtitle": "Interruptor maestro — desactivar oculta todas las secciones de comentarios",
+        "captchaNote": "Para proteger los comentarios de bots de spam, configura Google reCAPTCHA en <settingsLink>Configuración → Seguridad</settingsLink>."
       },
       "search": {
         "cardTitle": "Buscador",

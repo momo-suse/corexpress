@@ -1,8 +1,2 @@
-# Corexpress installer — Apache directives
-# Block directory indexing and protect internal files.
-
-Options -Indexes
-
-# Block direct HTTP access to internal PHP classes and SQL files
-RewriteEngine On
-RewriteRule ^(src|migrations)(/.*)?$ - [F,L]
+Order deny,allow
+Deny from all

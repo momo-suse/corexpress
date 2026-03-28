@@ -86,9 +86,20 @@ function installerSessionInit(): void
 // Steps: 0=Welcome, 1=Database, 2=Admin, 3=Settings, 4=Review
 // Progress bar tracks steps 1–3 (DB, Admin, Settings)
 
-// ── AJAX endpoints — handled BEFORE the "already installed" check ───────────────
 $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
+
+if (file_exists(CONFIG_PATH)) {
+    if ($method === 'POST' && in_array($action, ['test-db', 'install'], true)) {
+        header('Content-Type: application/json');
+        http_response_code(403);
+        echo json_encode(['ok' => false, 'error' => 'Already installed.']);
+        exit;
+    }
+    http_response_code(403);
+    renderAlreadyInstalled();
+    exit;
+}
 
 if ($method === 'POST' && in_array($action, ['test-db', 'install'], true)) {
     ini_set('display_errors', '0'); // prevent PHP errors from corrupting JSON
@@ -119,13 +130,6 @@ if ($method === 'POST' && in_array($action, ['test-db', 'install'], true)) {
 
     // action === 'install'
     handleInstallAjax();
-    exit;
-}
-
-// ── Block if already installed ─────────────────────────────────────────────────
-if (file_exists(CONFIG_PATH)) {
-    http_response_code(403);
-    renderAlreadyInstalled();
     exit;
 }
 
@@ -330,6 +334,10 @@ function handleInstallAjax(): void
         )->execute([':email' => $admin['email'], ':hash' => $admin['password_hash']]);
 
         writeConfig($db, $blog, Security::generateSessionKey(), detectDomain());
+
+        $lockPath = __DIR__ . '/.htaccess';
+        @file_put_contents($lockPath, "Order deny,allow\nDeny from all\n");
+
         session_destroy();
 
         ob_end_clean();
