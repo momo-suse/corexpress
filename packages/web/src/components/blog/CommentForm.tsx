@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,10 +11,41 @@ import { useTranslation } from 'react-i18next'
 
 interface CommentFormProps {
   postId: number
+  recaptchaSiteKey?: string
   onSubmitted?: () => void
 }
 
-export default function CommentForm({ postId, onSubmitted }: CommentFormProps) {
+function loadRecaptchaScript(siteKey: string): Promise<void> {
+  const id = 'recaptcha-v3-script'
+  if (document.getElementById(id)) return Promise.resolve()
+
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script')
+    script.id = id
+    script.src = `https://www.google.com/recaptcha/api.js?render=${siteKey}`
+    script.async = true
+    script.onload = () => resolve()
+    script.onerror = () => reject(new Error('Failed to load reCAPTCHA'))
+    document.head.appendChild(script)
+  })
+}
+
+function getRecaptchaToken(siteKey: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    if (!window.grecaptcha) {
+      reject(new Error('reCAPTCHA not loaded'))
+      return
+    }
+    window.grecaptcha.ready(() => {
+      window.grecaptcha
+        .execute(siteKey, { action: 'comment' })
+        .then(resolve)
+        .catch(reject)
+    })
+  })
+}
+
+export default function CommentForm({ postId, recaptchaSiteKey, onSubmitted }: CommentFormProps) {
   const { t } = useTranslation()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -23,14 +54,40 @@ export default function CommentForm({ postId, onSubmitted }: CommentFormProps) {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  async function handleSubmit(e: React.FormEvent) {
+  useEffect(() => {
+    if (!recaptchaSiteKey) return
+
+    loadRecaptchaScript(recaptchaSiteKey).catch(() => {})
+
+    return () => {
+      document.getElementById('recaptcha-v3-script')?.remove()
+
+      const badge = document.querySelector('.grecaptcha-badge')
+      if (badge?.parentElement) badge.parentElement.remove()
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (window as any).grecaptcha
+    }
+  }, [recaptchaSiteKey])
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
     setLoading(true)
 
     try {
+      let recaptchaToken: string | undefined
+      if (recaptchaSiteKey) {
+        recaptchaToken = await getRecaptchaToken(recaptchaSiteKey)
+      }
+
       await csrf()
-      await createComment(postId, { author_name: name, author_email: email, content })
+      await createComment(postId, {
+        author_name: name,
+        author_email: email,
+        content,
+        recaptcha_token: recaptchaToken,
+      })
       setSuccess(true)
       setName('')
       setEmail('')
@@ -45,7 +102,7 @@ export default function CommentForm({ postId, onSubmitted }: CommentFormProps) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [postId, name, email, content, recaptchaSiteKey, onSubmitted, t])
 
   if (success) {
     return (

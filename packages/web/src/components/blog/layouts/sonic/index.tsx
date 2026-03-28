@@ -30,6 +30,7 @@ import AboutTestimonials from '@/components/blog/AboutTestimonials'
 import AboutPdfButton from '@/components/blog/AboutPdfButton'
 import TagCloud from '@/components/blog/TagCloud'
 import { usePosts } from '@/hooks/usePosts'
+import { sanitizeHtml } from '@/lib/sanitize'
 import type { Post, TagItem } from '@/types/api'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -571,7 +572,7 @@ export function SonicPostContent({
               prose-blockquote:font-mono prose-blockquote:text-cyan-400 prose-blockquote:bg-zinc-900 prose-blockquote:border-l-4 prose-blockquote:border-cyan-400 prose-blockquote:not-italic
               prose-a:text-fuchsia-500 prose-a:no-underline hover:prose-a:underline
               prose-code:text-cyan-400 prose-pre:bg-zinc-900 prose-pre:border prose-pre:border-zinc-800"
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
           />
         </article>
 
@@ -638,7 +639,7 @@ export function SonicPostContent({
               <CommentList postId={post.id} />
             </div>
             <div className="[&_*]:!rounded-none [&_input]:!bg-zinc-900 [&_input]:!border-zinc-700 [&_textarea]:!bg-zinc-900 [&_textarea]:!border-zinc-700 [&_button[type=submit]]:!bg-fuchsia-500 [&_button[type=submit]]:hover:!bg-fuchsia-600 [&_button[type=submit]]:!text-zinc-950 [&_button[type=submit]]:!font-black [&_button[type=submit]]:!uppercase [&_button[type=submit]]:!tracking-wider">
-              <CommentForm postId={post.id} onCommentSubmitted={onCommentSubmitted} />
+              <CommentForm postId={post.id} onCommentSubmitted={onCommentSubmitted} recaptchaSiteKey={settings.recaptcha_site_key} />
             </div>
           </div>
         )}

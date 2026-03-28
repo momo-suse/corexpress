@@ -22,7 +22,7 @@ services:
       - DB_PORT=3306
       - DB_NAME=corexpress_db
       - DB_USER=corexpress
-      - DB_PASSWORD=secret
+      - DB_PASSWORD=${DB_PASSWORD:-secret}
     networks:
       - corexpress
     depends_on:
@@ -39,10 +39,10 @@ services:
     ports:
       - "3306:3306"   # Exposed for external DB clients (TablePlus, DBeaver, etc.)
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: corexpress_db
-      MYSQL_USER: corexpress
-      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-corexpress_db}
+      MYSQL_USER: ${MYSQL_USER:-corexpress}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-secret}
     volumes:
       - mysql_data:/var/lib/mysql
     networks:

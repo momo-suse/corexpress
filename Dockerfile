@@ -70,7 +70,7 @@ WORKDIR /var/www/html
 
 # ── PHP configuration ─────────────────────────────────────────────────────────
 RUN echo "error_reporting = E_ALL" >> /usr/local/etc/php/php.ini && \
-    echo "display_errors = On" >> /usr/local/etc/php/php.ini && \
+    echo "display_errors = Off" >> /usr/local/etc/php/php.ini && \
     echo "log_errors = On" >> /usr/local/etc/php/php.ini && \
     echo "date.timezone = UTC" >> /usr/local/etc/php/php.ini && \
     echo "upload_max_filesize = 20M" >> /usr/local/etc/php/php.ini && \

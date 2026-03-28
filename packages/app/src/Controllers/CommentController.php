@@ -7,13 +7,18 @@ namespace Corexpress\Controllers;
 use Corexpress\Models\Comment;
 use Corexpress\Models\Post;
 use Corexpress\Models\Setting;
+use Corexpress\Services\RateLimiter;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class CommentController extends Controller
 {
-    private const DEFAULT_PER_PAGE  = 20;
-    private const MAX_CONTENT_LENGTH = 5000;
+    private const DEFAULT_PER_PAGE      = 20;
+    private const MAX_CONTENT_LENGTH    = 5000;
+    private const COMMENT_MAX_PER_IP    = 5;
+    private const COMMENT_WINDOW        = 15 * 60; // 15 min
+    private const RECAPTCHA_VERIFY_URL  = 'https://www.google.com/recaptcha/api/siteverify';
+    private const RECAPTCHA_MIN_SCORE   = 0.5;
 
     /**
      * POST /api/v1/posts/{postId}/comments   [CSRF required, no auth]
@@ -21,7 +26,12 @@ class CommentController extends Controller
      */
     public function store(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
-        // Check global comments toggle
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $rateLimiter = new RateLimiter();
+        if ($rateLimiter->tooManyAttempts('comment:' . $ip, self::COMMENT_MAX_PER_IP, self::COMMENT_WINDOW)) {
+            return $this->error($response, 'Too many comments. Please try again later.', 429);
+        }
+
         $commentsEnabled = Setting::where('key', 'comments_enabled')->value('value') ?? '1';
         if ($commentsEnabled !== '1') {
             return $this->error($response, 'Comments are disabled.', 403);
@@ -34,6 +44,12 @@ class CommentController extends Controller
         }
 
         $body   = (array) ($request->getParsedBody() ?? []);
+
+        $captchaError = $this->verifyCaptcha($body);
+        if ($captchaError !== null) {
+            return $this->error($response, $captchaError, 422);
+        }
+
         $errors = $this->validateCommentBody($body);
 
         if ($errors !== []) {
@@ -42,11 +58,13 @@ class CommentController extends Controller
 
         $comment = Comment::create([
             'post_id'      => $post->id,
-            'author_name'  => trim((string) $body['author_name']),
+            'author_name'  => strip_tags(trim((string) $body['author_name'])),
             'author_email' => strtolower(trim((string) $body['author_email'])),
-            'content'      => trim((string) $body['content']),
+            'content'      => strip_tags(trim((string) $body['content'])),
             'status'       => 'pending',
         ]);
+
+        $rateLimiter->increment('comment:' . $ip, self::COMMENT_WINDOW);
 
         // Do not expose author_email in the public response (privacy)
         return $this->json($response, [
@@ -158,6 +176,47 @@ class CommentController extends Controller
      * @param  array<string, mixed> $body
      * @return array<string, string>
      */
+    /**
+     * @param array<string, mixed> $body
+     */
+    private function verifyCaptcha(array $body): ?string
+    {
+        $secretKey = Setting::where('key', 'recaptcha_secret_key')->value('value') ?? '';
+        if ($secretKey === '') {
+            return null;
+        }
+
+        $token = trim((string) ($body['recaptcha_token'] ?? ''));
+        if ($token === '') {
+            return 'CAPTCHA verification required.';
+        }
+
+        $verifyResponse = @file_get_contents(self::RECAPTCHA_VERIFY_URL . '?' . http_build_query([
+            'secret'   => $secretKey,
+            'response' => $token,
+            'remoteip' => $_SERVER['REMOTE_ADDR'] ?? '',
+        ]));
+
+        if ($verifyResponse === false) {
+            return null;
+        }
+
+        $result = json_decode($verifyResponse, true);
+        if (!is_array($result)) {
+            return null;
+        }
+
+        if (empty($result['success'])) {
+            return 'CAPTCHA verification failed. Please try again.';
+        }
+
+        if (isset($result['score']) && (float) $result['score'] < self::RECAPTCHA_MIN_SCORE) {
+            return 'CAPTCHA verification failed. Please try again.';
+        }
+
+        return null;
+    }
+
     private function validateCommentBody(array $body): array
     {
         $errors = [];

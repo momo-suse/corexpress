@@ -23,6 +23,7 @@ import AboutEducation from '@/components/blog/AboutEducation'
 import AboutTestimonials from '@/components/blog/AboutTestimonials'
 import AboutPdfButton from '@/components/blog/AboutPdfButton'
 import { usePosts } from '@/hooks/usePosts'
+import { sanitizeHtml } from '@/lib/sanitize'
 import type { Post, TagItem } from '@/types/api'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -545,7 +546,7 @@ export function ZenPostContent({
             '[&_a]:![color:var(--blog-accent)] [&_a]:no-underline hover:[&_a]:underline',
             '[&_blockquote]:![border-left-color:var(--blog-accent)]',
           ].join(' ')}
-          dangerouslySetInnerHTML={{ __html: post.content ?? '' }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content ?? '') }}
         />
 
         {/* ── Tags ──────────────────────────────────────────── */}
@@ -649,7 +650,7 @@ export function ZenPostContent({
             style={{ borderColor: '#E8E2D5' }}
           >
             <CommentList postId={post.id} />
-            <CommentForm postId={post.id} onSubmitted={onCommentSubmitted} />
+            <CommentForm postId={post.id} onSubmitted={onCommentSubmitted} recaptchaSiteKey={settings.recaptcha_site_key} />
           </div>
         )}
 
@@ -730,7 +731,7 @@ export function ZenAboutContent({
           <section className="mt-10 mb-8 max-w-2xl">
             <div className="font-sans text-lg font-light space-y-6" style={{ color: '#5A554E' }}>
               {summary && <p>{summary}</p>}
-              {description && <div dangerouslySetInnerHTML={{ __html: description }} />}
+              {description && <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }} />}
             </div>
             {socialVisible && (
               <div className="flex items-center gap-5 mt-8 pt-8 border-t" style={{ borderColor: '#E8E2D5' }}>

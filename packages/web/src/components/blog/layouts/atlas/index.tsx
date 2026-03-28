@@ -29,6 +29,7 @@ import CommentForm from '@/components/blog/CommentForm'
 import AboutTestimonials from '@/components/blog/AboutTestimonials'
 import AboutPdfButton from '@/components/blog/AboutPdfButton'
 import { usePosts } from '@/hooks/usePosts'
+import { sanitizeHtml } from '@/lib/sanitize'
 import type { Post, TagItem } from '@/types/api'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -645,7 +646,7 @@ export function AtlasPostContent({
             prose-blockquote:border-y prose-blockquote:border-stone-300 prose-blockquote:border-l-0
             prose-blockquote:py-12 prose-blockquote:bg-stone-100/50 prose-blockquote:text-center
             [&_a]:![color:var(--blog-accent)]"
-          dangerouslySetInnerHTML={{ __html: post.content ?? '' }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content ?? '') }}
         />
 
         {/* ── Map embed ─────────────────────────────────────────────────── */}
@@ -735,7 +736,7 @@ export function AtlasPostContent({
                   <h3 className="font-serif italic text-xl text-emerald-950 mb-4">
                     {t('blog.atlas.leaveDispatch', { defaultValue: 'Dejar un despacho' })}
                   </h3>
-                  <CommentForm postId={post.id} onSubmitted={onCommentSubmitted} />
+                  <CommentForm postId={post.id} onSubmitted={onCommentSubmitted} recaptchaSiteKey={settings.recaptcha_site_key} />
                 </div>
               </div>
             </div>

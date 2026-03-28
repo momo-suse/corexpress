@@ -39,7 +39,8 @@ class PostController extends Controller
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
-                $term = '%' . $search . '%';
+                $escaped = str_replace(['%', '_', '\\'], ['\\%', '\\_', '\\\\'], $search);
+                $term = '%' . $escaped . '%';
                 $q->where('title',   'LIKE', $term)
                   ->orWhere('excerpt', 'LIKE', $term)
                   ->orWhere('content', 'LIKE', $term)
@@ -49,7 +50,7 @@ class PostController extends Controller
 
         $tag = trim((string) ($params['tag'] ?? ''));
         if ($tag !== '') {
-            $tagNorm = strtolower($tag);
+            $tagNorm = str_replace(['%', '_', '\\'], ['\\%', '\\_', '\\\\'], strtolower($tag));
             $query->whereRaw(
                 "LOWER(CONCAT(',', REPLACE(tags, ', ', ','), ',')) LIKE ?",
                 ["%,{$tagNorm},%"]

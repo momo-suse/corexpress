@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Upload, X, Globe, Paintbrush, ShieldCheck, Languages, Palette, RefreshCw } from 'lucide-react'
+import { Upload, X, Globe, Paintbrush, ShieldCheck, Languages, Palette, RefreshCw, Bot } from 'lucide-react'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import { useSettings, useMutateSettings } from '@/hooks/useSettings'
 import { uploadImage } from '@/api/images'
@@ -168,7 +168,7 @@ export default function SettingsPage() {
           <h1 className="text-2xl font-semibold tracking-tight">{t('admin.settings.title')}</h1>
           <p className="text-xs text-muted-foreground mt-0.5">{t('admin.settings.subtitle')}</p>
         </div>
-        {activeTab !== 'security' && activeTab !== 'updates' && (
+        {activeTab !== 'updates' && (
           <Button onClick={handleSave} disabled={saving}>
             {saving ? t('common.saving') : t('admin.settings.saveChanges')}
           </Button>
@@ -411,7 +411,7 @@ export default function SettingsPage() {
         </div>}
 
         {/* Security */}
-        {activeTab === 'security' && <div className="rounded-2xl border-2 border-border overflow-hidden">
+        {activeTab === 'security' && <><div className="rounded-2xl border-2 border-border overflow-hidden">
           <div className="flex items-center gap-4 px-6 py-4 bg-muted/30 border-b">
             <div className="p-2.5 rounded-xl bg-muted text-muted-foreground shrink-0">
               <ShieldCheck className="h-4 w-4" />
@@ -459,7 +459,46 @@ export default function SettingsPage() {
               {pwdSaving ? t('admin.settings.security.changing') : t('admin.settings.security.change')}
             </Button>
           </div>
-        </div>}
+        </div>
+
+        <div className="rounded-2xl border-2 border-border overflow-hidden">
+          <div className="flex items-center gap-4 px-6 py-4 bg-muted/30 border-b">
+            <div className="p-2.5 rounded-xl bg-muted text-muted-foreground shrink-0">
+              <Bot className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold">reCAPTCHA v3</p>
+              <p className="text-xs text-muted-foreground">{t('admin.settings.security.recaptchaSubtitle', { defaultValue: 'Protege los comentarios contra spam y bots.' })}</p>
+            </div>
+          </div>
+          <div className="px-6 py-5 space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="recaptcha-site-key">Site Key</Label>
+              <Input
+                id="recaptcha-site-key"
+                value={form.recaptcha_site_key ?? ''}
+                onChange={(e) => set('recaptcha_site_key', e.target.value)}
+                placeholder="6Le..."
+                autoComplete="off"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="recaptcha-secret-key">Secret Key</Label>
+              <Input
+                id="recaptcha-secret-key"
+                type="password"
+                value={form.recaptcha_secret_key ?? ''}
+                onChange={(e) => set('recaptcha_secret_key', e.target.value)}
+                placeholder="6Le..."
+                autoComplete="off"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {t('admin.settings.security.recaptchaHint', { defaultValue: 'Obtén tus keys en Google reCAPTCHA Admin. Déjalos vacíos para desactivar.' })}
+            </p>
+          </div>
+        </div>
+        </>}
 
       </div>
     </div>
