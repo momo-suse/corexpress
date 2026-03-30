@@ -60,6 +60,7 @@
       "comments": "コメント",
       "blog": "ブログ",
       "styles": "スタイル",
+      "subscribers": "サブスクライバー",
       "settings": "設定",
       "viewBlog": "ブログを見る",
       "signOut": "サインアウト"
@@ -142,7 +143,13 @@
       "translationFailedDelete": "翻訳の削除に失敗しました。",
       "baseLanguage": "ベースコンテンツ ({{lang}})",
       "editing": "編集中",
-      "characters": "文字"
+      "characters": "文字",
+      "notifyDialog": {
+        "title": "サブスクライバーに通知しますか？",
+        "description": "{{count}}人のアクティブなサブスクライバーにこの投稿へのリンクをメールで送信します。",
+        "confirm": "はい、通知する",
+        "skip": "いいえ、公開のみ"
+      }
     },
     "comments": {
       "title": "コメント",
@@ -183,6 +190,8 @@
         "general": "一般",
         "style": "スタイルと言語",
         "security": "セキュリティ",
+        "subscribers": "サブスクライバー",
+        "recaptcha": "reCAPTCHA",
         "updates": "アップデート"
       },
       "saved": "設定を保存しました。",
@@ -235,7 +244,72 @@
         "tooShort": "パスワードは8文字以上である必要があります。",
         "noMatch": "新しいパスワードが一致しません。",
         "error": "パスワードの変更中にエラーが発生しました。"
+      },
+      "google": {
+        "title": "Google OAuth — サブスクライバー",
+        "subtitle": "ブログ訪問者がGoogleアカウントで購読できるようにします。",
+        "clientId": "クライアントID",
+        "clientSecret": "クライアントシークレット",
+        "hint": "Google Cloud Console → APIとサービス → 認証情報で資格情報を作成してください。空白にするとサブスクライバーログインが無効になります。"
+      },
+      "subscribers": {
+        "title": "サブスクライバー",
+        "subtitle": "訪問者が購読して新しい投稿のメール通知を受け取れるようにします。",
+        "enabled": "有効",
+        "disabled": "無効",
+        "disabledHint": "サブスクライバー機能は無効です。ブログに購読ボタンは表示されません。",
+        "missingCredentials": "サブスクライバーを有効にする前にGoogle Client IDとシークレットを入力してください。",
+        "bothRequired": "Client IDとClient Secretの両方を入力してください。",
+        "configured": "設定完了",
+        "wantToChange": "認証情報を変更しますか？",
+        "resetTitle": "認証情報を削除しますか？",
+        "resetDescription": "保存された認証情報は完全に削除されます。サブスクライバーを再有効化するには新しい情報を入力する必要があります。",
+        "googleInfo": {
+          "title": "Google OAuth 2.0 が必要です",
+          "description": "認証情報を取得するにはGoogle Cloud Consoleにアプリを登録する必要があります。",
+          "step1": "console.cloud.google.comにアクセスし、プロジェクトを作成または選択してください",
+          "step2": "プロジェクトでGoogle Identity APIを有効にしてください",
+          "step3": "認証情報 → 作成 → OAuth 2.0 クライアントIDに進んでください",
+          "step4": "リダイレクトURIを追加: https://your-domain.com/api/v1/auth/subscriber/google/callback",
+          "step5": "Client IDとClient Secretを下のフィールドにコピーしてください"
+        }
+      },
+      "recaptcha": {
+        "subtitle": "reCAPTCHA v3でコメントフォームをスパムやボットから保護します。",
+        "enabled": "有効",
+        "disabled": "無効",
+        "disabledHint": "reCAPTCHAは無効です。コメントは確認なしで送信できます。",
+        "missingKeys": "reCAPTCHAを有効にする前にSite KeyとSecret Keyを入力してください。",
+        "hint": "Google reCAPTCHA Adminでキーを取得してください。空白にすると無効のままになります。",
+        "bothRequired": "Site KeyとSecret Keyの両方を入力してください。",
+        "configured": "設定完了",
+        "wantToChange": "キーを変更しますか？",
+        "resetTitle": "キーを削除しますか？",
+        "resetDescription": "保存されたキーは完全に削除されます。reCAPTCHAを再有効化するには新しいキーを入力する必要があります。",
+        "googleInfo": {
+          "title": "Google reCAPTCHA v3 が必要です",
+          "description": "キーを取得するにはGoogle reCAPTCHA Adminでサイトを登録してください。",
+          "step1": "google.com/recaptcha/adminにアクセスしてください",
+          "step2": "新しいサイトを登録し、タイプとしてreCAPTCHA v3を選択してください",
+          "step3": "許可ドメインリストにあなたのドメインを追加してください",
+          "step4": "Site KeyとSecret Keyを下のフィールドにコピーしてください"
+        }
       }
+    },
+    "subscribers": {
+      "title": "サブスクライバー",
+      "activeCount": "{{count}}人のアクティブなサブスクライバー",
+      "colName": "名前",
+      "colEmail": "メールアドレス",
+      "colStatus": "状態",
+      "colJoined": "登録日",
+      "statusActive": "購読中",
+      "statusUnsubscribed": "購読解除",
+      "empty": "まだサブスクライバーがいません。",
+      "deleted": "サブスクライバーを削除しました。",
+      "deleteFailed": "サブスクライバーの削除に失敗しました。",
+      "deleteTitle": "サブスクライバーを削除",
+      "deleteDescription": "このサブスクライバーをリストから永久に削除します。通知は届かなくなります。"
     },
     "setup": {
       "title": "ブログを設定する",
@@ -562,7 +636,33 @@
       "submitting": "送信中…",
       "submitError": "コメントを送信できませんでした。",
       "successTitle": "コメントを送信しました！",
-      "successText": "コメントは承認待ちです。ありがとうございます！"
+      "successText": "コメントは承認待ちです。ありがとうございます！",
+      "subscriberBadge": "サブスクライバー"
+    },
+    "subscribe": {
+      "button": "購読 / サインイン",
+      "logout": "サインアウト",
+      "welcomeTitle": "購読しました！",
+      "welcomeText": "ご購読ありがとうございます。新しい記事が公開されるとメールでお知らせします。",
+      "welcomeNote": "通知メールからいつでも購読を解除できます。",
+      "unsubscribedTitle": "購読を解除しました",
+      "unsubscribedText": "メール通知は届かなくなりました。ブログからいつでも再購読できます。",
+      "errorTitle": "認証エラー",
+      "errorText": "Googleサインインに問題が発生しました。もう一度お試しください。",
+      "backToBlog": "ブログに戻る",
+      "greeting": "こんにちは、{{name}}さん！",
+      "manageAccount": "マイアカウント",
+      "notificationsOn": "通知を受け取っています",
+      "notificationsOff": "通知がオフです",
+      "toggleNotifications": "メール通知の切り替え",
+      "deleteAccount": "アカウントを削除",
+      "deleteConfirmTitle": "アカウントを削除しますか？",
+      "deleteConfirmText": "{{blogName}}のアカウントが完全に削除されます。",
+      "deleteConfirmYes": "はい、削除する",
+      "deleteConfirmNo": "キャンセル",
+      "deletedTitle": "またいつか！",
+      "deletedText": "アカウントが削除されました。またいつでも戻ってきてください。",
+      "deletedBack": "ブログに戻る"
     },
     "about": {
       "sectionTitle": "自己紹介",

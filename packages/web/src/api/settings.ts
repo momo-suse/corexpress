@@ -8,3 +8,7 @@ export function getSettings() {
 export function updateSettings(data: Partial<Settings>) {
   return api.put<{ data: Settings }>('/settings', data)
 }
+
+export function deleteCredentials(type: 'google' | 'recaptcha') {
+  return api.delete<void>(`/settings/credentials/${type}`)
+}

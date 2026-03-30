@@ -30,6 +30,7 @@ import AboutEducation from '@/components/blog/AboutEducation'
 import AboutTestimonials from '@/components/blog/AboutTestimonials'
 import SocialLinks from '@/components/blog/SocialLinks'
 import AboutPdfButton from '@/components/blog/AboutPdfButton'
+import SubscriberSection from '@/components/blog/SubscriberSection'
 import SearchBar from '@/components/blog/SearchBar'
 import TagCloud from '@/components/blog/TagCloud'
 import { usePosts } from '@/hooks/usePosts'
@@ -101,6 +102,7 @@ interface ClassicSidebarProps {
   isAbout?: boolean
   profileVisible: boolean
   socialVisible: boolean
+  subscriberVisible?: boolean
   mobileOpen: boolean
   onMobileClose: () => void
   searchVisible?: boolean
@@ -119,6 +121,7 @@ function ClassicSidebar({
   isAbout = false,
   profileVisible,
   socialVisible,
+  subscriberVisible = false,
   mobileOpen,
   onMobileClose,
   searchVisible = false,
@@ -293,8 +296,9 @@ function ClassicSidebar({
               ))}
             </div>
           )}
-          <div className="mb-4">
+          <div className="mb-4 flex items-center gap-1">
             <LanguageSwitcher variant="classic" />
+            <SubscriberSection collection="classic" subscriberVisible={subscriberVisible} settings={settings} />
           </div>
           <p className="text-xs text-gray-400">
             © {new Date().getFullYear()} {blogName}.
@@ -346,9 +350,10 @@ function ClassicSidebar({
 interface ClassicMobileHeaderProps {
   settings: Record<string, string>
   onMenuToggle: () => void
+  subscriberVisible?: boolean
 }
 
-function ClassicMobileHeader({ settings, onMenuToggle }: ClassicMobileHeaderProps) {
+function ClassicMobileHeader({ settings, onMenuToggle, subscriberVisible = false }: ClassicMobileHeaderProps) {
   const { t } = useTranslation()
   const blogName = settings.blog_name || 'Blog'
   return (
@@ -361,6 +366,7 @@ function ClassicMobileHeader({ settings, onMenuToggle }: ClassicMobileHeaderProp
         </Link>
         <div className="flex items-center gap-3">
           <LanguageSwitcher variant="classic" />
+          <SubscriberSection collection="classic" subscriberVisible={subscriberVisible} settings={settings} />
           <button
             onClick={onMenuToggle}
             className="text-gray-900 dark:text-white"
@@ -383,6 +389,7 @@ export interface ClassicBlogHomeProps {
   socialVisible: boolean
   postListVisible: boolean
   heroVisible: boolean
+  subscriberVisible?: boolean
   searchVisible?: boolean
   searchStyles?: Record<string, string>
   searchQuery?: string
@@ -400,6 +407,7 @@ export function ClassicBlogHome({
   socialVisible,
   postListVisible,
   heroVisible,
+  subscriberVisible = false,
   searchVisible = false,
   searchStyles = {},
   searchQuery = '',
@@ -426,12 +434,14 @@ export function ClassicBlogHome({
       <ClassicMobileHeader
         settings={settings}
         onMenuToggle={() => setMobileOpen(true)}
+        subscriberVisible={subscriberVisible}
       />
       <ClassicSidebar
         settings={settings}
         isHome={true}
         profileVisible={profileVisible}
         socialVisible={socialVisible}
+        subscriberVisible={subscriberVisible}
         mobileOpen={mobileOpen}
         onMobileClose={() => setMobileOpen(false)}
         searchVisible={searchVisible}
@@ -603,6 +613,7 @@ export interface ClassicPostContentProps {
   commentsEnabled: boolean
   profileVisible: boolean
   socialVisible: boolean
+  subscriberVisible?: boolean
   onCommentSubmitted: () => void
   searchVisible?: boolean
   searchStyles?: Record<string, string>
@@ -625,6 +636,7 @@ export function ClassicPostContent({
   commentsEnabled,
   profileVisible,
   socialVisible,
+  subscriberVisible = false,
   onCommentSubmitted,
   searchVisible = false,
   searchStyles = {},
@@ -656,12 +668,14 @@ export function ClassicPostContent({
       <ClassicMobileHeader
         settings={settings}
         onMenuToggle={() => setMobileOpen(true)}
+        subscriberVisible={subscriberVisible}
       />
       <ClassicSidebar
         settings={settings}
         isHome={false}
         profileVisible={profileVisible}
         socialVisible={socialVisible}
+        subscriberVisible={subscriberVisible}
         mobileOpen={mobileOpen}
         onMobileClose={() => setMobileOpen(false)}
         searchVisible={searchVisible}
@@ -817,7 +831,7 @@ export function ClassicPostContent({
           {commentsEnabled && (
             <div className="mt-16 pt-10 border-t border-gray-200 dark:border-gray-800 space-y-12">
               <CommentList postId={post.id} />
-              <CommentForm postId={post.id} onSubmitted={onCommentSubmitted} recaptchaSiteKey={settings.recaptcha_site_key} />
+              <CommentForm postId={post.id} onSubmitted={onCommentSubmitted} recaptchaSiteKey={settings.recaptcha_enabled === '1' ? settings.recaptcha_site_key : undefined} subscribersEnabled={settings.subscribers_enabled === '1'} />
             </div>
           )}
         </div>
@@ -837,6 +851,7 @@ export interface ClassicAboutContentProps {
   educationVisible: boolean
   testimonialsVisible: boolean
   socialVisible: boolean
+  subscriberVisible?: boolean
   downloadPdfVisible?: boolean
 }
 
@@ -849,6 +864,7 @@ export function ClassicAboutContent({
   educationVisible,
   testimonialsVisible,
   socialVisible,
+  subscriberVisible = false,
   downloadPdfVisible = false,
 }: ClassicAboutContentProps) {
   const { t } = useTranslation()
@@ -874,6 +890,7 @@ export function ClassicAboutContent({
       <ClassicMobileHeader
         settings={settings}
         onMenuToggle={() => setMobileOpen(true)}
+        subscriberVisible={subscriberVisible}
       />
       <ClassicSidebar
         settings={settings}
@@ -881,6 +898,7 @@ export function ClassicAboutContent({
         isAbout={true}
         profileVisible={false}
         socialVisible={false}
+        subscriberVisible={subscriberVisible}
         mobileOpen={mobileOpen}
         onMobileClose={() => setMobileOpen(false)}
       />

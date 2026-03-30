@@ -13,7 +13,7 @@ use Corexpress\Models\PostTranslation;
 class Post extends Model
 {
     protected $table = 'posts';
-    protected $fillable = ['user_id', 'title', 'slug', 'base_locale', 'content', 'excerpt', 'tags', 'featured_image_id', 'map_embed_url', 'reading_time', 'status'];
+    protected $fillable = ['user_id', 'title', 'slug', 'base_locale', 'content', 'excerpt', 'tags', 'featured_image_id', 'map_embed_url', 'reading_time', 'status', 'notified_at'];
 
     public function user(): BelongsTo
     {

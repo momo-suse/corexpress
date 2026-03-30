@@ -101,6 +101,7 @@ export default function PostPage() {
 
   const profileVisible = isVisible('profile')
   const socialVisible = isVisible('social-links')
+  const subscriberVisible = isVisible('subscriber') && settings.subscribers_enabled === '1'
   const commentsEnabled = (settings.comments_enabled ?? '1') === '1'
 
   // Recent posts: exclude current, max 4
@@ -130,6 +131,7 @@ export default function PostPage() {
         commentsEnabled={commentsEnabled}
         profileVisible={profileVisible}
         socialVisible={socialVisible}
+        subscriberVisible={subscriberVisible}
         onCommentSubmitted={handleCommentSubmitted}
         {...localeProps}
       />
@@ -147,6 +149,7 @@ export default function PostPage() {
         commentsEnabled={commentsEnabled}
         profileVisible={profileVisible}
         socialVisible={socialVisible}
+        subscriberVisible={subscriberVisible}
         onCommentSubmitted={handleCommentSubmitted}
         {...localeProps}
       />
@@ -164,6 +167,7 @@ export default function PostPage() {
         commentsEnabled={commentsEnabled}
         profileVisible={profileVisible}
         socialVisible={socialVisible}
+        subscriberVisible={subscriberVisible}
         onCommentSubmitted={handleCommentSubmitted}
         {...localeProps}
       />
@@ -181,6 +185,7 @@ export default function PostPage() {
         commentsEnabled={commentsEnabled}
         profileVisible={profileVisible}
         socialVisible={socialVisible}
+        subscriberVisible={subscriberVisible}
         onCommentSubmitted={handleCommentSubmitted}
         {...localeProps}
       />
@@ -198,6 +203,7 @@ export default function PostPage() {
         commentsEnabled={commentsEnabled}
         profileVisible={profileVisible}
         socialVisible={socialVisible}
+        subscriberVisible={subscriberVisible}
         onCommentSubmitted={handleCommentSubmitted}
         {...localeProps}
       />
@@ -214,6 +220,7 @@ export default function PostPage() {
       commentsEnabled={commentsEnabled}
       profileVisible={profileVisible}
       socialVisible={socialVisible}
+      subscriberVisible={subscriberVisible}
       onCommentSubmitted={handleCommentSubmitted}
       {...localeProps}
     />

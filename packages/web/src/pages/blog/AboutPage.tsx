@@ -34,10 +34,8 @@ export default function AboutPage() {
   const components: PageComponent[] = pageData?.data.components ?? []
   const activeCollection = settings.active_style_collection ?? 'default'
 
-  // If the about page doesn't exist in DB yet (containers not rebuilt),
-  // fall back to showing all sections so data added via Settings is visible.
   const isVisible = (name: string) =>
-    components.find((c) => c.name === name)?.is_visible ?? true
+    components.find((c) => c.name === name)?.is_visible ?? false
 
   const galleryVisible      = isVisible('about-gallery')
   const experienceVisible   = isVisible('about-experience')
@@ -45,6 +43,7 @@ export default function AboutPage() {
   const educationVisible    = isVisible('about-education')
   const testimonialsVisible = isVisible('about-testimonials')
   const socialVisible       = isVisible('social-links')
+  const subscriberVisible   = isVisible('subscriber') && settings.subscribers_enabled === '1'
   const downloadPdfVisible  = isVisible('download-pdf')
 
   // Atlas layout — travel/explorer journal
@@ -59,6 +58,7 @@ export default function AboutPage() {
         educationVisible={educationVisible}
         testimonialsVisible={testimonialsVisible}
         socialVisible={socialVisible}
+        subscriberVisible={subscriberVisible}
         downloadPdfVisible={downloadPdfVisible}
       />
     )
@@ -76,6 +76,7 @@ export default function AboutPage() {
         educationVisible={educationVisible}
         testimonialsVisible={testimonialsVisible}
         socialVisible={socialVisible}
+        subscriberVisible={subscriberVisible}
         downloadPdfVisible={downloadPdfVisible}
       />
     )
@@ -93,6 +94,7 @@ export default function AboutPage() {
         educationVisible={educationVisible}
         testimonialsVisible={testimonialsVisible}
         socialVisible={socialVisible}
+        subscriberVisible={subscriberVisible}
         downloadPdfVisible={downloadPdfVisible}
       />
     )
@@ -110,6 +112,7 @@ export default function AboutPage() {
         educationVisible={educationVisible}
         testimonialsVisible={testimonialsVisible}
         socialVisible={socialVisible}
+        subscriberVisible={subscriberVisible}
         downloadPdfVisible={downloadPdfVisible}
       />
     )
@@ -127,6 +130,7 @@ export default function AboutPage() {
         educationVisible={educationVisible}
         testimonialsVisible={testimonialsVisible}
         socialVisible={socialVisible}
+        subscriberVisible={subscriberVisible}
         downloadPdfVisible={downloadPdfVisible}
       />
     )
@@ -143,6 +147,7 @@ export default function AboutPage() {
       educationVisible={educationVisible}
       testimonialsVisible={testimonialsVisible}
       socialVisible={socialVisible}
+      subscriberVisible={subscriberVisible}
       downloadPdfVisible={downloadPdfVisible}
     />
   )

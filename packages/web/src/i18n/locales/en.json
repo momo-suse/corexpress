@@ -60,6 +60,7 @@
       "comments": "Comments",
       "blog": "Blog",
       "styles": "Styles",
+      "subscribers": "Subscribers",
       "settings": "Settings",
       "viewBlog": "View blog",
       "signOut": "Sign out"
@@ -142,7 +143,13 @@
       "translationFailedDelete": "Failed to delete translation.",
       "baseLanguage": "Base content ({{lang}})",
       "editing": "Editing",
-      "characters": "Characters"
+      "characters": "Characters",
+      "notifyDialog": {
+        "title": "Notify subscribers?",
+        "description": "Send an email notification to {{count}} active subscriber(s) with a link to this post.",
+        "confirm": "Yes, notify",
+        "skip": "No, just publish"
+      }
     },
     "comments": {
       "title": "Comments",
@@ -183,6 +190,8 @@
         "general": "General",
         "style": "Style & Language",
         "security": "Security",
+        "subscribers": "Subscribers",
+        "recaptcha": "reCAPTCHA",
         "updates": "Updates"
       },
       "saved": "Settings saved.",
@@ -235,7 +244,72 @@
         "tooShort": "Password must be at least 8 characters.",
         "noMatch": "New passwords do not match.",
         "error": "Error changing password."
+      },
+      "google": {
+        "title": "Google OAuth — Subscribers",
+        "subtitle": "Allow blog visitors to subscribe using their Google account.",
+        "clientId": "Client ID",
+        "clientSecret": "Client Secret",
+        "hint": "Create credentials at Google Cloud Console → APIs & Services → Credentials. Leave blank to disable subscriber login."
+      },
+      "subscribers": {
+        "title": "Subscribers",
+        "subtitle": "Allow visitors to subscribe and receive email notifications for new posts.",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "disabledHint": "Subscriber features are disabled. The subscribe button will not appear on the blog.",
+        "missingCredentials": "Enter your Google Client ID and Secret before enabling subscribers.",
+        "bothRequired": "You must enter both the Client ID and Client Secret.",
+        "configured": "Configuration complete",
+        "wantToChange": "Want to change your credentials?",
+        "resetTitle": "Delete credentials?",
+        "resetDescription": "The saved credentials will be permanently deleted. You will need to enter new ones to reactivate subscribers.",
+        "googleInfo": {
+          "title": "Google OAuth 2.0 required",
+          "description": "You need to register your app in Google Cloud Console to get the credentials.",
+          "step1": "Go to console.cloud.google.com and create or select a project",
+          "step2": "Enable the Google Identity API in your project",
+          "step3": "Go to Credentials → Create → OAuth 2.0 Client ID",
+          "step4": "Add the redirect URI: https://your-domain.com/api/v1/auth/subscriber/google/callback",
+          "step5": "Copy the Client ID and Client Secret into the fields below"
+        }
+      },
+      "recaptcha": {
+        "subtitle": "Protect the comment form against spam and bots with reCAPTCHA v3.",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "disabledHint": "reCAPTCHA is disabled. Comments can be submitted without verification.",
+        "missingKeys": "Enter your reCAPTCHA Site Key and Secret Key before enabling.",
+        "hint": "Get your keys at Google reCAPTCHA Admin. Leave blank to keep disabled.",
+        "bothRequired": "You must enter both the Site Key and Secret Key.",
+        "configured": "Configuration complete",
+        "wantToChange": "Want to change your keys?",
+        "resetTitle": "Delete keys?",
+        "resetDescription": "The saved keys will be permanently deleted. You will need to enter new ones to reactivate reCAPTCHA.",
+        "googleInfo": {
+          "title": "Google reCAPTCHA v3 required",
+          "description": "Register your site at Google reCAPTCHA Admin to get your keys.",
+          "step1": "Go to google.com/recaptcha/admin",
+          "step2": "Register a new site and select reCAPTCHA v3 as the type",
+          "step3": "Add your domain to the allowed domains list",
+          "step4": "Copy the Site Key and Secret Key into the fields below"
+        }
       }
+    },
+    "subscribers": {
+      "title": "Subscribers",
+      "activeCount": "{{count}} active subscribers",
+      "colName": "Name",
+      "colEmail": "Email",
+      "colStatus": "Status",
+      "colJoined": "Joined",
+      "statusActive": "Subscribed",
+      "statusUnsubscribed": "Unsubscribed",
+      "empty": "No subscribers yet.",
+      "deleted": "Subscriber removed.",
+      "deleteFailed": "Failed to remove subscriber.",
+      "deleteTitle": "Remove subscriber",
+      "deleteDescription": "This will permanently remove the subscriber from the list. They will no longer receive notifications."
     },
     "setup": {
       "title": "Set up your blog",
@@ -562,7 +636,33 @@
       "submitting": "Submitting…",
       "submitError": "Could not submit comment.",
       "successTitle": "Comment submitted!",
-      "successText": "Your comment is pending approval. Thank you!"
+      "successText": "Your comment is pending approval. Thank you!",
+      "subscriberBadge": "Subscriber"
+    },
+    "subscribe": {
+      "button": "Subscribe / Sign in",
+      "logout": "Sign out",
+      "welcomeTitle": "You're subscribed!",
+      "welcomeText": "Thanks for subscribing. You'll receive an email when new articles are published.",
+      "welcomeNote": "You can unsubscribe at any time from any notification email.",
+      "unsubscribedTitle": "You've unsubscribed",
+      "unsubscribedText": "You won't receive any more email notifications. You can re-subscribe at any time from the blog.",
+      "errorTitle": "Authentication error",
+      "errorText": "Something went wrong with Google sign-in. Please try again.",
+      "backToBlog": "Back to blog",
+      "greeting": "Hi, {{name}}!",
+      "manageAccount": "My account",
+      "notificationsOn": "Receiving notifications",
+      "notificationsOff": "Notifications off",
+      "toggleNotifications": "Toggle email notifications",
+      "deleteAccount": "Delete account",
+      "deleteConfirmTitle": "Delete account?",
+      "deleteConfirmText": "Your account will be permanently deleted from {{blogName}}.",
+      "deleteConfirmYes": "Yes, delete",
+      "deleteConfirmNo": "Cancel",
+      "deletedTitle": "See you next time!",
+      "deletedText": "Your account has been deleted. You're always welcome back.",
+      "deletedBack": "Back to blog"
     },
     "about": {
       "sectionTitle": "About Me",

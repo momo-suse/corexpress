@@ -28,6 +28,7 @@ import AboutExperience from '@/components/blog/AboutExperience'
 import AboutEducation from '@/components/blog/AboutEducation'
 import AboutTestimonials from '@/components/blog/AboutTestimonials'
 import AboutPdfButton from '@/components/blog/AboutPdfButton'
+import SubscriberSection from '@/components/blog/SubscriberSection'
 import SearchBar from '@/components/blog/SearchBar'
 import TagCloud from '@/components/blog/TagCloud'
 import { usePosts } from '@/hooks/usePosts'
@@ -78,9 +79,10 @@ interface NebulaFloatingNavProps {
   settings: Record<string, string>
   currentPage: 'home' | 'post' | 'about'
   profileVisible: boolean
+  subscriberVisible?: boolean
 }
 
-function NebulaFloatingNav({ settings, currentPage, profileVisible }: NebulaFloatingNavProps) {
+function NebulaFloatingNav({ settings, currentPage, profileVisible, subscriberVisible = false }: NebulaFloatingNavProps) {
   const { t } = useTranslation()
   const [mobileOpen, setMobileOpen] = useState(false)
   const blogName = settings.blog_name || 'Blog'
@@ -147,9 +149,10 @@ function NebulaFloatingNav({ settings, currentPage, profileVisible }: NebulaFloa
           </div>
         )}
 
-        {/* Language switcher (desktop) */}
-        <div className="hidden sm:flex items-center pr-1">
+        {/* Language switcher + subscriber (desktop) */}
+        <div className="hidden sm:flex items-center gap-1 pr-1">
           <LanguageSwitcher variant="nebula" />
+          <SubscriberSection collection="nebula" subscriberVisible={subscriberVisible} settings={settings} />
         </div>
 
         {/* Mobile menu toggle */}
@@ -185,8 +188,9 @@ function NebulaFloatingNav({ settings, currentPage, profileVisible }: NebulaFloa
               {t('blog.nav.about')}
             </Link>
           )}
-          <div className="flex items-center px-1">
+          <div className="flex items-center gap-1 px-1">
             <LanguageSwitcher variant="nebula" />
+            <SubscriberSection collection="nebula" subscriberVisible={subscriberVisible} settings={settings} />
           </div>
         </div>
       )}
@@ -373,6 +377,7 @@ interface NebulaBlogHomeProps {
   socialVisible: boolean
   postListVisible: boolean
   heroVisible: boolean
+  subscriberVisible: boolean
   searchVisible: boolean
   tagCloudVisible: boolean
   searchQuery: string
@@ -389,6 +394,7 @@ export function NebulaBlogHome({
   socialVisible,
   postListVisible,
   heroVisible,
+  subscriberVisible,
   searchVisible,
   tagCloudVisible,
   searchQuery,
@@ -414,7 +420,7 @@ export function NebulaBlogHome({
       <div className="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-cyan-600/10 blur-[120px] pointer-events-none" />
 
       {user && <AdminBar />}
-      <NebulaFloatingNav settings={settings} currentPage="home" profileVisible={profileVisible} />
+      <NebulaFloatingNav settings={settings} currentPage="home" profileVisible={profileVisible} subscriberVisible={subscriberVisible} />
 
       <main className={`relative z-10 pt-32 pb-12 max-w-7xl mx-auto px-4 flex-grow w-full ${user ? 'mt-9' : ''}`}>
 
@@ -579,6 +585,7 @@ interface NebulaPostContentProps {
   commentsEnabled: boolean
   profileVisible: boolean
   socialVisible: boolean
+  subscriberVisible: boolean
   onCommentSubmitted: () => void
   availableLocales?: string[]
   currentLocale?: string
@@ -592,6 +599,7 @@ export function NebulaPostContent({
   user,
   commentsEnabled,
   profileVisible,
+  subscriberVisible,
   onCommentSubmitted,
   availableLocales = [],
   currentLocale = 'en',
@@ -607,7 +615,7 @@ export function NebulaPostContent({
       <div className="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-cyan-600/10 blur-[120px] pointer-events-none" />
 
       {user && <AdminBar />}
-      <NebulaFloatingNav settings={settings} currentPage="post" profileVisible={profileVisible} />
+      <NebulaFloatingNav settings={settings} currentPage="post" profileVisible={profileVisible} subscriberVisible={subscriberVisible} />
 
       <main className={`relative z-10 pt-32 pb-12 max-w-7xl mx-auto px-4 flex-grow ${user ? 'mt-9' : ''}`}>
         <article className="max-w-3xl mx-auto mt-10">
@@ -753,7 +761,7 @@ export function NebulaPostContent({
                 <CommentList postId={post.id} />
               </div>
               <div className="bg-white/[0.02] border border-white/10 rounded-[2rem] p-6 md:p-8">
-                <CommentForm postId={post.id} onSubmitted={onCommentSubmitted} recaptchaSiteKey={settings.recaptcha_site_key} />
+                <CommentForm postId={post.id} onSubmitted={onCommentSubmitted} recaptchaSiteKey={settings.recaptcha_enabled === '1' ? settings.recaptcha_site_key : undefined} subscribersEnabled={settings.subscribers_enabled === '1'} />
               </div>
             </div>
           )}
@@ -777,6 +785,7 @@ interface NebulaAboutContentProps {
   educationVisible: boolean
   testimonialsVisible: boolean
   socialVisible: boolean
+  subscriberVisible?: boolean
   downloadPdfVisible?: boolean
 }
 
@@ -789,6 +798,7 @@ export function NebulaAboutContent({
   educationVisible,
   testimonialsVisible,
   socialVisible,
+  subscriberVisible = false,
   downloadPdfVisible = false,
 }: NebulaAboutContentProps) {
   const { t } = useTranslation()
@@ -817,7 +827,7 @@ export function NebulaAboutContent({
       <div className="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-cyan-600/10 blur-[120px] pointer-events-none" />
 
       {user && <AdminBar />}
-      <NebulaFloatingNav settings={settings} currentPage="about" profileVisible={true} />
+      <NebulaFloatingNav settings={settings} currentPage="about" profileVisible={true} subscriberVisible={subscriberVisible} />
 
       <main className={`relative z-10 pt-32 pb-12 max-w-7xl mx-auto px-4 flex-grow ${user ? 'mt-9' : ''}`}>
         <div className="mt-10">

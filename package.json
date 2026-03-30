@@ -12,6 +12,7 @@
     "docker:down": "docker compose -f compose.dev.yml down -v",
     "docker:logs": "docker compose -f compose.dev.yml logs -f",
     "docker:rebuild": "docker compose -f compose.dev.yml build --no-cache",
+    "frontend:dev": "npm run dev --workspace=packages/web",
     "frontend:build": "npm run build --workspace=packages/web",
     "frontend:install": "npm install && npm run build --workspace=packages/web",
     "test:web": "npm run test --workspace=packages/web",

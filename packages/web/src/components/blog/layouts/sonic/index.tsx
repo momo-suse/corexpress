@@ -28,6 +28,7 @@ import AboutSkills from '@/components/blog/AboutSkills'
 import AboutEducation from '@/components/blog/AboutEducation'
 import AboutTestimonials from '@/components/blog/AboutTestimonials'
 import AboutPdfButton from '@/components/blog/AboutPdfButton'
+import SubscriberSection from '@/components/blog/SubscriberSection'
 import TagCloud from '@/components/blog/TagCloud'
 import { usePosts } from '@/hooks/usePosts'
 import { sanitizeHtml } from '@/lib/sanitize'
@@ -79,9 +80,10 @@ interface SonicNavProps {
   user: boolean
   currentPage: 'home' | 'post' | 'about'
   profileVisible?: boolean
+  subscriberVisible?: boolean
 }
 
-function SonicNav({ settings, user, currentPage, profileVisible = true }: SonicNavProps) {
+function SonicNav({ settings, user, currentPage, profileVisible = true, subscriberVisible = false }: SonicNavProps) {
   const { t } = useTranslation()
   const [mobileOpen, setMobileOpen] = useState(false)
   const blogName = settings.blog_name || 'Blog'
@@ -142,6 +144,7 @@ function SonicNav({ settings, user, currentPage, profileVisible = true }: SonicN
             </a>
           ))}
           <LanguageSwitcher variant="nebula" />
+          <SubscriberSection collection="sonic" subscriberVisible={subscriberVisible} settings={settings} />
         </div>
 
         {/* Mobile toggle */}
@@ -175,6 +178,7 @@ function SonicNav({ settings, user, currentPage, profileVisible = true }: SonicN
           )}
           <div className="flex items-center gap-3 pt-1">
             <LanguageSwitcher variant="nebula" />
+            <SubscriberSection collection="sonic" subscriberVisible={subscriberVisible} settings={settings} />
             {socialNetworks.map(({ key, href, Icon }) => (
               <a key={key} href={href} target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-fuchsia-500 transition-colors">
                 <Icon size={16} />
@@ -247,6 +251,7 @@ interface SonicBlogHomeProps {
   postListVisible: boolean
   profileVisible: boolean
   socialVisible: boolean
+  subscriberVisible: boolean
   searchVisible: boolean
   tagCloudVisible: boolean
   searchQuery: string
@@ -263,6 +268,7 @@ export function SonicBlogHome({
   postListVisible,
   profileVisible,
   socialVisible,
+  subscriberVisible,
   searchVisible,
   tagCloudVisible,
   searchQuery,
@@ -290,7 +296,7 @@ export function SonicBlogHome({
   return (
     <div className="blog-collection-sonic min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-fuchsia-500 selection:text-white">
       {user && <AdminBar />}
-      <SonicNav settings={settings} user={user} currentPage="home" profileVisible={profileVisible} />
+      <SonicNav settings={settings} user={user} currentPage="home" profileVisible={profileVisible} subscriberVisible={subscriberVisible} />
 
       <main className="max-w-6xl mx-auto px-6 pt-16 pb-32">
 
@@ -488,6 +494,7 @@ interface SonicPostContentProps {
   commentsEnabled: boolean
   profileVisible: boolean
   socialVisible: boolean
+  subscriberVisible: boolean
   onCommentSubmitted: () => void
   availableLocales?: string[]
   currentLocale?: string
@@ -501,6 +508,7 @@ export function SonicPostContent({
   user,
   commentsEnabled,
   profileVisible,
+  subscriberVisible,
   onCommentSubmitted,
   availableLocales,
   currentLocale,
@@ -512,7 +520,7 @@ export function SonicPostContent({
   return (
     <div className="blog-collection-sonic min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-fuchsia-500 selection:text-white">
       {user && <AdminBar />}
-      <SonicNav settings={settings} user={user} currentPage="post" profileVisible={profileVisible} />
+      <SonicNav settings={settings} user={user} currentPage="post" profileVisible={profileVisible} subscriberVisible={subscriberVisible} />
 
       <main className="max-w-4xl mx-auto px-6 pt-16 pb-32">
         <article>
@@ -639,7 +647,7 @@ export function SonicPostContent({
               <CommentList postId={post.id} />
             </div>
             <div className="[&_*]:!rounded-none [&_input]:!bg-zinc-900 [&_input]:!border-zinc-700 [&_textarea]:!bg-zinc-900 [&_textarea]:!border-zinc-700 [&_button[type=submit]]:!bg-fuchsia-500 [&_button[type=submit]]:hover:!bg-fuchsia-600 [&_button[type=submit]]:!text-zinc-950 [&_button[type=submit]]:!font-black [&_button[type=submit]]:!uppercase [&_button[type=submit]]:!tracking-wider">
-              <CommentForm postId={post.id} onCommentSubmitted={onCommentSubmitted} recaptchaSiteKey={settings.recaptcha_site_key} />
+              <CommentForm postId={post.id} onCommentSubmitted={onCommentSubmitted} recaptchaSiteKey={settings.recaptcha_enabled === '1' ? settings.recaptcha_site_key : undefined} subscribersEnabled={settings.subscribers_enabled === '1'} />
             </div>
           </div>
         )}
@@ -662,6 +670,7 @@ interface SonicAboutContentProps {
   educationVisible: boolean
   testimonialsVisible: boolean
   socialVisible: boolean
+  subscriberVisible?: boolean
   downloadPdfVisible?: boolean
 }
 
@@ -674,6 +683,7 @@ export function SonicAboutContent({
   educationVisible,
   testimonialsVisible,
   socialVisible,
+  subscriberVisible = false,
   downloadPdfVisible,
 }: SonicAboutContentProps) {
   const profileName        = settings.profile_name        || ''
@@ -696,7 +706,7 @@ export function SonicAboutContent({
   return (
     <div className="blog-collection-sonic min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-fuchsia-500 selection:text-white">
       {user && <AdminBar />}
-      <SonicNav settings={settings} user={user} currentPage="about" profileVisible={true} />
+      <SonicNav settings={settings} user={user} currentPage="about" profileVisible={true} subscriberVisible={subscriberVisible} />
 
       <main className="max-w-5xl mx-auto px-6 pt-16 pb-32">
 

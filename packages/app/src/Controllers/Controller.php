@@ -35,4 +35,14 @@ abstract class Controller
     {
         return $this->json($response, ['error' => $message], $status);
     }
+
+    /**
+     * Returns true if the current request is from an authenticated admin.
+     * Named isAdmin() (not isAuthenticated()) so that when subscribers are added,
+     * only this method needs updating — callers remain unchanged.
+     */
+    protected function isAdmin(): bool
+    {
+        return !empty($_SESSION['user_id']);
+    }
 }

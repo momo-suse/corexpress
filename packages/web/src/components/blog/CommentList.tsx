@@ -1,5 +1,6 @@
 import { useComments } from '@/hooks/useComments'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
+import SubscriberBadge from '@/components/blog/SubscriberBadge'
 import { MessageCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
@@ -37,15 +38,29 @@ export default function CommentList({ postId }: CommentListProps) {
           })
           return (
             <div key={comment.id} className="flex gap-4">
-              {/* Avatar with initials */}
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-sm">
-                {comment.author_name[0]?.toUpperCase()}
+              {/* Avatar: subscriber photo or initials */}
+              <div className="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
+                {comment.avatar_url ? (
+                  <img
+                    src={comment.avatar_url}
+                    alt={comment.author_name}
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-sm">
+                    {comment.author_name[0]?.toUpperCase()}
+                  </div>
+                )}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 mb-1">
                   <span className="font-semibold text-sm text-gray-900 dark:text-white">
                     {comment.author_name}
                   </span>
+                  {comment.is_subscriber && (
+                    <SubscriberBadge avatarUrl={null} />
+                  )}
                   <span className="text-xs text-muted-foreground">{date}</span>
                 </div>
                 <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">

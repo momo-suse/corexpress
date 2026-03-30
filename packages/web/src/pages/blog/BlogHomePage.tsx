@@ -67,6 +67,7 @@ export default function BlogHomePage() {
   const socialVisible = isVisible('social-links')
   const searchVisible = isVisible('search')
   const tagCloudVisible = isVisible('tag-cloud')
+  const subscriberVisible = isVisible('subscriber') && settings.subscribers_enabled === '1'
 
   // Atlas layout — travel/explorer journal
   if (activeCollection === 'atlas') {
@@ -78,6 +79,7 @@ export default function BlogHomePage() {
         postListVisible={postListVisible}
         profileVisible={profileVisible}
         socialVisible={socialVisible}
+        subscriberVisible={subscriberVisible}
         searchVisible={searchVisible}
         tagCloudVisible={tagCloudVisible}
         searchQuery={searchQuery}
@@ -99,6 +101,7 @@ export default function BlogHomePage() {
         postListVisible={postListVisible}
         profileVisible={profileVisible}
         socialVisible={socialVisible}
+        subscriberVisible={subscriberVisible}
         searchVisible={searchVisible}
         tagCloudVisible={tagCloudVisible}
         searchQuery={searchQuery}
@@ -120,6 +123,7 @@ export default function BlogHomePage() {
         socialVisible={socialVisible}
         postListVisible={postListVisible}
         heroVisible={heroVisible}
+        subscriberVisible={subscriberVisible}
         searchVisible={searchVisible}
         tagCloudVisible={tagCloudVisible}
         searchQuery={searchQuery}
@@ -141,6 +145,7 @@ export default function BlogHomePage() {
         socialVisible={socialVisible}
         postListVisible={postListVisible}
         heroVisible={heroVisible}
+        subscriberVisible={subscriberVisible}
         searchVisible={searchVisible}
         tagCloudVisible={tagCloudVisible}
         searchQuery={searchQuery}
@@ -162,6 +167,7 @@ export default function BlogHomePage() {
         socialVisible={socialVisible}
         postListVisible={postListVisible}
         heroVisible={heroVisible}
+        subscriberVisible={subscriberVisible}
         searchVisible={searchVisible}
         searchStyles={getStyles('search')}
         searchQuery={searchQuery}
@@ -183,6 +189,7 @@ export default function BlogHomePage() {
       postListVisible={postListVisible}
       profileVisible={profileVisible}
       socialVisible={socialVisible}
+      subscriberVisible={subscriberVisible}
       searchVisible={searchVisible}
       tagCloudVisible={tagCloudVisible}
       getStyles={getStyles}

@@ -76,6 +76,7 @@ export interface DefaultBlogHomeProps {
   socialVisible: boolean
   searchVisible: boolean
   tagCloudVisible: boolean
+  subscriberVisible: boolean
   getStyles: (name: string) => Record<string, string>
   searchQuery: string
   onSearch: (query: string) => void
@@ -93,6 +94,7 @@ export function DefaultBlogHome({
   socialVisible,
   searchVisible,
   tagCloudVisible,
+  subscriberVisible,
   getStyles,
   searchQuery,
   onSearch,
@@ -115,7 +117,7 @@ export function DefaultBlogHome({
       {user && <AdminBar />}
 
       {/* Sticky top bar with blog name + language switcher */}
-      <BlogHeader settings={settings} adminBarVisible={user} />
+      <BlogHeader settings={settings} adminBarVisible={user} subscriberVisible={subscriberVisible} />
 
       <main className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 ${user ? 'mt-9' : ''}`}>
         {/* Hero */}
@@ -222,6 +224,7 @@ export interface DefaultPostContentProps {
   commentsEnabled: boolean
   profileVisible: boolean
   socialVisible: boolean
+  subscriberVisible: boolean
   onCommentSubmitted: () => void
   availableLocales?: string[]
   currentLocale?: string
@@ -236,6 +239,7 @@ export function DefaultPostContent({
   commentsEnabled,
   profileVisible,
   socialVisible,
+  subscriberVisible,
   onCommentSubmitted,
   availableLocales = [],
   currentLocale = 'en',
@@ -251,7 +255,7 @@ export function DefaultPostContent({
       {user && <AdminBar />}
 
       {/* Sticky top bar with blog name + language switcher */}
-      <BlogHeader settings={settings} adminBarVisible={user} />
+      <BlogHeader settings={settings} adminBarVisible={user} subscriberVisible={subscriberVisible} />
 
       <main className={`max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-10 md:py-14 ${user ? 'mt-9' : ''}`}>
         <div className={`grid grid-cols-1 ${hasSidebar ? 'lg:grid-cols-12' : ''} gap-10 lg:gap-14`}>
@@ -354,7 +358,7 @@ export function DefaultPostContent({
                   className="bg-white dark:bg-gray-900 shadow-md border border-gray-200 dark:border-gray-700 p-4 md:p-6"
                   style={{ borderRadius: 'var(--blog-radius-card)' }}
                 >
-                  <CommentForm postId={post.id} onSubmitted={onCommentSubmitted} recaptchaSiteKey={settings.recaptcha_site_key} />
+                  <CommentForm postId={post.id} onSubmitted={onCommentSubmitted} recaptchaSiteKey={settings.recaptcha_enabled === '1' ? settings.recaptcha_site_key : undefined} subscribersEnabled={settings.subscribers_enabled === '1'} />
                 </div>
               </>
             )}
@@ -377,6 +381,7 @@ export interface DefaultAboutContentProps {
   educationVisible: boolean
   testimonialsVisible: boolean
   socialVisible: boolean
+  subscriberVisible?: boolean
   downloadPdfVisible?: boolean
 }
 
@@ -389,6 +394,7 @@ export function DefaultAboutContent({
   educationVisible,
   testimonialsVisible,
   socialVisible,
+  subscriberVisible = false,
   downloadPdfVisible = false,
 }: DefaultAboutContentProps) {
   const { t } = useTranslation()
@@ -409,7 +415,7 @@ export function DefaultAboutContent({
       {user && <AdminBar />}
 
       {/* Sticky top bar with blog name + language switcher */}
-      <BlogHeader settings={settings} adminBarVisible={user} />
+      <BlogHeader settings={settings} adminBarVisible={user} subscriberVisible={subscriberVisible} />
 
       <main className={`max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 ${user ? 'mt-9' : ''}`}>
 
