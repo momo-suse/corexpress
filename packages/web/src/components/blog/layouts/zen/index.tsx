@@ -22,6 +22,7 @@ import AboutSkills from '@/components/blog/AboutSkills'
 import AboutEducation from '@/components/blog/AboutEducation'
 import AboutTestimonials from '@/components/blog/AboutTestimonials'
 import AboutPdfButton from '@/components/blog/AboutPdfButton'
+import SubscriberSection from '@/components/blog/SubscriberSection'
 import { usePosts } from '@/hooks/usePosts'
 import { sanitizeHtml } from '@/lib/sanitize'
 import type { Post, TagItem } from '@/types/api'
@@ -117,9 +118,10 @@ interface ZenNavProps {
   currentPage: 'home' | 'post' | 'about'
   profileVisible: boolean
   user: boolean
+  subscriberVisible?: boolean
 }
 
-function ZenNav({ settings, currentPage, profileVisible, user }: ZenNavProps) {
+function ZenNav({ settings, currentPage, profileVisible, user, subscriberVisible = false }: ZenNavProps) {
   const { t } = useTranslation()
   const blogName = settings.blog_name || 'Blog'
   const logoUrl = settings.blog_logo_url
@@ -185,6 +187,7 @@ function ZenNav({ settings, currentPage, profileVisible, user }: ZenNavProps) {
             </a>
           ))}
           <LanguageSwitcher variant="classic" />
+          <SubscriberSection collection="zen" subscriberVisible={subscriberVisible} settings={settings} />
         </div>
       </div>
     </nav>
@@ -200,6 +203,7 @@ interface ZenBlogHomeProps {
   socialVisible: boolean
   postListVisible: boolean
   heroVisible: boolean
+  subscriberVisible: boolean
   searchVisible: boolean
   tagCloudVisible: boolean
   searchQuery: string
@@ -216,6 +220,7 @@ export function ZenBlogHome({
   socialVisible,
   postListVisible,
   heroVisible,
+  subscriberVisible,
   searchVisible,
   tagCloudVisible,
   searchQuery,
@@ -235,7 +240,7 @@ export function ZenBlogHome({
       style={{ background: 'var(--blog-bg, #F7F5F0)', color: '#2D2B2A' }}
     >
       {user && <AdminBar />}
-      <ZenNav settings={settings} currentPage="home" profileVisible={profileVisible} user={user} />
+      <ZenNav settings={settings} currentPage="home" profileVisible={profileVisible} user={user} subscriberVisible={subscriberVisible} />
 
       <main className="flex-1 max-w-5xl mx-auto px-6 w-full pt-10">
 
@@ -443,6 +448,7 @@ interface ZenPostContentProps {
   commentsEnabled: boolean
   profileVisible: boolean
   socialVisible: boolean
+  subscriberVisible: boolean
   onCommentSubmitted: () => void
   availableLocales?: string[]
   currentLocale?: string
@@ -457,6 +463,7 @@ export function ZenPostContent({
   commentsEnabled,
   profileVisible,
   socialVisible,
+  subscriberVisible,
   onCommentSubmitted,
   availableLocales,
   currentLocale,
@@ -475,7 +482,7 @@ export function ZenPostContent({
       style={{ background: 'var(--blog-bg, #F7F5F0)', color: '#2D2B2A' }}
     >
       {user && <AdminBar />}
-      <ZenNav settings={settings} currentPage="post" profileVisible={profileVisible} user={user} />
+      <ZenNav settings={settings} currentPage="post" profileVisible={profileVisible} user={user} subscriberVisible={subscriberVisible} />
 
       <article className="flex-1 max-w-3xl mx-auto px-6 w-full">
 
@@ -650,7 +657,7 @@ export function ZenPostContent({
             style={{ borderColor: '#E8E2D5' }}
           >
             <CommentList postId={post.id} />
-            <CommentForm postId={post.id} onSubmitted={onCommentSubmitted} recaptchaSiteKey={settings.recaptcha_site_key} />
+            <CommentForm postId={post.id} onSubmitted={onCommentSubmitted} recaptchaSiteKey={settings.recaptcha_enabled === '1' ? settings.recaptcha_site_key : undefined} subscribersEnabled={settings.subscribers_enabled === '1'} />
           </div>
         )}
 
@@ -672,6 +679,7 @@ interface ZenAboutContentProps {
   educationVisible: boolean
   testimonialsVisible: boolean
   socialVisible: boolean
+  subscriberVisible?: boolean
   downloadPdfVisible?: boolean
 }
 
@@ -684,6 +692,7 @@ export function ZenAboutContent({
   educationVisible,
   testimonialsVisible,
   socialVisible,
+  subscriberVisible = false,
   downloadPdfVisible = false,
 }: ZenAboutContentProps) {
   const summary     = settings.profile_summary     || ''
@@ -702,7 +711,7 @@ export function ZenAboutContent({
       style={{ background: 'var(--blog-bg, #F7F5F0)', color: '#2D2B2A' }}
     >
       {user && <AdminBar />}
-      <ZenNav settings={settings} currentPage="about" profileVisible={true} user={user} />
+      <ZenNav settings={settings} currentPage="about" profileVisible={true} user={user} subscriberVisible={subscriberVisible} />
 
       <main className="flex-1 max-w-5xl mx-auto px-6 py-20 w-full">
 

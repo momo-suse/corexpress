@@ -7,18 +7,20 @@ namespace Corexpress\Controllers;
 use Corexpress\Models\Comment;
 use Corexpress\Models\Post;
 use Corexpress\Models\Setting;
+use Corexpress\Models\Subscriber;
 use Corexpress\Services\RateLimiter;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class CommentController extends Controller
 {
-    private const DEFAULT_PER_PAGE      = 20;
-    private const MAX_CONTENT_LENGTH    = 5000;
-    private const COMMENT_MAX_PER_IP    = 5;
-    private const COMMENT_WINDOW        = 15 * 60; // 15 min
-    private const RECAPTCHA_VERIFY_URL  = 'https://www.google.com/recaptcha/api/siteverify';
-    private const RECAPTCHA_MIN_SCORE   = 0.5;
+    private const DEFAULT_PER_PAGE             = 20;
+    private const MAX_CONTENT_LENGTH           = 5000;
+    private const COMMENT_MAX_PER_IP           = 5;
+    private const COMMENT_MAX_PER_SUBSCRIBER   = 10;
+    private const COMMENT_WINDOW               = 15 * 60; // 15 min
+    private const RECAPTCHA_VERIFY_URL         = 'https://www.google.com/recaptcha/api/siteverify';
+    private const RECAPTCHA_MIN_SCORE          = 0.5;
 
     /**
      * POST /api/v1/posts/{postId}/comments   [CSRF required, no auth]
@@ -26,9 +28,19 @@ class CommentController extends Controller
      */
     public function store(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
-        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $ip          = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
         $rateLimiter = new RateLimiter();
-        if ($rateLimiter->tooManyAttempts('comment:' . $ip, self::COMMENT_MAX_PER_IP, self::COMMENT_WINDOW)) {
+        $subscriber  = $this->currentSubscriber();
+
+        // Rate limiting — subscribers get a higher limit
+        $maxAttempts = $subscriber !== null
+            ? self::COMMENT_MAX_PER_SUBSCRIBER
+            : self::COMMENT_MAX_PER_IP;
+        $rateLimitKey = $subscriber !== null
+            ? 'comment:subscriber:' . $subscriber->id
+            : 'comment:' . $ip;
+
+        if ($rateLimiter->tooManyAttempts($rateLimitKey, $maxAttempts, self::COMMENT_WINDOW)) {
             return $this->error($response, 'Too many comments. Please try again later.', 429);
         }
 
@@ -43,37 +55,56 @@ class CommentController extends Controller
             return $this->error($response, 'Post not found.', 404);
         }
 
-        $body   = (array) ($request->getParsedBody() ?? []);
+        $body = (array) ($request->getParsedBody() ?? []);
 
-        $captchaError = $this->verifyCaptcha($body);
-        if ($captchaError !== null) {
-            return $this->error($response, $captchaError, 422);
+        // Only verify CAPTCHA for anonymous users
+        if ($subscriber === null) {
+            $captchaError = $this->verifyCaptcha($body);
+            if ($captchaError !== null) {
+                return $this->error($response, $captchaError, 422);
+            }
         }
 
-        $errors = $this->validateCommentBody($body);
+        if ($subscriber !== null) {
+            $errors = $this->validateSubscriberCommentBody($body);
+        } else {
+            $errors = $this->validateCommentBody($body);
+        }
 
         if ($errors !== []) {
             return $this->json($response, ['error' => 'Validation failed', 'fields' => $errors], 422);
         }
 
-        $comment = Comment::create([
-            'post_id'      => $post->id,
-            'author_name'  => strip_tags(trim((string) $body['author_name'])),
-            'author_email' => strtolower(trim((string) $body['author_email'])),
-            'content'      => strip_tags(trim((string) $body['content'])),
-            'status'       => 'pending',
-        ]);
+        if ($subscriber !== null) {
+            $comment = Comment::create([
+                'post_id'       => $post->id,
+                'subscriber_id' => $subscriber->id,
+                'author_name'   => $subscriber->name,
+                'author_email'  => $subscriber->email,
+                'content'       => strip_tags(trim((string) $body['content'])),
+                'status'        => 'pending',
+            ]);
+        } else {
+            $comment = Comment::create([
+                'post_id'      => $post->id,
+                'author_name'  => strip_tags(trim((string) $body['author_name'])),
+                'author_email' => strtolower(trim((string) $body['author_email'])),
+                'content'      => strip_tags(trim((string) $body['content'])),
+                'status'       => 'pending',
+            ]);
+        }
 
-        $rateLimiter->increment('comment:' . $ip, self::COMMENT_WINDOW);
+        $rateLimiter->increment($rateLimitKey, self::COMMENT_WINDOW);
 
-        // Do not expose author_email in the public response (privacy)
         return $this->json($response, [
             'data' => [
-                'id'          => $comment->id,
-                'post_id'     => $comment->post_id,
-                'author_name' => $comment->author_name,
-                'status'      => $comment->status,
-                'created_at'  => $comment->created_at,
+                'id'            => $comment->id,
+                'post_id'       => $comment->post_id,
+                'author_name'   => $comment->author_name,
+                'is_subscriber' => $subscriber !== null,
+                'avatar_url'    => $subscriber?->avatar_url,
+                'status'        => $comment->status,
+                'created_at'    => $comment->created_at,
             ],
         ], 201);
     }
@@ -172,6 +203,14 @@ class CommentController extends Controller
 
     // ── Private helpers ────────────────────────────────────────────────────
 
+    private function currentSubscriber(): ?Subscriber
+    {
+        if (empty($_SESSION['subscriber_id'])) {
+            return null;
+        }
+        return Subscriber::find((int) $_SESSION['subscriber_id']);
+    }
+
     /**
      * @param  array<string, mixed> $body
      * @return array<string, string>
@@ -181,6 +220,11 @@ class CommentController extends Controller
      */
     private function verifyCaptcha(array $body): ?string
     {
+        $recaptchaEnabled = Setting::where('key', 'recaptcha_enabled')->value('value') ?? '0';
+        if ($recaptchaEnabled !== '1') {
+            return null;
+        }
+
         $secretKey = Setting::where('key', 'recaptcha_secret_key')->value('value') ?? '';
         if ($secretKey === '') {
             return null;
@@ -236,6 +280,20 @@ class CommentController extends Controller
         } elseif (!filter_var($authorEmail, FILTER_VALIDATE_EMAIL)) {
             $errors['author_email'] = 'Invalid email format.';
         }
+
+        if ($content === '') {
+            $errors['content'] = 'Comment content is required.';
+        } elseif (mb_strlen($content) > self::MAX_CONTENT_LENGTH) {
+            $errors['content'] = sprintf('Comment must be %d characters or fewer.', self::MAX_CONTENT_LENGTH);
+        }
+
+        return $errors;
+    }
+
+    private function validateSubscriberCommentBody(array $body): array
+    {
+        $errors  = [];
+        $content = trim((string) ($body['content'] ?? ''));
 
         if ($content === '') {
             $errors['content'] = 'Comment content is required.';

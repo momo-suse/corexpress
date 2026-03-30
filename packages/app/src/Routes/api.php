@@ -9,14 +9,18 @@ use Corexpress\Controllers\PageController;
 use Corexpress\Controllers\PostController;
 use Corexpress\Controllers\SettingController;
 use Corexpress\Controllers\StyleCollectionController;
+use Corexpress\Controllers\SubscriberAuthController;
+use Corexpress\Controllers\SubscriberController;
 use Corexpress\Controllers\UpdateController;
 use Corexpress\Middleware\AuthMiddleware;
 use Corexpress\Middleware\CsrfMiddleware;
 use Corexpress\Middleware\JsonResponseMiddleware;
+use Corexpress\Middleware\SubscriberMiddleware;
 
 // ── Shared middleware instances ────────────────────────────────────────────────
-$authMiddleware = new AuthMiddleware();
-$csrfMiddleware = new CsrfMiddleware();
+$authMiddleware       = new AuthMiddleware();
+$csrfMiddleware       = new CsrfMiddleware();
+$subscriberMiddleware = new SubscriberMiddleware();
 
 // ── API v1 routes ──────────────────────────────────────────────────────────────
 // All routes in this group automatically receive Content-Type: application/json.
@@ -24,7 +28,7 @@ $csrfMiddleware = new CsrfMiddleware();
 // Admin pattern: ->add($csrfMiddleware)->add($authMiddleware)
 // Execution order: AuthMiddleware (outermost) → CsrfMiddleware → handler.
 
-$app->group('/api/v1', function (\Slim\Routing\RouteCollectorProxy $group) use ($authMiddleware, $csrfMiddleware): void {
+$app->group('/api/v1', function (\Slim\Routing\RouteCollectorProxy $group) use ($authMiddleware, $csrfMiddleware, $subscriberMiddleware): void {
 
     // ── Auth ───────────────────────────────────────────────────────────────────
 
@@ -52,6 +56,45 @@ $app->group('/api/v1', function (\Slim\Routing\RouteCollectorProxy $group) use (
 
     // Authenticated + CSRF: change password (requires current password)
     $group->post('/auth/change-password', [AuthController::class, 'changePassword'])
+          ->add($csrfMiddleware)
+          ->add($authMiddleware);
+
+    // ── Subscriber OAuth ───────────────────────────────────────────────────────
+
+    // Public: redirect to Google OAuth consent screen
+    $group->get('/auth/subscriber/google', [SubscriberAuthController::class, 'redirect']);
+
+    // Public: Google callback — exchanges code for session
+    $group->get('/auth/subscriber/google/callback', [SubscriberAuthController::class, 'callback']);
+
+    // Public: unsubscribe via token link from email
+    $group->get('/auth/subscriber/unsubscribe', [SubscriberAuthController::class, 'unsubscribe']);
+
+    // Subscriber authenticated: get current subscriber info
+    $group->get('/auth/subscriber/me', [SubscriberAuthController::class, 'me'])
+          ->add($subscriberMiddleware);
+
+    // Subscriber authenticated + CSRF: logout
+    $group->post('/auth/subscriber/logout', [SubscriberAuthController::class, 'logout'])
+          ->add($csrfMiddleware)
+          ->add($subscriberMiddleware);
+
+    // Subscriber authenticated + CSRF: update notification preference
+    $group->patch('/auth/subscriber/me', [SubscriberAuthController::class, 'update'])
+          ->add($csrfMiddleware)
+          ->add($subscriberMiddleware);
+
+    // Subscriber authenticated + CSRF: delete own account
+    $group->delete('/auth/subscriber/me', [SubscriberAuthController::class, 'destroy'])
+          ->add($csrfMiddleware)
+          ->add($subscriberMiddleware);
+
+    // ── Subscribers (admin) ────────────────────────────────────────────────────
+
+    $group->get('/subscribers', [SubscriberController::class, 'index'])
+          ->add($authMiddleware);
+
+    $group->delete('/subscribers/{id}', [SubscriberController::class, 'destroy'])
           ->add($csrfMiddleware)
           ->add($authMiddleware);
 
@@ -139,6 +182,11 @@ $app->group('/api/v1', function (\Slim\Routing\RouteCollectorProxy $group) use (
 
     // Admin + CSRF: bulk update settings
     $group->put('/settings', [SettingController::class, 'update'])
+          ->add($csrfMiddleware)
+          ->add($authMiddleware);
+
+    // Admin + CSRF: clear a credential group (google | recaptcha)
+    $group->delete('/settings/credentials/{type}', [SettingController::class, 'deleteCredentials'])
           ->add($csrfMiddleware)
           ->add($authMiddleware);
 

@@ -20,6 +20,7 @@ import {
   FileText, MessageCircle, Check, ArrowLeft, Plus, Edit3,
   Trash2, X, Upload, AlertTriangle, Languages, Eye, EyeOff,
 } from 'lucide-react'
+import NotifySubscribersDialog from '@/components/admin/NotifySubscribersDialog'
 import type { Post } from '@/types/api'
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -96,6 +97,10 @@ export default function DashboardPage() {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [confirmType, setConfirmType] = useState<'post' | 'comment'>('post')
   const [confirmId, setConfirmId] = useState<number | null>(null)
+
+  // ── Notify subscribers dialog ────────────────────────────────────────────────
+  const [notifyOpen, setNotifyOpen] = useState(false)
+  const [pendingSaveStatus, setPendingSaveStatus] = useState<'draft' | 'published' | 'hidden' | null>(null)
 
   const imageInputRef = useRef<HTMLInputElement>(null)
 
@@ -207,7 +212,7 @@ export default function DashboardPage() {
     }))
   }
 
-  async function handleSave(status: 'draft' | 'published' | 'hidden') {
+  async function handleSave(status: 'draft' | 'published' | 'hidden', notifySubscribers?: boolean) {
     const locale = editingPost?.base_locale
       ?? (settingsData?.data as Record<string, string> | undefined)?.app_locale
       ?? 'en'
@@ -216,6 +221,16 @@ export default function DashboardPage() {
     if (!baseLang.title.trim()) {
       toast({ title: t('admin.dashboard.titleRequired'), variant: 'destructive' })
       return
+    }
+
+    // Show notify dialog when publishing for the first time (notified_at is null)
+    if (status === 'published' && notifySubscribers === undefined) {
+      const isFirstPublish = !editingPost || editingPost.notified_at === null
+      if (isFirstPublish) {
+        setPendingSaveStatus(status)
+        setNotifyOpen(true)
+        return
+      }
     }
 
     let imageId = form.featured_image_id
@@ -230,7 +245,7 @@ export default function DashboardPage() {
       }
     }
 
-    const payload = {
+    const payload: Record<string, unknown> = {
       title: baseLang.title,
       content: baseLang.content,
       excerpt: baseLang.excerpt || null,
@@ -239,6 +254,10 @@ export default function DashboardPage() {
       map_embed_url: form.map_embed_url.trim() || null,
       featured_image_id: imageId,
       status,
+    }
+
+    if (status === 'published' && notifySubscribers !== undefined) {
+      payload.notify_subscribers = notifySubscribers
     }
 
     try {
@@ -274,6 +293,15 @@ export default function DashboardPage() {
       closeEditor()
     } catch {
       toast({ title: t('admin.dashboard.failedToSave'), variant: 'destructive' })
+    }
+  }
+
+  function handleNotifyDialogConfirm(notify: boolean) {
+    setNotifyOpen(false)
+    if (pendingSaveStatus) {
+      const status = pendingSaveStatus
+      setPendingSaveStatus(null)
+      handleSave(status, notify)
     }
   }
 
@@ -971,6 +999,12 @@ export default function DashboardPage() {
         confirmLabel={t('common.delete')}
         onConfirm={executeDelete}
         onCancel={() => setConfirmOpen(false)}
+      />
+
+      {/* ── NOTIFY SUBSCRIBERS DIALOG ──────────────────────────────────────── */}
+      <NotifySubscribersDialog
+        open={notifyOpen}
+        onConfirm={handleNotifyDialogConfirm}
       />
 
     </div>

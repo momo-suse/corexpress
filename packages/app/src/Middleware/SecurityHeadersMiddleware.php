@@ -28,7 +28,7 @@ class SecurityHeadersMiddleware implements MiddlewareInterface
                 . "img-src 'self' data: https:; "
                 . "font-src 'self' https://fonts.gstatic.com; "
                 . "frame-src https://www.google.com https://*.openstreetmap.org; "
-                . "connect-src 'self' https://www.google.com;"
+                . "connect-src 'self' https://www.google.com https://accounts.google.com https://www.googleapis.com;"
             );
     }
 }

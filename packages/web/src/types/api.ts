@@ -27,6 +27,7 @@ export interface Post {
   map_embed_url: string | null
   reading_time: string | null
   status: 'draft' | 'published' | 'hidden'
+  notified_at: string | null
   author_id: number
   created_at: string
   updated_at: string
@@ -48,8 +49,19 @@ export interface Comment {
   author_name: string
   content: string
   status: 'pending' | 'approved' | 'spam'
+  is_subscriber?: boolean
+  avatar_url?: string | null
   created_at: string
   post?: { id: number; title: string; slug: string }
+}
+
+export interface Subscriber {
+  id: number
+  name: string
+  email: string
+  avatar_url: string | null
+  subscribed: boolean
+  created_at: string
 }
 
 export interface Setting {
@@ -104,6 +116,12 @@ export interface Settings {
   comments_enabled: string
   /** Numeric string — max tags shown in Tag Cloud widget (default "6") */
   tags_max_count: string
+  /** Google OAuth client ID (public) */
+  google_client_id: string
+  /** '1' = subscribers feature enabled, '0' = disabled */
+  subscribers_enabled: string
+  /** '1' = reCAPTCHA v3 enabled on comment form, '0' = disabled */
+  recaptcha_enabled: string
   [key: string]: string
 }
 

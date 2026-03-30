@@ -9,7 +9,10 @@ export function getComments(params?: { post_id?: number; status?: string; page?:
   return api.get<PaginatedResponse<Comment>>(`/comments?${qs.toString()}`)
 }
 
-export function createComment(postId: number, data: { author_name: string; author_email: string; content: string; recaptcha_token?: string }) {
+export function createComment(
+  postId: number,
+  data: { author_name?: string; author_email?: string; content: string; recaptcha_token?: string },
+) {
   return api.post<ApiResponse<Comment>>(`/posts/${postId}/comments`, data)
 }
 

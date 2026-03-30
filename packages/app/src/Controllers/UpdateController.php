@@ -458,11 +458,12 @@ final class UpdateController extends Controller
             // Update app_version setting
             $newVersion = $this->readCurrentVersion();
             if ($newVersion !== 'unknown') {
-                $stmt = $pdo->prepare(
-                    "INSERT INTO `settings` (`key`, `value`) VALUES ('app_version', :v1)
-                     ON DUPLICATE KEY UPDATE `value` = :v2"
-                );
-                $stmt->execute([':v1' => $newVersion, ':v2' => $newVersion]);
+                $upd = $pdo->prepare("UPDATE `settings` SET `value` = ? WHERE `key` = 'app_version'");
+                $upd->execute([$newVersion]);
+                if ($upd->rowCount() === 0) {
+                    $pdo->prepare("INSERT INTO `settings` (`key`, `value`) VALUES ('app_version', ?)")
+                        ->execute([$newVersion]);
+                }
             }
 
             // Success: backup is no longer needed

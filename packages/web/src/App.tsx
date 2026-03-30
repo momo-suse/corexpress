@@ -6,6 +6,7 @@ import { useLocale } from '@/hooks/useLocale'
 import BlogHomePage from '@/pages/blog/BlogHomePage'
 import PostPage from '@/pages/blog/PostPage'
 import AboutPage from '@/pages/blog/AboutPage'
+import { SubscriberWelcomePage, SubscriberUnsubscribedPage, SubscriberErrorPage } from '@/pages/blog/SubscriberPages'
 
 // Admin pages
 import LoginPage from '@/pages/admin/LoginPage'
@@ -16,6 +17,7 @@ import SettingsPage from '@/pages/admin/SettingsPage'
 import CommentsPage from '@/pages/admin/CommentsPage'
 import StylesPage from '@/pages/admin/StylesPage'
 import BlogPage from '@/pages/admin/BlogPage'
+import SubscribersPage from '@/pages/admin/SubscribersPage'
 
 // Shared
 import ProtectedRoute from '@/components/shared/ProtectedRoute'
@@ -40,6 +42,11 @@ function AppInner() {
         <Route path="/post/:slug" element={<PostPage />} />
         <Route path="/about" element={<AboutPage />} />
 
+        {/* Subscriber OAuth flow pages */}
+        <Route path="/subscriber/welcome" element={<SubscriberWelcomePage />} />
+        <Route path="/subscriber/unsubscribed" element={<SubscriberUnsubscribedPage />} />
+        <Route path="/subscriber/error" element={<SubscriberErrorPage />} />
+
         {/* Admin auth — public */}
         <Route path="/cx-admin/login" element={<LoginPage />} />
         <Route path="/cx-admin/reset-password" element={<ResetPasswordPage />} />
@@ -56,6 +63,7 @@ function AppInner() {
             <Route path="settings" element={<SettingsPage />} />
             <Route path="comments" element={<CommentsPage />} />
             <Route path="styles" element={<StylesPage />} />
+            <Route path="subscribers" element={<SubscribersPage />} />
           </Route>
         </Route>
 

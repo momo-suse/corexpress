@@ -11,6 +11,15 @@ export default defineConfig({
     },
   },
 
+  server: {
+    host: true,
+    port: 5173,
+    proxy: {
+      '/api': 'http://localhost:8080',
+      '/img': 'http://localhost:8080',
+    },
+  },
+
   build: {
     // index.html lands at packages/app/public/index.html (served by Apache)
     outDir: '../app/public',

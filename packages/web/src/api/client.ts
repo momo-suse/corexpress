@@ -12,7 +12,7 @@ export class ApiError extends Error {
 
 const BASE_URL = '/api/v1'
 
-type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
 /** Fetch a fresh CSRF token from the server and store it. Returns the token or null on failure. */
 export async function refreshCsrfToken(): Promise<string | null> {
@@ -103,7 +103,7 @@ async function request<T>(
   // Only force re-login if the user had an active session; unauthenticated visitors
   // on public blog pages must never be redirected to the admin login screen.
   if (response.status === 401 || response.status === 403) {
-    if (useAuthStore.getState().user) {
+    if (useAuthStore.getState().user && !endpoint.startsWith('/auth/subscriber')) {
       forceLogin(response.status, isMutation)
     } else {
       throw new ApiError(response.status, 'Unauthorized')
@@ -128,5 +128,6 @@ export const api = {
   get: <T>(endpoint: string) => request<T>(endpoint, 'GET'),
   post: <T>(endpoint: string, body?: unknown) => request<T>(endpoint, 'POST', body),
   put: <T>(endpoint: string, body?: unknown) => request<T>(endpoint, 'PUT', body),
+  patch: <T>(endpoint: string, body?: unknown) => request<T>(endpoint, 'PATCH', body),
   delete: <T>(endpoint: string) => request<T>(endpoint, 'DELETE'),
 }

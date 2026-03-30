@@ -21,7 +21,7 @@ class SessionMiddleware implements MiddlewareInterface
                 || ($_SERVER['SERVER_PORT'] ?? 80) == 443;
 
             ini_set('session.cookie_httponly', '1');
-            ini_set('session.cookie_samesite', 'Strict');
+            ini_set('session.cookie_samesite', 'Lax');
             ini_set('session.cookie_secure', $isHttps ? '1' : '0');
             ini_set('session.use_only_cookies', '1'); // prevents session ID in URL (fixation)
             ini_set('session.use_strict_mode', '1'); // server rejects unrecognized session IDs

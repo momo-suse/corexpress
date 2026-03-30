@@ -24,7 +24,8 @@ class PageController extends Controller
             'pageComponents.componentDefinition',
         ])->orderBy('id')->get();
 
-        return $this->json($response, ['data' => $pages->map(fn (Page $p) => $this->formatPage($p))]);
+        $isAdmin = $this->isAdmin();
+        return $this->json($response, ['data' => $pages->map(fn (Page $p) => $this->formatPage($p, $isAdmin))]);
     }
 
     /**
@@ -50,7 +51,10 @@ class PageController extends Controller
         $defaultStyles = $this->indexStyles($defaultCollection?->componentStyles ?? collect());
         $activeStyles  = $this->indexStyles($activeCollection?->componentStyles ?? collect());
 
-        $components = $page->pageComponents->map(function (PageComponent $pc) use ($activeStyles, $defaultStyles): array {
+        $isAdmin    = $this->isAdmin();
+        $components = $page->pageComponents
+            ->filter(fn(PageComponent $pc) => $isAdmin || $pc->is_visible)
+            ->map(function (PageComponent $pc) use ($activeStyles, $defaultStyles): array {
             $defId  = $pc->component_definition_id;
             $def    = $pc->componentDefinition;
             $styles = $activeStyles[$defId] ?? $defaultStyles[$defId] ?? [];
@@ -67,7 +71,7 @@ class PageController extends Controller
                 'display_order'           => $pc->display_order,
                 'styles'                  => $styles,
             ];
-        });
+        })->values();
 
         return $this->json($response, [
             'data' => [
@@ -121,26 +125,28 @@ class PageController extends Controller
         return $map;
     }
 
-    private function formatPage(Page $page): array
+    private function formatPage(Page $page, bool $includeHidden = false): array
     {
         return [
             'id'         => $page->id,
             'slug'       => $page->slug,
             'title'      => $page->title,
-            'components' => $page->pageComponents->map(function (PageComponent $pc): array {
-                $def = $pc->componentDefinition;
-                return [
-                    'id'                      => $pc->id,
-                    'component_definition_id' => $pc->component_definition_id,
-                    'type'                    => $def?->type ?? 'component',
-                    'parent_id'               => $def?->parent_id,
-                    'has_own_page'            => (bool) ($def?->has_own_page ?? false),
-                    'name'                    => $def?->name,
-                    'label'                   => $def?->label,
-                    'is_visible'              => $pc->is_visible,
-                    'display_order'           => $pc->display_order,
-                ];
-            }),
+            'components' => $page->pageComponents
+                ->filter(fn(PageComponent $pc) => $includeHidden || $pc->is_visible)
+                ->map(function (PageComponent $pc): array {
+                    $def = $pc->componentDefinition;
+                    return [
+                        'id'                      => $pc->id,
+                        'component_definition_id' => $pc->component_definition_id,
+                        'type'                    => $def?->type ?? 'component',
+                        'parent_id'               => $def?->parent_id,
+                        'has_own_page'            => (bool) ($def?->has_own_page ?? false),
+                        'name'                    => $def?->name,
+                        'label'                   => $def?->label,
+                        'is_visible'              => $pc->is_visible,
+                        'display_order'           => $pc->display_order,
+                    ];
+                })->values(),
         ];
     }
 }

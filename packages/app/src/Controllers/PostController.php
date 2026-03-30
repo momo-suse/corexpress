@@ -6,6 +6,7 @@ namespace Corexpress\Controllers;
 
 use Corexpress\Models\Image;
 use Corexpress\Models\Post;
+use Corexpress\Services\Mailer;
 use Corexpress\Models\PostTranslation;
 use Corexpress\Models\Setting;
 use Psr\Http\Message\ResponseInterface;
@@ -303,7 +304,19 @@ class PostController extends Controller
             : 'draft',
         ]);
 
-        $data = $post->fresh()->toArray();
+        $post = $post->fresh();
+
+        if (
+            $post->status === 'published'
+            && !empty($body['notify_subscribers'])
+            && $post->notified_at === null
+        ) {
+            Mailer::notifySubscribers($post);
+            $post->notified_at = now();
+            $post->save();
+        }
+
+        $data = $post->toArray();
         $data['featured_image_url'] = $this->resolveFeaturedImageUrl($post->featured_image_id);
 
         return $this->json($response, ['data' => $data], 201);
@@ -371,8 +384,19 @@ class PostController extends Controller
         }
 
         $post->save();
+        $post = $post->fresh();
 
-        $data = $post->fresh()->toArray();
+        if (
+            $post->status === 'published'
+            && !empty($body['notify_subscribers'])
+            && $post->notified_at === null
+        ) {
+            Mailer::notifySubscribers($post);
+            $post->notified_at = now();
+            $post->save();
+        }
+
+        $data = $post->toArray();
         $data['featured_image_url'] = $this->resolveFeaturedImageUrl($post->featured_image_id);
 
         return $this->json($response, ['data' => $data]);

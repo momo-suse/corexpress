@@ -13,10 +13,15 @@ class Comment extends Model
     public const UPDATED_AT = null;
 
     protected $table    = 'comments';
-    protected $fillable = ['post_id', 'author_name', 'author_email', 'content', 'status'];
+    protected $fillable = ['post_id', 'subscriber_id', 'author_name', 'author_email', 'content', 'status'];
 
     public function post(): BelongsTo
     {
         return $this->belongsTo(Post::class);
+    }
+
+    public function subscriber(): BelongsTo
+    {
+        return $this->belongsTo(Subscriber::class);
     }
 }

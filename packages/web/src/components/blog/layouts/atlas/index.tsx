@@ -28,6 +28,7 @@ import CommentList from '@/components/blog/CommentList'
 import CommentForm from '@/components/blog/CommentForm'
 import AboutTestimonials from '@/components/blog/AboutTestimonials'
 import AboutPdfButton from '@/components/blog/AboutPdfButton'
+import SubscriberSection from '@/components/blog/SubscriberSection'
 import { usePosts } from '@/hooks/usePosts'
 import { sanitizeHtml } from '@/lib/sanitize'
 import type { Post, TagItem } from '@/types/api'
@@ -87,9 +88,10 @@ interface AtlasNavProps {
   user: boolean
   currentPage: 'home' | 'post' | 'about'
   profileVisible?: boolean
+  subscriberVisible?: boolean
 }
 
-function AtlasNav({ settings, user, currentPage, profileVisible = true }: AtlasNavProps) {
+function AtlasNav({ settings, user, currentPage, profileVisible = true, subscriberVisible = false }: AtlasNavProps) {
   const { t, i18n } = useTranslation()
   const [mobileOpen, setMobileOpen] = useState(false)
   const blogName = settings.blog_name || 'Blog'
@@ -173,6 +175,7 @@ function AtlasNav({ settings, user, currentPage, profileVisible = true }: AtlasN
                 </button>
               ))}
             </div>
+            <SubscriberSection collection="atlas" subscriberVisible={subscriberVisible} settings={settings} />
           </div>
 
           {/* Mobile toggle */}
@@ -218,6 +221,7 @@ function AtlasNav({ settings, user, currentPage, profileVisible = true }: AtlasN
                   {lang}
                 </button>
               ))}
+              <SubscriberSection collection="atlas" subscriberVisible={subscriberVisible} settings={settings} />
               {socialNetworks.map(({ key, href, Icon }) => (
                 <a key={key} href={href} target="_blank" rel="noopener noreferrer" className="text-stone-400 hover:text-amber-700 transition-colors">
                   <Icon size={16} />
@@ -283,6 +287,7 @@ interface AtlasBlogHomeProps {
   postListVisible: boolean
   profileVisible: boolean
   socialVisible: boolean
+  subscriberVisible: boolean
   searchVisible: boolean
   tagCloudVisible: boolean
   searchQuery: string
@@ -299,6 +304,7 @@ export function AtlasBlogHome({
   postListVisible,
   profileVisible,
   socialVisible: _socialVisible,
+  subscriberVisible,
   searchVisible,
   tagCloudVisible,
   searchQuery,
@@ -322,7 +328,7 @@ export function AtlasBlogHome({
   return (
     <div className="blog-collection-atlas min-h-screen bg-stone-50 text-stone-800 font-sans selection:bg-amber-700 selection:text-white">
       {user && <AdminBar />}
-      <AtlasNav user={user} settings={settings} currentPage="home" profileVisible={profileVisible} />
+      <AtlasNav user={user} settings={settings} currentPage="home" profileVisible={profileVisible} subscriberVisible={subscriberVisible} />
 
       <main className="max-w-7xl mx-auto px-6 pt-12 pb-32">
 
@@ -563,6 +569,7 @@ interface AtlasPostContentProps {
   commentsEnabled: boolean
   profileVisible: boolean
   socialVisible: boolean
+  subscriberVisible: boolean
   onCommentSubmitted: () => void
   availableLocales: string[]
   currentLocale: string
@@ -576,6 +583,7 @@ export function AtlasPostContent({
   user,
   commentsEnabled,
   profileVisible,
+  subscriberVisible,
   onCommentSubmitted,
   availableLocales,
   currentLocale,
@@ -586,7 +594,7 @@ export function AtlasPostContent({
   return (
     <div className="blog-collection-atlas min-h-screen bg-stone-50 font-sans">
       {user && <AdminBar />}
-      <AtlasNav user={user} settings={settings} currentPage="post" profileVisible={profileVisible} />
+      <AtlasNav user={user} settings={settings} currentPage="post" profileVisible={profileVisible} subscriberVisible={subscriberVisible} />
 
       <article className="max-w-4xl mx-auto px-6 pt-12 pb-32">
 
@@ -736,7 +744,7 @@ export function AtlasPostContent({
                   <h3 className="font-serif italic text-xl text-emerald-950 mb-4">
                     {t('blog.atlas.leaveDispatch', { defaultValue: 'Dejar un despacho' })}
                   </h3>
-                  <CommentForm postId={post.id} onSubmitted={onCommentSubmitted} recaptchaSiteKey={settings.recaptcha_site_key} />
+                  <CommentForm postId={post.id} onSubmitted={onCommentSubmitted} recaptchaSiteKey={settings.recaptcha_enabled === '1' ? settings.recaptcha_site_key : undefined} subscribersEnabled={settings.subscribers_enabled === '1'} />
                 </div>
               </div>
             </div>
@@ -761,6 +769,7 @@ interface AtlasAboutContentProps {
   educationVisible: boolean
   testimonialsVisible: boolean
   socialVisible: boolean
+  subscriberVisible?: boolean
   downloadPdfVisible: boolean
 }
 
@@ -773,6 +782,7 @@ export function AtlasAboutContent({
   educationVisible,
   testimonialsVisible,
   socialVisible,
+  subscriberVisible = false,
   downloadPdfVisible,
 }: AtlasAboutContentProps) {
   const { t } = useTranslation()
@@ -798,7 +808,7 @@ export function AtlasAboutContent({
   return (
     <div className="blog-collection-atlas min-h-screen bg-stone-50 font-sans">
       {user && <AdminBar />}
-      <AtlasNav user={user} settings={settings} currentPage="about" profileVisible={true} />
+      <AtlasNav user={user} settings={settings} currentPage="about" profileVisible={true} subscriberVisible={subscriberVisible} />
 
       <div className="max-w-5xl mx-auto px-6 pt-12 pb-32 space-y-24">
 

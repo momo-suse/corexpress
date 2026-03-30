@@ -60,6 +60,7 @@
       "comments": "Comentarios",
       "blog": "Blog",
       "styles": "Estilos",
+      "subscribers": "Suscriptores",
       "settings": "Configuración",
       "viewBlog": "Ver blog",
       "signOut": "Cerrar sesión"
@@ -142,7 +143,13 @@
       "translationFailedDelete": "Error al eliminar la traducción.",
       "baseLanguage": "Contenido base ({{lang}})",
       "editing": "Editando",
-      "characters": "Caracteres"
+      "characters": "Caracteres",
+      "notifyDialog": {
+        "title": "¿Notificar a suscriptores?",
+        "description": "Se enviará un email a {{count}} suscriptor(es) activo(s) con un enlace a este post.",
+        "confirm": "Sí, notificar",
+        "skip": "No, solo publicar"
+      }
     },
     "comments": {
       "title": "Comentarios",
@@ -183,6 +190,8 @@
         "general": "General",
         "style": "Estilo & Idioma",
         "security": "Seguridad",
+        "subscribers": "Suscriptores",
+        "recaptcha": "reCAPTCHA",
         "updates": "Actualizaciones"
       },
       "saved": "Configuración guardada.",
@@ -235,7 +244,72 @@
         "tooShort": "La contraseña debe tener al menos 8 caracteres.",
         "noMatch": "Las contraseñas nuevas no coinciden.",
         "error": "Error al cambiar la contraseña."
+      },
+      "google": {
+        "title": "Google OAuth — Suscriptores",
+        "subtitle": "Permite que los visitantes se suscriban con su cuenta de Google.",
+        "clientId": "Client ID",
+        "clientSecret": "Client Secret",
+        "hint": "Crea las credenciales en Google Cloud Console → APIs y servicios → Credenciales. Déjalos vacíos para desactivar el login de suscriptores."
+      },
+      "subscribers": {
+        "title": "Suscriptores",
+        "subtitle": "Permite que los visitantes se suscriban y reciban notificaciones de nuevas publicaciones.",
+        "enabled": "Activado",
+        "disabled": "Desactivado",
+        "disabledHint": "Los suscriptores están desactivados. El botón de suscripción no aparecerá en el blog.",
+        "missingCredentials": "Introduce el Client ID y Client Secret de Google antes de activar los suscriptores.",
+        "bothRequired": "Debes ingresar tanto el Client ID como el Client Secret.",
+        "configured": "Configuración realizada",
+        "wantToChange": "¿Quieres cambiar tus credenciales?",
+        "resetTitle": "¿Borrar credenciales?",
+        "resetDescription": "Las credenciales guardadas se eliminarán permanentemente. Necesitarás ingresar nuevas para reactivar los suscriptores.",
+        "googleInfo": {
+          "title": "Requiere Google OAuth 2.0",
+          "description": "Debes registrar tu app en Google Cloud Console para obtener las credenciales.",
+          "step1": "Entra a console.cloud.google.com y crea o selecciona un proyecto",
+          "step2": "Habilita la API de Google Identity en tu proyecto",
+          "step3": "Ve a Credenciales → Crear → ID de cliente OAuth 2.0",
+          "step4": "Agrega la URI de redirección: https://tu-dominio.com/api/v1/auth/subscriber/google/callback",
+          "step5": "Copia el Client ID y Client Secret en los campos de abajo"
+        }
+      },
+      "recaptcha": {
+        "subtitle": "Protege el formulario de comentarios contra spam y bots con reCAPTCHA v3.",
+        "enabled": "Activado",
+        "disabled": "Desactivado",
+        "disabledHint": "reCAPTCHA está desactivado. Los comentarios se pueden enviar sin verificación.",
+        "missingKeys": "Introduce el Site Key y Secret Key de reCAPTCHA antes de activarlo.",
+        "hint": "Obtén las keys en Google reCAPTCHA Admin. Déjalas vacías para mantenerlo desactivado.",
+        "bothRequired": "Debes ingresar tanto el Site Key como el Secret Key.",
+        "configured": "Configuración realizada",
+        "wantToChange": "¿Quieres cambiar tus claves?",
+        "resetTitle": "¿Borrar claves?",
+        "resetDescription": "Las claves guardadas se eliminarán permanentemente. Necesitarás ingresar nuevas para reactivar reCAPTCHA.",
+        "googleInfo": {
+          "title": "Requiere Google reCAPTCHA v3",
+          "description": "Registra tu sitio en Google reCAPTCHA Admin para obtener las claves.",
+          "step1": "Entra a google.com/recaptcha/admin",
+          "step2": "Registra un nuevo sitio y selecciona reCAPTCHA v3 como tipo",
+          "step3": "Agrega tu dominio a la lista de dominios permitidos",
+          "step4": "Copia el Site Key y Secret Key en los campos de abajo"
+        }
       }
+    },
+    "subscribers": {
+      "title": "Suscriptores",
+      "activeCount": "{{count}} suscriptor(es) activo(s)",
+      "colName": "Nombre",
+      "colEmail": "Email",
+      "colStatus": "Estado",
+      "colJoined": "Registro",
+      "statusActive": "Suscrito",
+      "statusUnsubscribed": "Desuscrito",
+      "empty": "Aún no hay suscriptores.",
+      "deleted": "Suscriptor eliminado.",
+      "deleteFailed": "No se pudo eliminar al suscriptor.",
+      "deleteTitle": "Eliminar suscriptor",
+      "deleteDescription": "Esto eliminará permanentemente al suscriptor de la lista. Ya no recibirá notificaciones."
     },
     "setup": {
       "title": "Configura tu blog",
@@ -562,7 +636,33 @@
       "submitting": "Enviando…",
       "submitError": "No se pudo enviar el comentario.",
       "successTitle": "¡Comentario enviado!",
-      "successText": "Tu comentario está pendiente de aprobación. ¡Gracias!"
+      "successText": "Tu comentario está pendiente de aprobación. ¡Gracias!",
+      "subscriberBadge": "Suscriptor"
+    },
+    "subscribe": {
+      "button": "Suscribirse / Entrar",
+      "logout": "Cerrar sesión",
+      "welcomeTitle": "¡Estás suscrito!",
+      "welcomeText": "Gracias por suscribirte. Recibirás un email cuando se publiquen nuevos artículos.",
+      "welcomeNote": "Puedes desuscribirte en cualquier momento desde cualquier email de notificación.",
+      "unsubscribedTitle": "Te has desuscrito",
+      "unsubscribedText": "Ya no recibirás más notificaciones por email. Puedes volver a suscribirte desde el blog.",
+      "errorTitle": "Error de autenticación",
+      "errorText": "Algo salió mal con el inicio de sesión de Google. Por favor, intenta de nuevo.",
+      "backToBlog": "Volver al blog",
+      "greeting": "¡Hola, {{name}}!",
+      "manageAccount": "Mi cuenta",
+      "notificationsOn": "Recibiendo notificaciones",
+      "notificationsOff": "Notificaciones desactivadas",
+      "toggleNotifications": "Activar/desactivar notificaciones por email",
+      "deleteAccount": "Eliminar cuenta",
+      "deleteConfirmTitle": "¿Eliminar cuenta?",
+      "deleteConfirmText": "Tu cuenta en {{blogName}} será eliminada permanentemente.",
+      "deleteConfirmYes": "Sí, eliminar",
+      "deleteConfirmNo": "Cancelar",
+      "deletedTitle": "¡Hasta la próxima!",
+      "deletedText": "Tu cuenta ha sido eliminada. Siempre eres bienvenido de vuelta.",
+      "deletedBack": "Volver al blog"
     },
     "about": {
       "sectionTitle": "Sobre Mí",
