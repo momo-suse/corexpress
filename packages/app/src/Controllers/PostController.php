@@ -311,9 +311,13 @@ class PostController extends Controller
             && !empty($body['notify_subscribers'])
             && $post->notified_at === null
         ) {
-            Mailer::notifySubscribers($post);
-            $post->notified_at = now();
-            $post->save();
+            try {
+                Mailer::notifySubscribers($post);
+                $post->notified_at = now();
+                $post->save();
+            } catch (\Throwable) {
+                // Post already saved; email failure must not fail the response
+            }
         }
 
         $data = $post->toArray();
@@ -391,9 +395,13 @@ class PostController extends Controller
             && !empty($body['notify_subscribers'])
             && $post->notified_at === null
         ) {
-            Mailer::notifySubscribers($post);
-            $post->notified_at = now();
-            $post->save();
+            try {
+                Mailer::notifySubscribers($post);
+                $post->notified_at = now();
+                $post->save();
+            } catch (\Throwable) {
+                // Post already saved; email failure must not fail the response
+            }
         }
 
         $data = $post->toArray();

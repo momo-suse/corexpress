@@ -730,5 +730,12 @@
       "connect": "つながる"
     },
     "errorLoading": "ブログの読み込みエラー。"
+  },
+  "email": {
+    "greeting": "{{name}} さん、こんにちは。",
+    "newPost": "{{blogName}} の新しい投稿",
+    "readArticle": "記事を読む →",
+    "subscribedTo": "{{blogName}} に登録しているため、このメールをお届けしています。",
+    "unsubscribe": "登録解除"
   }
 }

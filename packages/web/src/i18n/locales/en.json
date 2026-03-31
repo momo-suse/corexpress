@@ -730,5 +730,12 @@
       "connect": "Connect"
     },
     "errorLoading": "Error loading blog."
+  },
+  "email": {
+    "greeting": "Hi {{name}},",
+    "newPost": "New post on {{blogName}}",
+    "readArticle": "Read article →",
+    "subscribedTo": "You're receiving this because you subscribed to {{blogName}}.",
+    "unsubscribe": "Unsubscribe"
   }
 }
