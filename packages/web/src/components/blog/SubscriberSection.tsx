@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Bell, BellOff, Trash2, X, Loader2, LogOut } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useSubscriber, useUpdateSubscriber, useDeleteSubscriber, useSubscriberLogout } from '@/hooks/useSubscriber'
@@ -273,7 +274,7 @@ export default function SubscriberSection({ collection, subscriberVisible, setti
             </button>
           )}
         </div>
-        {modalOpen && <SubscriberModal onClose={() => setModalOpen(false)} blogName={blogName} />}
+        {modalOpen && createPortal(<SubscriberModal onClose={() => setModalOpen(false)} blogName={blogName} />, document.body)}
       </>
     )
   }
@@ -302,7 +303,7 @@ export default function SubscriberSection({ collection, subscriberVisible, setti
             )}
           </div>
         </div>
-        {modalOpen && <SubscriberModal onClose={() => setModalOpen(false)} blogName={blogName} />}
+        {modalOpen && createPortal(<SubscriberModal onClose={() => setModalOpen(false)} blogName={blogName} />, document.body)}
       </>
     )
   }
@@ -327,7 +328,7 @@ export default function SubscriberSection({ collection, subscriberVisible, setti
             {t('blog.subscribe.button')}
           </button>
         )}
-        {modalOpen && <SubscriberModal onClose={() => setModalOpen(false)} blogName={blogName} />}
+        {modalOpen && createPortal(<SubscriberModal onClose={() => setModalOpen(false)} blogName={blogName} />, document.body)}
       </>
     )
   }
@@ -356,7 +357,7 @@ export default function SubscriberSection({ collection, subscriberVisible, setti
             )}
           </div>
         </div>
-        {modalOpen && <SubscriberModal onClose={() => setModalOpen(false)} blogName={blogName} />}
+        {modalOpen && createPortal(<SubscriberModal onClose={() => setModalOpen(false)} blogName={blogName} />, document.body)}
       </>
     )
   }
@@ -385,7 +386,7 @@ export default function SubscriberSection({ collection, subscriberVisible, setti
             )}
           </div>
         </div>
-        {modalOpen && <SubscriberModal onClose={() => setModalOpen(false)} blogName={blogName} />}
+        {modalOpen && createPortal(<SubscriberModal onClose={() => setModalOpen(false)} blogName={blogName} />, document.body)}
       </>
     )
   }
@@ -428,7 +429,7 @@ export default function SubscriberSection({ collection, subscriberVisible, setti
           )}
         </div>
       </div>
-      {modalOpen && <SubscriberModal onClose={() => setModalOpen(false)} blogName={blogName} />}
+      {modalOpen && createPortal(<SubscriberModal onClose={() => setModalOpen(false)} blogName={blogName} />, document.body)}
     </>
   )
 }

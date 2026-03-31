@@ -16,9 +16,22 @@ class Mailer
      */
     public static function notifySubscribers(Post $post): int
     {
-        $domain   = self::domain();
-        $blogName = Setting::where('key', 'blog_name')->value('value') ?? 'Blog';
-        $postUrl  = rtrim($domain, '/') . '/post/' . $post->slug;
+        $domain = self::domain();
+
+        $settings   = Setting::whereIn('key', ['blog_name', 'blog_logo_url', 'active_style_collection', 'app_locale'])
+                              ->pluck('value', 'key');
+        $blogName   = $settings['blog_name']              ?? 'Blog';
+        $logoUrl    = $settings['blog_logo_url']          ?? '';
+        $collection = $settings['active_style_collection'] ?? 'default';
+        $locale     = $settings['app_locale']             ?? 'en';
+
+        $logoAbsUrl = $logoUrl
+            ? (str_starts_with($logoUrl, 'http') ? $logoUrl : rtrim($domain, '/') . $logoUrl)
+            : '';
+
+        $t = self::loadTranslations($locale);
+
+        $postUrl = rtrim($domain, '/') . '/post/' . $post->slug;
 
         $excerpt = $post->excerpt
             ? strip_tags($post->excerpt)
@@ -34,14 +47,16 @@ class Mailer
         foreach ($subscribers as $subscriber) {
             $unsubscribeUrl = rtrim($domain, '/') . '/api/v1/auth/subscriber/unsubscribe?token=' . urlencode($subscriber->unsubscribe_token);
 
-            $html = self::buildEmailHtml(
-                blogName: $blogName,
-                postTitle: $post->title,
-                excerpt: $excerpt,
-                postUrl: $postUrl,
-                subscriberName: $subscriber->name,
-                unsubscribeUrl: $unsubscribeUrl,
-            );
+            $html = self::renderTemplate($collection, [
+                'blogName'       => $blogName,
+                'blogLogoUrl'    => $logoAbsUrl,
+                'postTitle'      => $post->title,
+                'excerpt'        => $excerpt,
+                'postUrl'        => $postUrl,
+                'subscriberName' => $subscriber->name,
+                'unsubscribeUrl' => $unsubscribeUrl,
+                't'              => $t,
+            ]);
 
             $headers = implode("\r\n", [
                 'MIME-Version: 1.0',
@@ -57,7 +72,7 @@ class Mailer
                 $sent++;
             }
 
-            usleep(100000); // 100ms between sends to avoid SMTP throttling
+            usleep(100000);
         }
 
         return $sent;
@@ -73,64 +88,26 @@ class Mailer
         return '';
     }
 
-    private static function buildEmailHtml(
-        string $blogName,
-        string $postTitle,
-        string $excerpt,
-        string $postUrl,
-        string $subscriberName,
-        string $unsubscribeUrl,
-    ): string {
-        $blogNameE    = htmlspecialchars($blogName, ENT_QUOTES);
-        $postTitleE   = htmlspecialchars($postTitle, ENT_QUOTES);
-        $excerptE     = nl2br(htmlspecialchars($excerpt, ENT_QUOTES));
-        $postUrlE     = htmlspecialchars($postUrl, ENT_QUOTES);
-        $nameE        = htmlspecialchars($subscriberName, ENT_QUOTES);
-        $unsubscribeE = htmlspecialchars($unsubscribeUrl, ENT_QUOTES);
+    private static function loadTranslations(string $locale): array
+    {
+        $path = __DIR__ . '/EmailTemplates/locales/' . $locale . '.php';
+        if (!file_exists($path)) {
+            $path = __DIR__ . '/EmailTemplates/locales/en.php';
+        }
+        return require $path;
+    }
 
-        return <<<HTML
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>{$postTitleE}</title>
-        </head>
-        <body style="margin:0;padding:0;background:#f4f4f5;font-family:sans-serif;">
-          <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:32px 0;">
-            <tr>
-              <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;max-width:600px;">
-                  <tr>
-                    <td style="background:#18181b;padding:24px 32px;">
-                      <p style="margin:0;color:#a1a1aa;font-size:13px;text-transform:uppercase;letter-spacing:1px;">{$blogNameE}</p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding:32px 32px 24px;">
-                      <p style="margin:0 0 8px;color:#71717a;font-size:13px;">Hi {$nameE},</p>
-                      <h1 style="margin:0 0 16px;font-size:22px;color:#09090b;line-height:1.3;">{$postTitleE}</h1>
-                      <p style="margin:0 0 24px;color:#3f3f46;font-size:15px;line-height:1.6;">{$excerptE}</p>
-                      <a href="{$postUrlE}"
-                         style="display:inline-block;background:#09090b;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:6px;font-size:14px;font-weight:600;">
-                        Read article →
-                      </a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding:16px 32px 24px;border-top:1px solid #f4f4f5;">
-                      <p style="margin:0;color:#a1a1aa;font-size:12px;">
-                        You're receiving this because you subscribed to {$blogNameE}.<br>
-                        <a href="{$unsubscribeE}" style="color:#71717a;">Unsubscribe</a>
-                      </p>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
-        </body>
-        </html>
-        HTML;
+    private static function renderTemplate(string $collection, array $vars): string
+    {
+        $path = __DIR__ . '/EmailTemplates/' . $collection . '.php';
+        if (!file_exists($path)) {
+            $path = __DIR__ . '/EmailTemplates/default.php';
+        }
+        return (static function (array $v, string $tplPath): string {
+            ob_start();
+            extract($v);
+            include $tplPath;
+            return (string) ob_get_clean();
+        })($vars, $path);
     }
 }

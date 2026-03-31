@@ -730,5 +730,12 @@
       "connect": "Conéctate"
     },
     "errorLoading": "Error al cargar el blog."
+  },
+  "email": {
+    "greeting": "Hola {{name}},",
+    "newPost": "Nueva publicación en {{blogName}}",
+    "readArticle": "Leer artículo →",
+    "subscribedTo": "Recibes esto porque te suscribiste a {{blogName}}.",
+    "unsubscribe": "Cancelar suscripción"
   }
 }
