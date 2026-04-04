@@ -61,6 +61,7 @@
       "blog": "Blog",
       "styles": "Estilos",
       "subscribers": "Suscriptores",
+      "resources": "Recursos",
       "settings": "Configuración",
       "viewBlog": "Ver blog",
       "signOut": "Cerrar sesión"
@@ -306,10 +307,59 @@
       "statusActive": "Suscrito",
       "statusUnsubscribed": "Desuscrito",
       "empty": "Aún no hay suscriptores.",
+      "featureDisabled": "Las suscripciones están desactivadas. El botón de suscripción no aparecerá en el blog.",
       "deleted": "Suscriptor eliminado.",
       "deleteFailed": "No se pudo eliminar al suscriptor.",
       "deleteTitle": "Eliminar suscriptor",
       "deleteDescription": "Esto eliminará permanentemente al suscriptor de la lista. Ya no recibirá notificaciones."
+    },
+    "resources": {
+      "title": "Recursos",
+      "subtitle": "Gestiona las imagenes subidas al sistema y revisa donde se estan usando.",
+      "totalResources": "Recursos totales",
+      "searchPlaceholder": "Busca por post, nombre, slug, tag...",
+      "clearSearch": "Limpiar",
+      "empty": "Aun no hay recursos subidos.",
+      "emptySearch": "No encontramos recursos para esa busqueda.",
+      "emptyHint": "Cuando los usuarios suban imagenes, apareceran aqui con sus usos y acciones.",
+      "usageCount": "{{count}} uso(s)",
+      "fileType": "Tipo de archivo",
+      "fileSize": "Peso del archivo",
+      "uploadedAt": "Fecha de carga",
+      "recordsTitle": "Registros encontrados",
+      "noPostRecords": "Sin titulos de posts vinculados",
+      "locationsTitle": "Lugares donde se usa",
+      "totalStorage": "Memoria usada",
+      "unusedResources": "Recursos sin uso",
+      "unused": "Sin usos detectados",
+      "replace": "Actualizar",
+      "download": "Descargar",
+      "replacing": "Actualizando...",
+      "replaced": "Recurso actualizado.",
+      "replaceFailed": "No se pudo actualizar el recurso.",
+      "deleted": "Recurso eliminado.",
+      "deleteFailed": "No se pudo eliminar el recurso.",
+      "deleteTitle": "Eliminar recurso",
+      "deleteDescriptionUsed": "Este recurso esta siendo utilizado en {{count}} lugar(es). Si lo eliminas, esas vistas quedaran afectadas.",
+      "deleteDescriptionUnused": "Este recurso se eliminara del servidor de forma permanente.",
+      "impactedAreas": "Lugares afectados",
+      "loadingMore": "Cargando...",
+      "loadMore": "Cargar mas",
+      "unknownTitle": "Registro sin titulo",
+      "unknownLocation": "Ubicacion desconocida",
+      "locationFeatured": "Imagen destacada: {{title}}",
+      "locationContent": "Contenido del post: {{title}}",
+      "locationTranslation": "Traduccion del post ({{locale}}): {{title}}",
+      "deleting": "Eliminando...",
+      "settingKeys": {
+        "blog_logo_id": "Logo del blog",
+        "hero_image_id": "Banner de inicio",
+        "profile_image_id": "Imagen de perfil",
+        "profile_cover_id": "Portada del perfil",
+        "profile_gallery": "Galeria del perfil",
+        "profile_testimonials": "Testimoniales del perfil",
+        "profile_description": "Descripcion del perfil"
+      }
     },
     "setup": {
       "title": "Configura tu blog",
@@ -377,7 +427,8 @@
         "social": "Redes sociales",
         "comments": "Comentarios",
         "search": "Buscador",
-        "tags": "Tags"
+        "tags": "Tags",
+        "likes": "Likes"
       },
       "hero": {
         "description": "El banner de inicio es lo primero que ven los visitantes al llegar al blog.",
@@ -462,7 +513,20 @@
         "cardSubtitle": "Muestra los tags más utilizados del blog para filtrar publicaciones.",
         "countLabel": "Número de tags a mostrar",
         "countHint": "Mínimo 1, máximo 20. Ordenados por popularidad."
+      },
+      "likes": {
+        "description": "Permite a los lectores dar like a tus posts. Se cuentan por dirección IP, sin necesidad de cuenta.",
+        "cardTitle": "Likes en posts",
+        "cardSubtitle": "Mostrar u ocultar el botón de like en cada post"
       }
+    },
+    "analytics": {
+      "title": "Analíticas",
+      "today": "Hoy",
+      "week": "Esta semana",
+      "month": "Este mes",
+      "views": "visitas",
+      "noData": "Aún no hay datos. Visita tu blog para comenzar a registrar."
     },
     "styles": {
       "title": "Estilo del blog",
@@ -728,6 +792,10 @@
     },
     "socialLinks": {
       "connect": "Conéctate"
+    },
+    "likes": {
+      "like": "Me gusta",
+      "liked": "Te gustó"
     },
     "errorLoading": "Error al cargar el blog."
   },

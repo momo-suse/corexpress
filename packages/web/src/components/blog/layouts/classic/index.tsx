@@ -21,6 +21,7 @@ import {
 import { Linkedin, Instagram, Youtube, Facebook } from 'lucide-react'
 import AdminBar from '@/components/blog/AdminBar'
 import LanguageSwitcher from '@/components/blog/LanguageSwitcher'
+import LikeButton from '@/components/blog/LikeButton'
 import CommentList from '@/components/blog/CommentList'
 import CommentForm from '@/components/blog/CommentForm'
 import AboutGallery from '@/components/blog/AboutGallery'
@@ -611,6 +612,7 @@ export interface ClassicPostContentProps {
   settings: Record<string, string>
   user: boolean
   commentsEnabled: boolean
+  likesEnabled: boolean
   profileVisible: boolean
   socialVisible: boolean
   subscriberVisible?: boolean
@@ -634,6 +636,7 @@ export function ClassicPostContent({
   settings,
   user,
   commentsEnabled,
+  likesEnabled,
   profileVisible,
   socialVisible,
   subscriberVisible = false,
@@ -778,6 +781,13 @@ export function ClassicPostContent({
               className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-serif prose-p:font-light [&_a]:![color:var(--blog-accent)] [&_blockquote]:!border-l-[2px] [&_blockquote]:![border-left-color:var(--blog-accent)] mb-20"
               dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
             />
+
+            {/* Likes */}
+            {likesEnabled && (
+              <div className="flex justify-start mt-8 mb-2">
+                <LikeButton postId={post.id} collection="classic" initialCount={post.likes_count} />
+              </div>
+            )}
 
             {/* Related posts */}
             {relatedPosts.length > 0 && (

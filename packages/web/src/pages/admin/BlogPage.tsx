@@ -17,6 +17,7 @@ import {
   Search,
   Tag,
   FileDown,
+  Heart,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -41,7 +42,7 @@ import type { PageComponent, Settings } from '@/types/api'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-type Tab = 'hero' | 'profile' | 'social' | 'comments' | 'search' | 'tags'
+type Tab = 'hero' | 'profile' | 'social' | 'comments' | 'search' | 'tags' | 'likes'
 
 function parseJSON<T>(value: string | undefined, fallback: T): T {
   try { return JSON.parse(value ?? '[]') as T } catch { return fallback }
@@ -223,6 +224,7 @@ export default function BlogPage() {
     { id: 'comments', label: t('admin.blog.tabs.comments'), Icon: MessageSquare },
     { id: 'search',   label: t('admin.blog.tabs.search'),  Icon: Search },
     { id: 'tags',     label: t('admin.blog.tabs.tags'),    Icon: Tag },
+    { id: 'likes',    label: t('admin.blog.tabs.likes'),   Icon: Heart },
   ]
 
   const qc = useQueryClient()
@@ -791,6 +793,43 @@ export default function BlogPage() {
             </div>
           </SectionCard>
         )}
+
+        {activeTab === 'likes' && (() => {
+          const likesOn = (form.likes_enabled ?? '0') === '1'
+          return (
+            <>
+              <p className="text-sm text-muted-foreground">
+                {t('admin.blog.likes.description')}
+              </p>
+              <div className={cn(
+                'rounded-2xl border-2 overflow-hidden transition-all duration-200',
+                likesOn ? 'border-primary/40 shadow-sm shadow-primary/5' : 'border-border',
+              )}>
+                <div className={cn(
+                  'flex items-center gap-4 px-6 py-4',
+                  likesOn ? 'bg-primary/5' : 'bg-card',
+                )}>
+                  <div className={cn(
+                    'p-2.5 rounded-xl shrink-0',
+                    likesOn ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground',
+                  )}>
+                    <Heart className="h-4 w-4" />
+                  </div>
+                  <div className="flex-1">
+                    <p className={cn('text-sm font-semibold', likesOn ? 'text-foreground' : 'text-muted-foreground')}>
+                      {t('admin.blog.likes.cardTitle')}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{t('admin.blog.likes.cardSubtitle')}</p>
+                  </div>
+                  <Switch
+                    checked={likesOn}
+                    onCheckedChange={(v) => setField('likes_enabled' as keyof Settings, v ? '1' : '0')}
+                  />
+                </div>
+              </div>
+            </>
+          )
+        })()}
 
       </div>
     </div>

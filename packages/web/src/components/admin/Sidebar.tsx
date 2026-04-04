@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, MessageSquare, Settings, LogOut, Globe, Palette, Rss, Users } from 'lucide-react'
+import { LayoutDashboard, MessageSquare, Settings, LogOut, Globe, Palette, Rss, Users, Images } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { logout } from '@/api/auth'
 import { useComments } from '@/hooks/useComments'
@@ -62,6 +62,11 @@ export default function Sidebar() {
         <NavLink to="/cx-admin/subscribers" className={navLink}>
           <Users className="h-4 w-4 shrink-0" />
           <span>{t('admin.sidebar.subscribers')}</span>
+        </NavLink>
+
+        <NavLink to="/cx-admin/resources" className={navLink}>
+          <Images className="h-4 w-4 shrink-0" />
+          <span>{t('admin.sidebar.resources')}</span>
         </NavLink>
 
         <NavLink to="/cx-admin/settings" className={navLink}>

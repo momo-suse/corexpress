@@ -22,6 +22,7 @@ import SocialLinks from '@/components/blog/SocialLinks'
 import SearchBar from '@/components/blog/SearchBar'
 import TagCloud from '@/components/blog/TagCloud'
 import PostDetail from '@/components/blog/PostDetail'
+import LikeButton from '@/components/blog/LikeButton'
 import CommentList from '@/components/blog/CommentList'
 import CommentForm from '@/components/blog/CommentForm'
 import AboutHero from '@/components/blog/AboutHero'
@@ -222,6 +223,7 @@ export interface DefaultPostContentProps {
   settings: Record<string, string>
   user: boolean
   commentsEnabled: boolean
+  likesEnabled: boolean
   profileVisible: boolean
   socialVisible: boolean
   subscriberVisible: boolean
@@ -237,6 +239,7 @@ export function DefaultPostContent({
   settings,
   user,
   commentsEnabled,
+  likesEnabled,
   profileVisible,
   socialVisible,
   subscriberVisible,
@@ -343,6 +346,11 @@ export function DefaultPostContent({
                 currentLocale={currentLocale}
                 onLocaleChange={onLocaleChange}
               />
+              {likesEnabled && (
+                <div className="flex justify-start mt-6 pt-5 border-t border-gray-100 dark:border-gray-800">
+                  <LikeButton postId={post.id} collection={settings.active_style_collection ?? 'default'} initialCount={post.likes_count} />
+                </div>
+              )}
             </div>
 
             {/* Comments — only rendered when enabled */}

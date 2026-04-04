@@ -62,7 +62,7 @@ class PostController extends Controller
 
         $total = $query->count();
         $posts = (clone $query)
-            ->select(['id', 'title', 'slug', 'excerpt', 'tags', 'reading_time', 'content', 'featured_image_id', 'status', 'created_at', 'updated_at', 'base_locale'])
+            ->select(['id', 'title', 'slug', 'excerpt', 'tags', 'reading_time', 'content', 'featured_image_id', 'status', 'likes_count', 'created_at', 'updated_at', 'base_locale'])
             ->withCount([
                 'comments as comments_count',
                 'comments as comments_pending_count' => static fn ($q) => $q->where('status', 'pending'),

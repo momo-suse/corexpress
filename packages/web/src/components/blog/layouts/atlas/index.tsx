@@ -24,6 +24,7 @@ import {
 } from 'lucide-react'
 import { Linkedin, Instagram, Youtube, Facebook } from 'lucide-react'
 import AdminBar from '@/components/blog/AdminBar'
+import LikeButton from '@/components/blog/LikeButton'
 import CommentList from '@/components/blog/CommentList'
 import CommentForm from '@/components/blog/CommentForm'
 import AboutTestimonials from '@/components/blog/AboutTestimonials'
@@ -567,6 +568,7 @@ interface AtlasPostContentProps {
   settings: Record<string, string>
   user: boolean
   commentsEnabled: boolean
+  likesEnabled: boolean
   profileVisible: boolean
   socialVisible: boolean
   subscriberVisible: boolean
@@ -582,6 +584,7 @@ export function AtlasPostContent({
   settings,
   user,
   commentsEnabled,
+  likesEnabled,
   profileVisible,
   subscriberVisible,
   onCommentSubmitted,
@@ -656,6 +659,13 @@ export function AtlasPostContent({
             [&_a]:![color:var(--blog-accent)]"
           dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content ?? '') }}
         />
+
+        {/* ── Likes ─────────────────────────────────────────────────────── */}
+        {likesEnabled && (
+          <div className="flex justify-start mt-8 mb-4">
+            <LikeButton postId={post.id} collection="atlas" initialCount={post.likes_count} />
+          </div>
+        )}
 
         {/* ── Map embed ─────────────────────────────────────────────────── */}
         {post.map_embed_url && (

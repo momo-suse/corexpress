@@ -31,6 +31,7 @@ export interface Post {
   author_id: number
   created_at: string
   updated_at: string
+  likes_count: number
   comments_count?: number
   comments_pending_count?: number
   /** Locales that have a translation (e.g. ['es', 'ja']). Present in list() response. */
@@ -122,7 +123,17 @@ export interface Settings {
   subscribers_enabled: string
   /** '1' = reCAPTCHA v3 enabled on comment form, '0' = disabled */
   recaptcha_enabled: string
+  /** '1' = post likes enabled, '0' = disabled */
+  likes_enabled: string
   [key: string]: string
+}
+
+export interface ImageUsageRecord {
+  kind: 'setting' | 'post_featured' | 'post_content' | 'translation_content'
+  setting_key: string | null
+  post_id: number | null
+  locale: string | null
+  titles: string[]
 }
 
 export interface ImageAsset {
@@ -134,6 +145,9 @@ export interface ImageAsset {
   file_size: number
   url: string
   created_at: string
+  usage_count: number
+  usage_titles: string[]
+  usage_records: ImageUsageRecord[]
 }
 
 export interface ComponentDefinition {
@@ -182,6 +196,12 @@ export interface Page {
   components: PageComponent[]
 }
 
+export interface ResourceStats {
+  total_resources: number
+  total_bytes: number
+  unused_resources: number
+}
+
 export interface PaginatedResponse<T> {
   data: T[]
   meta: {
@@ -189,6 +209,7 @@ export interface PaginatedResponse<T> {
     last_page: number
     per_page: number
     total: number
+    resource_stats?: ResourceStats
   }
 }
 
@@ -199,4 +220,18 @@ export interface ApiResponse<T> {
 export interface TagItem {
   tag: string
   count: number
+}
+
+export interface LikeStatus {
+  count: number
+  liked: boolean
+}
+
+export interface AnalyticsSummary {
+  /** hour (0–23) → view count for today */
+  today: Record<number, number>
+  /** 'YYYY-MM-DD' → view count for last 7 days */
+  week: Record<string, number>
+  /** 'YYYY-MM-DD' → view count for last 30 days */
+  month: Record<string, number>
 }

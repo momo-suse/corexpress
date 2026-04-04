@@ -18,6 +18,7 @@ import CommentsPage from '@/pages/admin/CommentsPage'
 import StylesPage from '@/pages/admin/StylesPage'
 import BlogPage from '@/pages/admin/BlogPage'
 import SubscribersPage from '@/pages/admin/SubscribersPage'
+import ResourcesPage from '@/pages/admin/ResourcesPage'
 
 // Shared
 import ProtectedRoute from '@/components/shared/ProtectedRoute'
@@ -64,6 +65,7 @@ function AppInner() {
             <Route path="comments" element={<CommentsPage />} />
             <Route path="styles" element={<StylesPage />} />
             <Route path="subscribers" element={<SubscribersPage />} />
+            <Route path="resources" element={<ResourcesPage />} />
           </Route>
         </Route>
 

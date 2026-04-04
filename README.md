@@ -1,96 +1,267 @@
-# 🚀 Corexpress
+# Corexpress
 
-**Corexpress** is an open-source personal blog platform designed specifically to run on **Hostinger (Shared Hosting)**. It provides a modern experience with selectable themes, configurable views, and a visual administration interface, all with an installation process as simple as WordPress.
+[![PHP](https://img.shields.io/badge/PHP-8.3-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/) [![Slim](https://img.shields.io/badge/Slim-4-74a045?style=for-the-badge&logo=slim&logoColor=white)](https://www.slimframework.com/) [![React](https://img.shields.io/badge/React-19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/) [![Vite](https://img.shields.io/badge/Vite-6-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![MySQL](https://img.shields.io/badge/MySQL-8-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/) [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/) [![Apache](https://img.shields.io/badge/Apache-Shared_Hosting-D22128?style=for-the-badge&logo=apache&logoColor=white)](https://httpd.apache.org/)
 
----
 
-## ✨ Key Features
+## Overview
 
-- **Web Installer:** Step-by-step browser-based configuration (WordPress style).
-- **Admin Dashboard:** Modern visual interface for managing posts, comments, and site settings.
-- **Dual Theme System:**
-  - *Dashboard Theme:* Customize the administration interface (Light, Dark, Minimal).
-  - *Blog Style:* Semantic and configurable style collections for the public view.
-- **Modular Components:** Show or hide blog sections (hero, profile, post list, comment form) according to your needs.
-- **Built-in Security:** Protection against CSRF, rate limiting, secure passwords (Argon2id), and SQL injection prevention (PDO) by default.
-- **Shared Hosting Oriented:** Does not require a Node.js environment, VPS, or root access on the production server.
+Corexpress is a monorepo for a personal blog platform designed for Hostinger-style shared hosting.
+It combines:
 
----
+- a PHP 8.3 + Slim 4 backend API
+- a React 19 + Vite frontend
+- a web installer under `/setup`
+- an admin panel under `/cx-admin`
+- a public blog with configurable layouts and sections
 
-## 📋 System Requirements
+The production target is shared hosting with Apache + MySQL. Node.js is used for local frontend development and build time, not as a runtime dependency on the production server.
 
-To install Corexpress, you need a hosting environment (like Hostinger) that meets the following criteria:
+## What Exists Today
 
-- **PHP:** 8.3.x (pre-installed)
-- **Web Server:** Apache with `mod_rewrite` enabled
-- **Database:** MySQL 8.0
-- **TLS/SSL:** Managed by the hosting provider (e.g., AutoSSL, cPanel, hPanel)
+### Installer
 
-### Pre-installation Requirements
-1. An active shared hosting account.
-2. A configured domain pointing to your hosting.
-3. An empty MySQL database created from your control panel.
+- Browser-based setup flow available at `/setup`
+- Admin setup flow available at `/cx-admin/setup`
+- Installer source lives in `packages/installer`
+- Optional SSH bootstrap via `install.sh`
 
----
+### Admin Area
 
-## 🚀 Installation
+Current admin sections in the repo:
 
-You have two options for installing Corexpress on your server:
+- Dashboard
+- Blog
+- Comments
+- Styles
+- Subscribers
+- Resources
+- Settings
+- Setup
+- Login / reset password
 
-### Option A: Quick SSH Installation (Recommended)
-If your hosting plan includes SSH access (e.g., Business plans and above), run the following command in your terminal:
+### Public Site
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/user/corexpress/main/install.sh | bash
+Current public routes in the repo:
+
+- `/` blog home
+- `/post/:slug` single post view
+- `/about`
+- subscriber flow pages for welcome, unsubscribe, and error states
+
+### Product Capabilities Present in Code
+
+- Post CRUD
+- Post translations
+- Comment moderation
+- Blog settings management
+- Admin theme switching
+- Blog style collections
+- Subscriber management and Google subscriber auth flow
+- Image upload, replacement, deletion, usage tracking, and download from admin
+- In-app update check/apply endpoints
+- CSRF-protected admin mutations
+- Session-based authentication
+
+## Monorepo Structure
+
+```text
+.
+├── packages/
+│   ├── app/         # PHP backend API, public assets, tests
+│   ├── installer/   # Web installer and migrations
+│   └── web/         # React admin + public frontend
+├── compose.dev.yml  # Local shared-hosting simulation
+├── Dockerfile
+├── install.sh       # SSH installer for release ZIPs
+├── update.sh
+└── VERSION
 ```
-The script will download the latest version, extract it, and prepare the files. Once it finishes, visit `https://yourdomain.com/setup` in your browser.
 
-### Option B: Manual Installation
-1. Download the latest `corexpress.zip` file from the [Releases](../../releases) tab on GitHub.
-2. Upload and extract the ZIP file into your hosting's public directory (usually `public_html`) using FTP or your panel's File Manager.
-3. Visit `https://yourdomain.com/setup` in your browser.
+## Tech Stack
 
-### Browser Setup Wizard (`/setup`)
-The web installer will guide you step by step:
-1. Requirements check (PHP version, Apache rewrite, write permissions).
-2. Database connection.
-3. Administrator account creation.
-4. Blog settings (Name, description, admin dashboard theme).
-5. Installation (Database table creation).
+### Backend
 
-> **Note:** For security reasons, the `/setup` route will self-destruct once the installation is successful.
+- PHP 8.3
+- Slim 4
+- Eloquent ORM (`illuminate/database`)
+- PHPUnit for backend tests
 
----
+### Frontend
 
-## 🛠️ Technology Stack
+- React 19
+- Vite 6
+- TypeScript
+- React Router 7
+- TanStack Query
+- Zustand
+- Tailwind CSS
+- Radix UI primitives
+- Tiptap editor
+- Vitest for frontend tests
 
-Corexpress is structured as a monorepo, combining modern methodologies while remaining fully compatible with traditional infrastructure:
+### Infrastructure Target
 
-- **Backend Architecture:** PHP 8.3 + [Slim 4 Framework](https://www.slimframework.com/) for the API.
-- **Frontend Architecture:** React 19 + Vite (The UI is pre-built and deployed as static assets).
-- **Database / ORM:** MySQL 8.0 managed via Eloquent ORM (Standalone).
-- **Authentication:** Native PHP sessions + CSRF protecting the REST API.
+- Apache
+- MySQL 8.0
+- Hostinger-style shared hosting
 
----
+## Requirements
 
-## 💻 Development Environment
+### Production / Shared Hosting
 
-If you'd like to contribute or modify Corexpress, the development environment simulates a shared hosting setup using containers via Podman/Docker Compose.
+- PHP 8.3
+- MySQL 8.0
+- Apache with rewrite support
+- ability to upload the release package or use SSH
 
-### Developer Quick Start
+### Local Development
+
+- Node.js 20+
+- npm 10+
+- Composer
+- Docker or Podman
+
+## Installation
+
+### Option A: SSH Installer
 
 ```bash
-# 1. Start services (Apache/PHP 8.3 + MySQL)
-podman compose -f compose.dev.yml up -d
+curl -fsSL https://raw.githubusercontent.com/momo-suse/corexpress/main/install.sh | bash
+```
 
-# 2. Install backend dependencies
+What the script does:
+
+1. Checks for PHP, unzip, and curl/wget.
+2. Downloads the latest GitHub release ZIP.
+3. Extracts the files into the current directory.
+4. Tells you to complete setup in the browser.
+
+Then open:
+
+```text
+https://your-domain.com/setup
+```
+
+### Option B: Manual Release Install
+
+1. Download the latest release ZIP from GitHub Releases.
+2. Upload it to your hosting directory.
+3. Extract the archive.
+4. Open `/setup` in the browser.
+
+## Local Development
+
+Corexpress includes a local environment that simulates shared hosting with Apache + PHP + MySQL.
+
+### Start with Podman
+
+```bash
+npm run podman:up
+```
+
+### Start with Docker
+
+```bash
+npm run docker:up
+```
+
+The app is exposed at:
+
+```text
+http://localhost:8080
+```
+
+### Install Dependencies
+
+Backend:
+
+```bash
 cd packages/app
 composer install
+```
 
-# 3. Start frontend development environment
-cd ../web
+Frontend:
+
+```bash
+cd packages/web
 npm install
+```
+
+### Frontend Development
+
+From the repo root:
+
+```bash
+npm run frontend:dev
+```
+
+Or directly:
+
+```bash
+cd packages/web
 npm run dev
 ```
 
-> Node.js is strictly used for the development environment. Upon creating a release, the frontend code is compiled using Vite and stored in the backend's public folder (`packages/app/public/assets`).
+### Frontend Build
+
+From the repo root:
+
+```bash
+npm run frontend:build
+```
+
+Or directly:
+
+```bash
+cd packages/web
+npm run build
+```
+
+## Testing
+
+### Frontend
+
+```bash
+npm run test:web
+```
+
+or:
+
+```bash
+cd packages/web
+npm run test
+```
+
+### Backend
+
+Directly with Composer:
+
+```bash
+cd packages/app
+composer test
+```
+
+Container helpers also exist in the root `package.json`:
+
+```bash
+npm run test:php
+npm run test:php:coverage
+npm run test:php:podman
+```
+
+## Important Notes
+
+- Production does not require Node.js as a runtime dependency.
+- The installer is part of the repo in `packages/installer`; it is not just documentation.
+- The admin and public site are served from the same project, but they are separate route areas.
+- The current repo includes an image resources manager in the admin panel.
+- The current repo includes update endpoints and scripts, so updating is part of the product surface.
+
+## Useful Paths
+
+- `packages/app/src/Routes/api.php` — backend API routes
+- `packages/web/src/App.tsx` — frontend routes
+- `packages/installer` — installer source
+- `compose.dev.yml` — local development stack
+- `install.sh` — release installer
+

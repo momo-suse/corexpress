@@ -21,6 +21,7 @@ import {
 import { Linkedin, Instagram, Youtube, Facebook } from 'lucide-react'
 import AdminBar from '@/components/blog/AdminBar'
 import LanguageSwitcher from '@/components/blog/LanguageSwitcher'
+import LikeButton from '@/components/blog/LikeButton'
 import CommentList from '@/components/blog/CommentList'
 import CommentForm from '@/components/blog/CommentForm'
 import AboutGallery from '@/components/blog/AboutGallery'
@@ -583,6 +584,7 @@ interface NebulaPostContentProps {
   settings: Record<string, string>
   user: boolean
   commentsEnabled: boolean
+  likesEnabled: boolean
   profileVisible: boolean
   socialVisible: boolean
   subscriberVisible: boolean
@@ -598,6 +600,7 @@ export function NebulaPostContent({
   settings,
   user,
   commentsEnabled,
+  likesEnabled,
   profileVisible,
   subscriberVisible,
   onCommentSubmitted,
@@ -683,6 +686,13 @@ export function NebulaPostContent({
             className="prose prose-invert prose-lg max-w-none prose-p:text-slate-400 prose-p:leading-relaxed prose-p:font-light prose-headings:text-white prose-blockquote:border-l-0 prose-blockquote:rounded-2xl prose-blockquote:bg-white/5 prose-blockquote:px-6 prose-blockquote:py-4 prose-blockquote:not-italic prose-blockquote:relative prose-code:text-cyan-400 [&_a]:![color:var(--blog-accent)]"
             dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
           />
+
+          {/* Likes */}
+          {likesEnabled && (
+            <div className="mt-10 flex justify-start">
+              <LikeButton postId={post.id} collection="nebula" initialCount={post.likes_count} />
+            </div>
+          )}
 
           {/* Related posts + back CTA */}
           <div className="mt-24 pt-12 border-t border-white/10">

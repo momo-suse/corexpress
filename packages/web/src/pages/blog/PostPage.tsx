@@ -7,6 +7,7 @@ import { getSettings } from '@/api/settings'
 import { getPostWithLocale } from '@/api/posts'
 import { useBlogPage } from '@/hooks/useBlogPage'
 import { useBlogMeta } from '@/hooks/useBlogMeta'
+import { usePageView } from '@/hooks/usePageView'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import { Link } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
@@ -69,6 +70,7 @@ export default function PostPage() {
   const post = localizedPost ?? basePost
 
   useBlogMeta(settings, post?.title)
+  usePageView(slug ?? '')
 
   // Recent posts for sidebar (max 4, exclude current)
   const { data: recentData } = usePosts(1)
@@ -103,6 +105,7 @@ export default function PostPage() {
   const socialVisible = isVisible('social-links')
   const subscriberVisible = isVisible('subscriber') && settings.subscribers_enabled === '1'
   const commentsEnabled = (settings.comments_enabled ?? '1') === '1'
+  const likesEnabled = settings.likes_enabled === '1'
 
   // Recent posts: exclude current, max 4
   const recentPosts = (recentData?.data ?? [])
@@ -129,6 +132,7 @@ export default function PostPage() {
         settings={settings}
         user={!!user}
         commentsEnabled={commentsEnabled}
+        likesEnabled={likesEnabled}
         profileVisible={profileVisible}
         socialVisible={socialVisible}
         subscriberVisible={subscriberVisible}
@@ -147,6 +151,7 @@ export default function PostPage() {
         settings={settings}
         user={!!user}
         commentsEnabled={commentsEnabled}
+        likesEnabled={likesEnabled}
         profileVisible={profileVisible}
         socialVisible={socialVisible}
         subscriberVisible={subscriberVisible}
@@ -165,6 +170,7 @@ export default function PostPage() {
         settings={settings}
         user={!!user}
         commentsEnabled={commentsEnabled}
+        likesEnabled={likesEnabled}
         profileVisible={profileVisible}
         socialVisible={socialVisible}
         subscriberVisible={subscriberVisible}
@@ -183,6 +189,7 @@ export default function PostPage() {
         settings={settings}
         user={!!user}
         commentsEnabled={commentsEnabled}
+        likesEnabled={likesEnabled}
         profileVisible={profileVisible}
         socialVisible={socialVisible}
         subscriberVisible={subscriberVisible}
@@ -201,6 +208,7 @@ export default function PostPage() {
         settings={settings}
         user={!!user}
         commentsEnabled={commentsEnabled}
+        likesEnabled={likesEnabled}
         profileVisible={profileVisible}
         socialVisible={socialVisible}
         subscriberVisible={subscriberVisible}

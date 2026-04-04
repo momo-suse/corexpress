@@ -13,6 +13,7 @@ import AdminBar from '@/components/blog/AdminBar'
 import LanguageSwitcher from '@/components/blog/LanguageSwitcher'
 import SearchBar from '@/components/blog/SearchBar'
 import TagCloud from '@/components/blog/TagCloud'
+import LikeButton from '@/components/blog/LikeButton'
 import CommentList from '@/components/blog/CommentList'
 import CommentForm from '@/components/blog/CommentForm'
 import AboutHero from '@/components/blog/AboutHero'
@@ -446,6 +447,7 @@ interface ZenPostContentProps {
   settings: Record<string, string>
   user: boolean
   commentsEnabled: boolean
+  likesEnabled: boolean
   profileVisible: boolean
   socialVisible: boolean
   subscriberVisible: boolean
@@ -461,6 +463,7 @@ export function ZenPostContent({
   settings,
   user,
   commentsEnabled,
+  likesEnabled,
   profileVisible,
   socialVisible,
   subscriberVisible,
@@ -572,6 +575,13 @@ export function ZenPostContent({
                 {tg}
               </Link>
             ))}
+          </div>
+        )}
+
+        {/* ── Likes ─────────────────────────────────────────── */}
+        {likesEnabled && (
+          <div className="flex justify-start mt-10 mb-2">
+            <LikeButton postId={post.id} collection="zen" initialCount={post.likes_count} />
           </div>
         )}
 

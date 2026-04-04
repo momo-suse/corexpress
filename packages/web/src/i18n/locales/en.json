@@ -61,6 +61,7 @@
       "blog": "Blog",
       "styles": "Styles",
       "subscribers": "Subscribers",
+      "resources": "Resources",
       "settings": "Settings",
       "viewBlog": "View blog",
       "signOut": "Sign out"
@@ -306,10 +307,59 @@
       "statusActive": "Subscribed",
       "statusUnsubscribed": "Unsubscribed",
       "empty": "No subscribers yet.",
+      "featureDisabled": "Subscriptions are disabled. The subscribe button will not appear on the blog.",
       "deleted": "Subscriber removed.",
       "deleteFailed": "Failed to remove subscriber.",
       "deleteTitle": "Remove subscriber",
       "deleteDescription": "This will permanently remove the subscriber from the list. They will no longer receive notifications."
+    },
+    "resources": {
+      "title": "Resources",
+      "subtitle": "Manage uploaded system images and review where they are being used.",
+      "totalResources": "Total resources",
+      "searchPlaceholder": "Search by post, name, slug, tag...",
+      "clearSearch": "Clear",
+      "empty": "No uploaded resources yet.",
+      "emptySearch": "No resources matched that search.",
+      "emptyHint": "When users upload images, they will appear here with usage details and actions.",
+      "usageCount": "{{count}} use(s)",
+      "fileType": "File type",
+      "fileSize": "File size",
+      "uploadedAt": "Uploaded at",
+      "recordsTitle": "Records found",
+      "noPostRecords": "No linked post titles",
+      "locationsTitle": "Used in",
+      "totalStorage": "Storage used",
+      "unusedResources": "Unused resources",
+      "unused": "No detected usage",
+      "replace": "Update",
+      "download": "Download",
+      "replacing": "Updating...",
+      "replaced": "Resource updated.",
+      "replaceFailed": "Failed to update resource.",
+      "deleted": "Resource deleted.",
+      "deleteFailed": "Failed to delete resource.",
+      "deleteTitle": "Delete resource",
+      "deleteDescriptionUsed": "This resource is currently used in {{count}} place(s). Deleting it will affect those views.",
+      "deleteDescriptionUnused": "This resource will be permanently removed from the server.",
+      "impactedAreas": "Affected areas",
+      "loadingMore": "Loading...",
+      "loadMore": "Load more",
+      "unknownTitle": "Untitled record",
+      "unknownLocation": "Unknown location",
+      "locationFeatured": "Featured image: {{title}}",
+      "locationContent": "Post content: {{title}}",
+      "locationTranslation": "Post translation ({{locale}}): {{title}}",
+      "deleting": "Deleting...",
+      "settingKeys": {
+        "blog_logo_id": "Blog logo",
+        "hero_image_id": "Hero banner",
+        "profile_image_id": "Profile image",
+        "profile_cover_id": "Profile cover",
+        "profile_gallery": "Profile gallery",
+        "profile_testimonials": "Profile testimonials",
+        "profile_description": "Profile description"
+      }
     },
     "setup": {
       "title": "Set up your blog",
@@ -377,7 +427,8 @@
         "social": "Social Links",
         "comments": "Comments",
         "search": "Search",
-        "tags": "Tags"
+        "tags": "Tags",
+        "likes": "Likes"
       },
       "hero": {
         "description": "The hero banner is the first thing visitors see at the top of the home page.",
@@ -462,7 +513,20 @@
         "cardSubtitle": "Shows the most used tags on the blog to filter posts.",
         "countLabel": "Number of tags to display",
         "countHint": "Minimum 1, maximum 20. Ordered by popularity."
+      },
+      "likes": {
+        "description": "Allow readers to like your posts. Likes are counted per IP address, no account required.",
+        "cardTitle": "Post Likes",
+        "cardSubtitle": "Show or hide the like button on every post"
       }
+    },
+    "analytics": {
+      "title": "Analytics",
+      "today": "Today",
+      "week": "This week",
+      "month": "This month",
+      "views": "views",
+      "noData": "No data yet. Visit your blog to start tracking."
     },
     "styles": {
       "title": "Blog Style",
@@ -728,6 +792,10 @@
     },
     "socialLinks": {
       "connect": "Connect"
+    },
+    "likes": {
+      "like": "Like",
+      "liked": "Liked"
     },
     "errorLoading": "Error loading blog."
   },

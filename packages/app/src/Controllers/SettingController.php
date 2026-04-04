@@ -139,7 +139,7 @@ class SettingController extends Controller
             'blog_name', 'blog_description', 'blog_theme', 'active_style_collection',
             'app_locale', 'comments_enabled', 'tags_max_count', 'recaptcha_site_key',
             'app_version', 'blog_logo_id', 'blog_logo_url', 'setup_complete',
-            'google_client_id', 'subscribers_enabled', 'recaptcha_enabled',
+            'google_client_id', 'subscribers_enabled', 'recaptcha_enabled', 'likes_enabled',
         ];
 
         $componentSettings = [
