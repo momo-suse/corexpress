@@ -10,6 +10,7 @@ import { toast } from '@/hooks/useToast'
 import { Trash2, Bell, BellOff } from 'lucide-react'
 import { getSubscribers, deleteSubscriber } from '@/api/subscribers'
 import { csrf } from '@/api/auth'
+import { useSettings } from '@/hooks/useSettings'
 import type { Subscriber } from '@/types/api'
 
 export default function SubscribersPage() {
@@ -23,6 +24,9 @@ export default function SubscribersPage() {
     queryKey: ['subscribers', { page }],
     queryFn: () => getSubscribers({ page }),
   })
+
+  const { data: settingsData } = useSettings()
+  const subscribersEnabled = settingsData?.data.subscribers_enabled === '1'
 
   const remove = useMutation({
     mutationFn: async (id: number) => {
@@ -65,6 +69,13 @@ export default function SubscribersPage() {
           </p>
         </div>
       </div>
+
+      {settingsData && !subscribersEnabled && (
+        <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/60 px-4 py-2.5 text-sm text-muted-foreground">
+          <BellOff className="h-4 w-4 shrink-0" />
+          {t('admin.subscribers.featureDisabled')}
+        </div>
+      )}
 
       {isLoading && <LoadingSpinner className="py-12" />}
 

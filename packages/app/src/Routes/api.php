@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
+use Corexpress\Controllers\AnalyticsController;
 use Corexpress\Controllers\AuthController;
 use Corexpress\Controllers\CommentController;
 use Corexpress\Controllers\ImageController;
+use Corexpress\Controllers\LikeController;
 use Corexpress\Controllers\PageController;
 use Corexpress\Controllers\PostController;
 use Corexpress\Controllers\SettingController;
@@ -119,6 +121,24 @@ $app->group('/api/v1', function (\Slim\Routing\RouteCollectorProxy $group) use (
     $group->put('/posts/{id}/translations/{locale}',      [PostController::class, 'updateTranslation'])->add($csrfMiddleware)->add($authMiddleware);
     $group->delete('/posts/{id}/translations/{locale}',   [PostController::class, 'destroyTranslation'])->add($csrfMiddleware)->add($authMiddleware);
 
+    // ── Likes ──────────────────────────────────────────────────────────────────
+
+    // Public: get like count + whether current IP already liked
+    $group->get('/posts/{id}/likes', [LikeController::class, 'show']);
+
+    // Public + CSRF: toggle like for current IP
+    $group->post('/posts/{id}/likes', [LikeController::class, 'toggle'])
+          ->add($csrfMiddleware);
+
+    // ── Analytics ──────────────────────────────────────────────────────────────
+
+    // Public: record a page view (no CSRF — beacon endpoint)
+    $group->post('/analytics/view', [AnalyticsController::class, 'record']);
+
+    // Admin: get aggregated view counts for charts
+    $group->get('/analytics/summary', [AnalyticsController::class, 'summary'])
+          ->add($authMiddleware);
+
     // ── Comments ───────────────────────────────────────────────────────────────
 
     // Public (CSRF protected): submit a comment — stored with status=pending
@@ -167,6 +187,11 @@ $app->group('/api/v1', function (\Slim\Routing\RouteCollectorProxy $group) use (
 
     // Admin upload (Auth + CSRF — multipart/form-data, field name: "image")
     $group->post('/images', [ImageController::class, 'store'])
+          ->add($csrfMiddleware)
+          ->add($authMiddleware);
+
+    // Admin replace binary while preserving the same public filename
+    $group->post('/images/{id}/replace', [ImageController::class, 'replace'])
           ->add($csrfMiddleware)
           ->add($authMiddleware);
 

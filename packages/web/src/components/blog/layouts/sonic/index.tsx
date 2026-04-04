@@ -20,6 +20,7 @@ import {
 import { Linkedin, Instagram, Youtube, Facebook } from 'lucide-react'
 import AdminBar from '@/components/blog/AdminBar'
 import LanguageSwitcher from '@/components/blog/LanguageSwitcher'
+import LikeButton from '@/components/blog/LikeButton'
 import CommentList from '@/components/blog/CommentList'
 import CommentForm from '@/components/blog/CommentForm'
 import AboutGallery from '@/components/blog/AboutGallery'
@@ -492,6 +493,7 @@ interface SonicPostContentProps {
   settings: Record<string, string>
   user: boolean
   commentsEnabled: boolean
+  likesEnabled: boolean
   profileVisible: boolean
   socialVisible: boolean
   subscriberVisible: boolean
@@ -507,6 +509,7 @@ export function SonicPostContent({
   settings,
   user,
   commentsEnabled,
+  likesEnabled,
   profileVisible,
   subscriberVisible,
   onCommentSubmitted,
@@ -582,6 +585,13 @@ export function SonicPostContent({
               prose-code:text-cyan-400 prose-pre:bg-zinc-900 prose-pre:border prose-pre:border-zinc-800"
             dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
           />
+
+          {/* Likes */}
+          {likesEnabled && (
+            <div className="mt-10 flex justify-start">
+              <LikeButton postId={post.id} collection="sonic" initialCount={post.likes_count} />
+            </div>
+          )}
         </article>
 
         {/* Related posts */}

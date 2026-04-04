@@ -3,7 +3,7 @@
 -- Migration 004 — Post translations (multilingual content per post)
 -- ─────────────────────────────────────────────────────────────────────────────
 
-CREATE TABLE `post_translations` (
+CREATE TABLE IF NOT EXISTS `post_translations` (
   `id`         INT UNSIGNED    NOT NULL AUTO_INCREMENT,
   `post_id`    INT UNSIGNED    NOT NULL,
   `locale`     VARCHAR(10)     NOT NULL,

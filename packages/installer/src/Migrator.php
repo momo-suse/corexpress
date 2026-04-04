@@ -147,7 +147,19 @@ final class Migrator
         );
 
         foreach ($statements as $statement) {
-            $this->pdo->exec($statement);
+            try {
+                $this->pdo->exec($statement);
+            } catch (\PDOException $e) {
+                // Silently skip "already in desired state" errors so migrations stay
+                // idempotent even when schema_versions is restored to a prior state.
+                // MySQL 1060 = Duplicate column name (ADD COLUMN on an existing column)
+                // MySQL 1061 = Duplicate key name   (ADD INDEX/KEY on an existing index)
+                $driverCode = (int) ($e->errorInfo[1] ?? 0);
+                if (in_array($driverCode, [1060, 1061], true)) {
+                    continue;
+                }
+                throw $e;
+            }
         }
     }
 }

@@ -61,6 +61,7 @@
       "blog": "ブログ",
       "styles": "スタイル",
       "subscribers": "サブスクライバー",
+      "resources": "リソース",
       "settings": "設定",
       "viewBlog": "ブログを見る",
       "signOut": "サインアウト"
@@ -306,10 +307,59 @@
       "statusActive": "購読中",
       "statusUnsubscribed": "購読解除",
       "empty": "まだサブスクライバーがいません。",
+      "featureDisabled": "サブスクリプションは無効です。ブログに購読ボタンは表示されません。",
       "deleted": "サブスクライバーを削除しました。",
       "deleteFailed": "サブスクライバーの削除に失敗しました。",
       "deleteTitle": "サブスクライバーを削除",
       "deleteDescription": "このサブスクライバーをリストから永久に削除します。通知は届かなくなります。"
+    },
+    "resources": {
+      "title": "リソース",
+      "subtitle": "システムにアップロードされた画像を管理し、どこで使われているかを確認します。",
+      "totalResources": "総リソース数",
+      "searchPlaceholder": "投稿名、名前、スラッグ、タグで検索...",
+      "clearSearch": "クリア",
+      "empty": "アップロードされたリソースはまだありません。",
+      "emptySearch": "検索条件に一致するリソースはありません。",
+      "emptyHint": "ユーザーが画像をアップロードすると、ここに使用状況と操作が表示されます。",
+      "usageCount": "{{count}} 件の使用",
+      "fileType": "ファイル形式",
+      "fileSize": "ファイルサイズ",
+      "uploadedAt": "アップロード日時",
+      "recordsTitle": "見つかったレコード",
+      "noPostRecords": "関連する投稿タイトルはありません",
+      "locationsTitle": "使用箇所",
+      "totalStorage": "使用ストレージ",
+      "unusedResources": "未使用リソース",
+      "unused": "使用は検出されていません",
+      "replace": "更新",
+      "download": "ダウンロード",
+      "replacing": "更新中...",
+      "replaced": "リソースを更新しました。",
+      "replaceFailed": "リソースの更新に失敗しました。",
+      "deleted": "リソースを削除しました。",
+      "deleteFailed": "リソースの削除に失敗しました。",
+      "deleteTitle": "リソースを削除",
+      "deleteDescriptionUsed": "このリソースは現在 {{count}} 箇所で使われています。削除するとそれらの表示に影響します。",
+      "deleteDescriptionUnused": "このリソースはサーバーから完全に削除されます。",
+      "impactedAreas": "影響を受ける箇所",
+      "loadingMore": "読み込み中...",
+      "loadMore": "さらに読み込む",
+      "unknownTitle": "タイトルなしレコード",
+      "unknownLocation": "不明な場所",
+      "locationFeatured": "アイキャッチ画像: {{title}}",
+      "locationContent": "投稿本文: {{title}}",
+      "locationTranslation": "投稿翻訳 ({{locale}}): {{title}}",
+      "deleting": "削除中...",
+      "settingKeys": {
+        "blog_logo_id": "ブログロゴ",
+        "hero_image_id": "ヒーローバナー",
+        "profile_image_id": "プロフィール画像",
+        "profile_cover_id": "プロフィールカバー",
+        "profile_gallery": "プロフィールギャラリー",
+        "profile_testimonials": "プロフィールの推薦文",
+        "profile_description": "プロフィール説明"
+      }
     },
     "setup": {
       "title": "ブログを設定する",
@@ -377,7 +427,8 @@
         "social": "ソーシャルリンク",
         "comments": "コメント",
         "search": "検索",
-        "tags": "タグ"
+        "tags": "タグ",
+        "likes": "いいね"
       },
       "hero": {
         "description": "ヒーローバナーは訪問者がホームページで最初に目にするものです。",
@@ -462,7 +513,20 @@
         "cardSubtitle": "投稿をフィルタリングするためにブログで最もよく使用されるタグを表示します。",
         "countLabel": "表示するタグの数",
         "countHint": "最小1、最大20。人気順で表示されます。"
+      },
+      "likes": {
+        "description": "読者が投稿にいいねできるようにします。IPアドレスでカウントされ、アカウント不要です。",
+        "cardTitle": "投稿いいね",
+        "cardSubtitle": "各投稿にいいねボタンを表示または非表示にする"
       }
+    },
+    "analytics": {
+      "title": "アナリティクス",
+      "today": "今日",
+      "week": "今週",
+      "month": "今月",
+      "views": "訪問",
+      "noData": "データがまだありません。ブログを訪問して記録を始めましょう。"
     },
     "styles": {
       "title": "ブログスタイル",
@@ -728,6 +792,10 @@
     },
     "socialLinks": {
       "connect": "つながる"
+    },
+    "likes": {
+      "like": "いいね",
+      "liked": "いいね済み"
     },
     "errorLoading": "ブログの読み込みエラー。"
   },

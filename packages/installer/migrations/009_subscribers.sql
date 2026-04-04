@@ -1,6 +1,6 @@
 -- Migration 009 — Subscribers: Google OAuth, email notifications, and page component
 
-CREATE TABLE `subscribers` (
+CREATE TABLE IF NOT EXISTS `subscribers` (
     `id`                 INT UNSIGNED  NOT NULL AUTO_INCREMENT,
     `google_id`          VARCHAR(255)  NOT NULL,
     `name`               VARCHAR(255)  NOT NULL,

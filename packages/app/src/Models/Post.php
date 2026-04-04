@@ -8,12 +8,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Corexpress\Models\PostLike;
 use Corexpress\Models\PostTranslation;
 
 class Post extends Model
 {
     protected $table = 'posts';
-    protected $fillable = ['user_id', 'title', 'slug', 'base_locale', 'content', 'excerpt', 'tags', 'featured_image_id', 'map_embed_url', 'reading_time', 'status', 'notified_at'];
+    protected $fillable = ['user_id', 'title', 'slug', 'base_locale', 'content', 'excerpt', 'tags', 'featured_image_id', 'map_embed_url', 'reading_time', 'status', 'notified_at', 'likes_count'];
 
     public function user(): BelongsTo
     {
@@ -38,6 +39,11 @@ class Post extends Model
     public function translations(): HasMany
     {
         return $this->hasMany(PostTranslation::class);
+    }
+
+    public function likes(): HasMany
+    {
+        return $this->hasMany(PostLike::class);
     }
 
     /** Scope: only published posts */

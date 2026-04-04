@@ -15,12 +15,14 @@ import ChipInput from '@/components/admin/about/ChipInput'
 import { getPost, createTranslation, updateTranslation, deleteTranslation } from '@/api/posts'
 import { uploadImage } from '@/api/images'
 import { getComments } from '@/api/comments'
+import { getSubscribers } from '@/api/subscribers'
 import { toast } from '@/hooks/useToast'
 import {
   FileText, MessageCircle, Check, ArrowLeft, Plus, Edit3,
   Trash2, X, Upload, AlertTriangle, Languages, Eye, EyeOff,
 } from 'lucide-react'
 import NotifySubscribersDialog from '@/components/admin/NotifySubscribersDialog'
+import AnalyticsPanel from '@/components/admin/AnalyticsPanel'
 import type { Post } from '@/types/api'
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -108,6 +110,11 @@ export default function DashboardPage() {
   const { data: postsData, isLoading: postsLoading } = usePosts(postsPage, true)
   const { data: publishedData } = usePosts(1, false)
   const { data: pendingCommentsData } = useComments({ status: 'pending' })
+  const { data: subscribersData } = useQuery({
+    queryKey: ['subscribers', { page: 1 }],
+    queryFn: () => getSubscribers({ page: 1 }),
+    staleTime: 30 * 1000,
+  })
 
   const { data: drawerCommentsData } = useQuery({
     queryKey: ['comments', { post_id: drawerPostId }],
@@ -128,6 +135,7 @@ export default function DashboardPage() {
   const totalPosts = postsData?.meta.total ?? 0
   const publishedPosts = publishedData?.meta.total ?? 0
   const pendingCount = pendingCommentsData?.meta.total ?? 0
+  const activeSubscribers = (subscribersData?.meta as Record<string, number> | undefined)?.active ?? 0
   const pendingComments = pendingCommentsData?.data ?? []
   const displayImage = form._imagePreview ?? form.featured_image_url
   const commentsEnabled = (settingsData?.data.comments_enabled ?? '1') === '1'
@@ -223,14 +231,10 @@ export default function DashboardPage() {
       return
     }
 
-    // Show notify dialog when publishing for the first time (notified_at is null)
-    if (status === 'published' && notifySubscribers === undefined) {
-      const isFirstPublish = !editingPost || editingPost.notified_at === null
-      if (isFirstPublish) {
-        setPendingSaveStatus(status)
-        setNotifyOpen(true)
-        return
-      }
+    if (status === 'published' && notifySubscribers === undefined && !editingPost && activeSubscribers > 0) {
+      setPendingSaveStatus(status)
+      setNotifyOpen(true)
+      return
     }
 
     let imageId = form.featured_image_id
@@ -409,7 +413,7 @@ export default function DashboardPage() {
               )}
               <Button size="sm" onClick={() => handleSave('published')} disabled={saving} className="gap-2">
                 <Check className="h-4 w-4" />
-                {t('admin.dashboard.publish')}
+                {editingPost ? t('common.save') : t('admin.dashboard.publish')}
               </Button>
             </>
           )}
@@ -452,6 +456,9 @@ export default function DashboardPage() {
               )}
             </div>
           </section>
+
+          {/* Analytics */}
+          <AnalyticsPanel />
 
           {/* Quick Actions: Pending Comments */}
           {commentsEnabled && pendingComments.length > 0 && (
