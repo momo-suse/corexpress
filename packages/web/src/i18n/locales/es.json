@@ -194,6 +194,7 @@
         "security": "Seguridad",
         "subscribers": "Suscriptores",
         "recaptcha": "reCAPTCHA",
+        "backup": "Backup",
         "updates": "Actualizaciones"
       },
       "saved": "Configuración guardada.",
@@ -232,6 +233,53 @@
         "upToDate": "Corexpress está al día.",
         "checkFailed": "No se pudo verificar las actualizaciones.",
         "applyFailed": "La actualización falló. Inténtalo de nuevo o actualiza vía SSH."
+      },
+      "backup": {
+        "blocksTitle": "Bloques del backup",
+        "blocks": {
+          "appearance": "Apariencia",
+          "content": "Contenido",
+          "subscribers": "Suscriptores",
+          "activity": "Actividad",
+          "media": "Medios"
+        },
+        "export": {
+          "title": "Exportar backup",
+          "subtitle": "Crea un ZIP con los datos que usa tu blog.",
+          "button": "Exportar backup",
+          "exporting": "Exportando…",
+          "chooseBlocks": "Selecciona al menos un bloque para exportar.",
+          "includeMedia": "Incluir archivos de imagen subidos",
+          "includeMediaHint": "Recomendado para una restauración exacta. El ZIP será más pesado.",
+          "formatHint": "El archivo incluye un manifiesto y ficheros de datos estructurados. Los archivos multimedia son opcionales.",
+          "success": "Backup exportado correctamente.",
+          "error": "No se pudo exportar el backup."
+        },
+        "restore": {
+          "title": "Restaurar backup",
+          "subtitle": "Primero inspecciona el ZIP y luego restaura solo las partes que necesites.",
+          "step1": "Paso 1 · Subir archivo",
+          "step2": "Paso 2 · Revisar archivo",
+          "step3": "Paso 3 · Elegir bloques a restaurar",
+          "inspectButton": "Inspeccionar backup",
+          "inspecting": "Inspeccionando…",
+          "button": "Restaurar bloques seleccionados",
+          "restoring": "Restaurando…",
+          "chooseFile": "Selecciona primero un archivo ZIP de backup.",
+          "noFile": "No hay ningún archivo seleccionado.",
+          "inspectSuccess": "Backup inspeccionado correctamente.",
+          "inspectError": "No se pudo inspeccionar el backup.",
+          "inspectFirst": "Inspecciona el backup antes de restaurarlo.",
+          "chooseBlocks": "Selecciona al menos un bloque para restaurar.",
+          "records": "{{count}} registro(s)",
+          "exportedAt": "Fecha de exportación",
+          "appVersion": "Versión de origen",
+          "mediaFiles": "Incluye archivos multimedia",
+          "warnings": "Advertencias",
+          "rollbackHint": "Corexpress crea una protección temporal antes de restaurar y revierte automáticamente si el proceso falla.",
+          "success": "Backup restaurado correctamente.",
+          "error": "No se pudo restaurar el backup."
+        }
       },
       "security": {
         "title": "Seguridad",

@@ -9,8 +9,10 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import { useSettings, useMutateSettings } from '@/hooks/useSettings'
 import { uploadImage } from '@/api/images'
 import { changePassword } from '@/api/auth'
+import { downloadBackupArchive, inspectBackupArchive, restoreBackupArchive } from '@/api/backup'
 import { checkUpdate, applyUpdate } from '@/api/update'
 import { deleteCredentials } from '@/api/settings'
+import type { BackupBlock, BackupInspectResult } from '@/api/backup'
 import type { UpdateCheckResult } from '@/api/update'
 import { toast } from '@/hooks/useToast'
 import { cn } from '@/lib/utils'
@@ -19,6 +21,7 @@ import { useTranslation } from 'react-i18next'
 import type { Settings } from '@/types/api'
 
 const THEME_CLASSES = ['theme-default', 'theme-minimal', 'theme-dark'] as const
+const BACKUP_BLOCKS: BackupBlock[] = ['appearance', 'content', 'subscribers', 'activity', 'media']
 
 function GoogleIcon({ className }: { className?: string }) {
   return (
@@ -31,7 +34,7 @@ function GoogleIcon({ className }: { className?: string }) {
   )
 }
 
-type Tab = 'general' | 'style' | 'security' | 'updates' | 'subscribers' | 'recaptcha'
+type Tab = 'general' | 'style' | 'security' | 'updates' | 'backup' | 'subscribers' | 'recaptcha'
 
 export default function SettingsPage() {
   const { t, i18n } = useTranslation()
@@ -45,13 +48,23 @@ export default function SettingsPage() {
   const [localRecaptchaOn, setLocalRecaptchaOn] = useState(false)
   const [confirmResetSubscribers, setConfirmResetSubscribers] = useState(false)
   const [confirmResetRecaptcha, setConfirmResetRecaptcha] = useState(false)
-  const [resetting, setResetting] = useState(false)
+  const [, setResetting] = useState(false)
 
   // Update state
   const [updateInfo, setUpdateInfo]       = useState<UpdateCheckResult | null>(null)
   const [checking, setChecking]           = useState(false)
   const [applying, setApplying]           = useState(false)
   const [updateDone, setUpdateDone]       = useState(false)
+
+  // Backup state
+  const [exportBlocks, setExportBlocks] = useState<BackupBlock[]>(['appearance', 'content', 'subscribers'])
+  const [includeMediaFiles, setIncludeMediaFiles] = useState(false)
+  const [exportingBackup, setExportingBackup] = useState(false)
+  const [backupFile, setBackupFile] = useState<File | null>(null)
+  const [inspectInfo, setInspectInfo] = useState<BackupInspectResult | null>(null)
+  const [restoreBlocks, setRestoreBlocks] = useState<BackupBlock[]>([])
+  const [inspectingBackup, setInspectingBackup] = useState(false)
+  const [restoringBackup, setRestoringBackup] = useState(false)
 
   // Change-password state
   const [currentPwd, setCurrentPwd] = useState('')
@@ -98,8 +111,37 @@ export default function SettingsPage() {
     }
   }, [form.app_locale]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => {
+    if (!exportBlocks.includes('media') && includeMediaFiles) {
+      setIncludeMediaFiles(false)
+    }
+  }, [exportBlocks, includeMediaFiles])
+
   function set(key: keyof Settings, value: string) {
     setForm(f => ({ ...f, [key]: value }))
+  }
+
+  function toggleBackupBlock(block: BackupBlock, setSelected: React.Dispatch<React.SetStateAction<BackupBlock[]>>) {
+    setSelected((current) => {
+      const next = current.includes(block)
+        ? current.filter((item) => item !== block)
+        : [...current, block]
+
+      return BACKUP_BLOCKS.filter((item) => next.includes(item))
+    })
+  }
+
+  function formatBackupDate(value: string) {
+    const date = new Date(value)
+    return Number.isNaN(date.getTime()) ? value : date.toLocaleString()
+  }
+
+  function handleBackupFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0] ?? null
+    setBackupFile(file)
+    setInspectInfo(null)
+    setRestoreBlocks([])
+    e.target.value = ''
   }
 
   function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -142,6 +184,74 @@ export default function SettingsPage() {
       toast({ title: t('admin.settings.updates.applyFailed'), variant: 'destructive' })
     } finally {
       setApplying(false)
+    }
+  }
+
+  async function handleExportBackup() {
+    if (exportBlocks.length === 0) {
+      toast({ title: t('admin.settings.backup.export.chooseBlocks'), variant: 'destructive' })
+      return
+    }
+
+    setExportingBackup(true)
+    try {
+      await downloadBackupArchive(exportBlocks, includeMediaFiles)
+      toast({ title: t('admin.settings.backup.export.success') })
+    } catch (err) {
+      const msg = err instanceof ApiError ? err.message : t('admin.settings.backup.export.error')
+      toast({ title: msg, variant: 'destructive' })
+    } finally {
+      setExportingBackup(false)
+    }
+  }
+
+  async function handleInspectBackup() {
+    if (!backupFile) {
+      toast({ title: t('admin.settings.backup.restore.chooseFile'), variant: 'destructive' })
+      return
+    }
+
+    setInspectingBackup(true)
+    try {
+      const result = await inspectBackupArchive(backupFile)
+      setInspectInfo(result)
+      setRestoreBlocks(result.available_blocks)
+      toast({ title: t('admin.settings.backup.restore.inspectSuccess') })
+    } catch (err) {
+      const msg = err instanceof ApiError ? err.message : t('admin.settings.backup.restore.inspectError')
+      toast({ title: msg, variant: 'destructive' })
+    } finally {
+      setInspectingBackup(false)
+    }
+  }
+
+  async function handleRestoreBackup() {
+    if (!backupFile || !inspectInfo) {
+      toast({ title: t('admin.settings.backup.restore.inspectFirst'), variant: 'destructive' })
+      return
+    }
+
+    if (restoreBlocks.length === 0) {
+      toast({ title: t('admin.settings.backup.restore.chooseBlocks'), variant: 'destructive' })
+      return
+    }
+
+    setRestoringBackup(true)
+    try {
+      const result = await restoreBackupArchive(backupFile, restoreBlocks)
+      if (result.warnings.length > 0) {
+        toast({ title: result.warnings[0] })
+      }
+      toast({ title: t('admin.settings.backup.restore.success') })
+      setBackupFile(null)
+      setInspectInfo(null)
+      setRestoreBlocks([])
+      await refetch()
+    } catch (err) {
+      const msg = err instanceof ApiError ? err.message : t('admin.settings.backup.restore.error')
+      toast({ title: msg, variant: 'destructive' })
+    } finally {
+      setRestoringBackup(false)
     }
   }
 
@@ -277,7 +387,7 @@ export default function SettingsPage() {
           <h1 className="text-2xl font-semibold tracking-tight">{t('admin.settings.title')}</h1>
           <p className="text-xs text-muted-foreground mt-0.5">{t('admin.settings.subtitle')}</p>
         </div>
-        {activeTab !== 'updates' && (
+        {activeTab !== 'updates' && activeTab !== 'backup' && (
           <Button onClick={handleSave} disabled={saving}>
             {saving ? t('common.saving') : t('admin.settings.saveChanges')}
           </Button>
@@ -292,6 +402,7 @@ export default function SettingsPage() {
           { id: 'security'    as Tab, label: t('admin.settings.tabs.security'),    Icon: ShieldCheck },
           { id: 'subscribers' as Tab, label: t('admin.settings.tabs.subscribers'), Icon: Users },
           { id: 'recaptcha'   as Tab, label: t('admin.settings.tabs.recaptcha'),   Icon: Bot },
+          { id: 'backup'      as Tab, label: t('admin.settings.tabs.backup'),      Icon: Upload },
           { id: 'updates'     as Tab, label: t('admin.settings.tabs.updates'),     Icon: RefreshCw },
         ]).map(({ id, label, Icon }) => (
           <button
@@ -463,63 +574,207 @@ export default function SettingsPage() {
         </>}
 
         {/* Updates */}
-        {activeTab === 'updates' && <div className="rounded-2xl border-2 border-border overflow-hidden">
-          <div className="flex items-center gap-4 px-6 py-4 bg-muted/30 border-b">
-            <div className="p-2.5 rounded-xl bg-muted text-muted-foreground shrink-0">
-              <RefreshCw className="h-4 w-4" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold">{t('admin.settings.updates.title')}</p>
-              <p className="text-xs text-muted-foreground">{t('admin.settings.updates.subtitle')}</p>
-            </div>
-          </div>
-          <div className="px-6 py-5 space-y-4">
-
-            {updateDone && (
-              <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400 font-medium">
-                <span>✓</span>
-                <span>{t('admin.settings.updates.upToDate')}</span>
+        {activeTab === 'updates' && <>
+          <div className="rounded-2xl border-2 border-border overflow-hidden">
+            <div className="flex items-center gap-4 px-6 py-4 bg-muted/30 border-b">
+              <div className="p-2.5 rounded-xl bg-muted text-muted-foreground shrink-0">
+                <RefreshCw className="h-4 w-4" />
               </div>
-            )}
+              <div>
+                <p className="text-sm font-semibold">{t('admin.settings.updates.title')}</p>
+                <p className="text-xs text-muted-foreground">{t('admin.settings.updates.subtitle')}</p>
+              </div>
+            </div>
+            <div className="px-6 py-5 space-y-4">
 
-            {!updateDone && (
-              <Button onClick={handleCheckUpdate} disabled={checking} variant="outline">
-                {checking ? t('admin.settings.updates.checking') : t('admin.settings.updates.checkButton')}
-              </Button>
-            )}
-
-            {updateInfo && !updateDone && (
-              <div className="space-y-3">
-                <div className="text-sm text-muted-foreground">
-                  {t('admin.settings.updates.currentVersion')}: <span className="font-mono font-medium text-foreground">{updateInfo.current}</span>
+              {updateDone && (
+                <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400 font-medium">
+                  <span>✓</span>
+                  <span>{t('admin.settings.updates.upToDate')}</span>
                 </div>
+              )}
 
-                {updateInfo.error && (
-                  <p className="text-sm text-destructive">{updateInfo.error}</p>
-                )}
+              {!updateDone && (
+                <Button onClick={handleCheckUpdate} disabled={checking} variant="outline">
+                  {checking ? t('admin.settings.updates.checking') : t('admin.settings.updates.checkButton')}
+                </Button>
+              )}
 
-                {!updateInfo.error && !updateInfo.has_update && (
-                  <p className="text-sm text-muted-foreground">{t('admin.settings.updates.alreadyLatest')}</p>
-                )}
-
-                {!updateInfo.error && updateInfo.has_update && (
-                  <div className="space-y-3">
-                    <p className="text-sm">
-                      {t('admin.settings.updates.available')}: <span className="font-mono font-medium text-primary">{updateInfo.latest}</span>
-                    </p>
-                    <Button onClick={handleApplyUpdate} disabled={applying}>
-                      {applying ? t('admin.settings.updates.applying') : t('admin.settings.updates.applyButton')}
-                    </Button>
-                    {applying && (
-                      <p className="text-xs text-muted-foreground">{t('admin.settings.updates.applyingHint')}</p>
-                    )}
+              {updateInfo && !updateDone && (
+                <div className="space-y-3">
+                  <div className="text-sm text-muted-foreground">
+                    {t('admin.settings.updates.currentVersion')}: <span className="font-mono font-medium text-foreground">{updateInfo.current}</span>
                   </div>
-                )}
-              </div>
-            )}
 
+                  {updateInfo.error && (
+                    <p className="text-sm text-destructive">{updateInfo.error}</p>
+                  )}
+
+                  {!updateInfo.error && !updateInfo.has_update && (
+                    <p className="text-sm text-muted-foreground">{t('admin.settings.updates.alreadyLatest')}</p>
+                  )}
+
+                  {!updateInfo.error && updateInfo.has_update && (
+                    <div className="space-y-3">
+                      <p className="text-sm">
+                        {t('admin.settings.updates.available')}: <span className="font-mono font-medium text-primary">{updateInfo.latest}</span>
+                      </p>
+                      <Button onClick={handleApplyUpdate} disabled={applying}>
+                        {applying ? t('admin.settings.updates.applying') : t('admin.settings.updates.applyButton')}
+                      </Button>
+                      {applying && (
+                        <p className="text-xs text-muted-foreground">{t('admin.settings.updates.applyingHint')}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+            </div>
           </div>
-        </div>}
+
+        </>}
+
+        {/* Backup */}
+        {activeTab === 'backup' && <>
+          <div className="rounded-2xl border-2 border-border overflow-hidden">
+            <div className="flex items-center gap-4 px-6 py-4 bg-muted/30 border-b">
+              <div className="p-2.5 rounded-xl bg-muted text-muted-foreground shrink-0">
+                <Upload className="h-4 w-4" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold">{t('admin.settings.backup.export.title')}</p>
+                <p className="text-xs text-muted-foreground">{t('admin.settings.backup.export.subtitle')}</p>
+              </div>
+            </div>
+            <div className="px-6 py-5 space-y-5">
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('admin.settings.backup.blocksTitle')}</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {BACKUP_BLOCKS.map((block) => {
+                    const active = exportBlocks.includes(block)
+                    return (
+                      <button
+                        key={`export-${block}`}
+                        type="button"
+                        onClick={() => toggleBackupBlock(block, setExportBlocks)}
+                        className={cn(
+                          'flex items-center justify-between rounded-xl border px-4 py-3 text-left transition-colors',
+                          active ? 'border-primary bg-primary/5 text-foreground' : 'border-border bg-card text-muted-foreground hover:text-foreground',
+                        )}
+                      >
+                        <span className="text-sm font-medium">{t(`admin.settings.backup.blocks.${block}`)}</span>
+                        {active && <CheckCircle2 className="h-4 w-4 text-primary" />}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-border/70 bg-card px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{t('admin.settings.backup.export.includeMedia')}</p>
+                    <p className="text-xs text-muted-foreground">{t('admin.settings.backup.export.includeMediaHint')}</p>
+                  </div>
+                  <Switch
+                    checked={includeMediaFiles}
+                    disabled={!exportBlocks.includes('media')}
+                    onCheckedChange={setIncludeMediaFiles}
+                  />
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-border/70 bg-muted/20 px-4 py-3 text-xs text-muted-foreground">
+                {t('admin.settings.backup.export.formatHint')}
+              </div>
+
+              <Button onClick={handleExportBackup} disabled={exportingBackup || exportBlocks.length === 0}>
+                {exportingBackup ? t('admin.settings.backup.export.exporting') : t('admin.settings.backup.export.button')}
+              </Button>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border-2 border-border overflow-hidden">
+            <div className="flex items-center gap-4 px-6 py-4 bg-muted/30 border-b">
+              <div className="p-2.5 rounded-xl bg-muted text-muted-foreground shrink-0">
+                <CheckCircle2 className="h-4 w-4" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold">{t('admin.settings.backup.restore.title')}</p>
+                <p className="text-xs text-muted-foreground">{t('admin.settings.backup.restore.subtitle')}</p>
+              </div>
+            </div>
+            <div className="px-6 py-5 space-y-5">
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('admin.settings.backup.restore.step1')}</p>
+                <Input type="file" accept=".zip,application/zip" onChange={handleBackupFileChange} />
+                <p className="text-xs text-muted-foreground">
+                  {backupFile ? backupFile.name : t('admin.settings.backup.restore.noFile')}
+                </p>
+                <Button onClick={handleInspectBackup} disabled={inspectingBackup || !backupFile} variant="outline">
+                  {inspectingBackup ? t('admin.settings.backup.restore.inspecting') : t('admin.settings.backup.restore.inspectButton')}
+                </Button>
+              </div>
+
+              {inspectInfo && (
+                <>
+                  <div className="space-y-2 rounded-xl border border-border/70 bg-card px-4 py-3">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('admin.settings.backup.restore.step2')}</p>
+                    <div className="text-sm text-muted-foreground space-y-1">
+                      <p>{t('admin.settings.backup.restore.exportedAt')}: <span className="text-foreground font-medium">{formatBackupDate(inspectInfo.exported_at)}</span></p>
+                      <p>{t('admin.settings.backup.restore.appVersion')}: <span className="text-foreground font-medium">{inspectInfo.app_version ?? 'n/a'}</span></p>
+                      <p>{t('admin.settings.backup.restore.mediaFiles')}: <span className="text-foreground font-medium">{inspectInfo.has_media_files ? t('common.yes') : t('common.no')}</span></p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('admin.settings.backup.restore.step3')}</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {inspectInfo.available_blocks.map((block) => {
+                        const active = restoreBlocks.includes(block)
+                        return (
+                          <button
+                            key={`restore-${block}`}
+                            type="button"
+                            onClick={() => toggleBackupBlock(block, setRestoreBlocks)}
+                            className={cn(
+                              'flex items-center justify-between rounded-xl border px-4 py-3 text-left transition-colors',
+                              active ? 'border-primary bg-primary/5 text-foreground' : 'border-border bg-card text-muted-foreground hover:text-foreground',
+                            )}
+                          >
+                            <div>
+                              <p className="text-sm font-medium">{t(`admin.settings.backup.blocks.${block}`)}</p>
+                              <p className="text-xs text-muted-foreground">{t('admin.settings.backup.restore.records', { count: inspectInfo.block_counts[block] ?? 0 })}</p>
+                            </div>
+                            {active && <CheckCircle2 className="h-4 w-4 text-primary" />}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  {inspectInfo.warnings.length > 0 && (
+                    <div className="rounded-xl border border-border/70 bg-muted/20 px-4 py-3 space-y-1">
+                      <p className="text-sm font-medium">{t('admin.settings.backup.restore.warnings')}</p>
+                      {inspectInfo.warnings.map((warning) => (
+                        <p key={warning} className="text-xs text-muted-foreground">{warning}</p>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="rounded-xl border border-border/70 bg-muted/20 px-4 py-3 text-xs text-muted-foreground">
+                    {t('admin.settings.backup.restore.rollbackHint')}
+                  </div>
+
+                  <Button onClick={handleRestoreBackup} disabled={restoringBackup || restoreBlocks.length === 0}>
+                    {restoringBackup ? t('admin.settings.backup.restore.restoring') : t('admin.settings.backup.restore.button')}
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+        </>}
 
         {/* Security */}
         {activeTab === 'security' && <div className="rounded-2xl border-2 border-border overflow-hidden">
