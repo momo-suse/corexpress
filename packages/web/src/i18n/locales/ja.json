@@ -194,6 +194,7 @@
         "security": "セキュリティ",
         "subscribers": "サブスクライバー",
         "recaptcha": "reCAPTCHA",
+        "backup": "バックアップ",
         "updates": "アップデート"
       },
       "saved": "設定を保存しました。",
@@ -232,6 +233,53 @@
         "upToDate": "Corexpressは最新です。",
         "checkFailed": "アップデートを確認できませんでした。",
         "applyFailed": "アップデートに失敗しました。再試行するかSSH経由で更新してください。"
+      },
+      "backup": {
+        "blocksTitle": "バックアップ対象",
+        "blocks": {
+          "appearance": "外観",
+          "content": "コンテンツ",
+          "subscribers": "サブスクライバー",
+          "activity": "アクティビティ",
+          "media": "メディア"
+        },
+        "export": {
+          "title": "バックアップを書き出す",
+          "subtitle": "ブログが使うデータをZIPで保存します。",
+          "button": "バックアップを出力",
+          "exporting": "出力中…",
+          "chooseBlocks": "少なくとも1つのブロックを選択してください。",
+          "includeMedia": "アップロード済み画像ファイルを含める",
+          "includeMediaHint": "完全な復元に推奨されます。ZIPは大きくなります。",
+          "formatHint": "アーカイブにはマニフェストと構造化データが含まれます。メディアファイルは任意です。",
+          "success": "バックアップを書き出しました。",
+          "error": "バックアップを書き出せませんでした。"
+        },
+        "restore": {
+          "title": "バックアップを復元",
+          "subtitle": "まずZIPを確認し、その後必要な部分だけ復元します。",
+          "step1": "手順1 · アーカイブをアップロード",
+          "step2": "手順2 · 内容を確認",
+          "step3": "手順3 · 復元するブロックを選択",
+          "inspectButton": "バックアップを確認",
+          "inspecting": "確認中…",
+          "button": "選択したブロックを復元",
+          "restoring": "復元中…",
+          "chooseFile": "先にZIPバックアップファイルを選択してください。",
+          "noFile": "ファイルが選択されていません。",
+          "inspectSuccess": "バックアップを確認しました。",
+          "inspectError": "バックアップを確認できませんでした。",
+          "inspectFirst": "復元する前にバックアップを確認してください。",
+          "chooseBlocks": "少なくとも1つのブロックを選択してください。",
+          "records": "{{count}} 件",
+          "exportedAt": "出力日時",
+          "appVersion": "元のバージョン",
+          "mediaFiles": "メディアファイルを含む",
+          "warnings": "警告",
+          "rollbackHint": "復元前に一時的な保護を作成し、失敗した場合は自動で元に戻します。",
+          "success": "バックアップを復元しました。",
+          "error": "バックアップを復元できませんでした。"
+        }
       },
       "security": {
         "title": "セキュリティ",

@@ -13,6 +13,12 @@ class JsonResponseMiddleware implements MiddlewareInterface
 {
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        return $handler->handle($request)->withHeader('Content-Type', 'application/json');
+        $response = $handler->handle($request);
+
+        if ($response->hasHeader('Content-Type')) {
+            return $response;
+        }
+
+        return $response->withHeader('Content-Type', 'application/json');
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Corexpress\Controllers\AnalyticsController;
 use Corexpress\Controllers\AuthController;
+use Corexpress\Controllers\BackupController;
 use Corexpress\Controllers\CommentController;
 use Corexpress\Controllers\ImageController;
 use Corexpress\Controllers\LikeController;
@@ -223,6 +224,20 @@ $app->group('/api/v1', function (\Slim\Routing\RouteCollectorProxy $group) use (
 
     // Admin + CSRF: download and apply the latest release
     $group->post('/admin/update/apply', [UpdateController::class, 'apply'])
+          ->add($csrfMiddleware)
+          ->add($authMiddleware);
+
+    // ── Backups ────────────────────────────────────────────────────────────────
+
+    $group->post('/admin/backup/export', [BackupController::class, 'export'])
+          ->add($csrfMiddleware)
+          ->add($authMiddleware);
+
+    $group->post('/admin/backup/inspect', [BackupController::class, 'inspect'])
+          ->add($csrfMiddleware)
+          ->add($authMiddleware);
+
+    $group->post('/admin/backup/restore', [BackupController::class, 'restore'])
           ->add($csrfMiddleware)
           ->add($authMiddleware);
 

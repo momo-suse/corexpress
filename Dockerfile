@@ -3,7 +3,7 @@
 # Simulates Hostinger shared hosting: PHP 8.3 + Apache + MySQL client
 #
 # What is pre-installed (mirrors Hostinger shared hosting):
-#   - PHP 8.3 with common extensions (pdo, pdo_mysql, mbstring, json, etc.)
+#   - PHP 8.3 with common extensions (pdo, pdo_mysql, mbstring, zip, json, etc.)
 #   - Apache 2.4 with mod_rewrite
 #   - Composer (available via SSH on most Hostinger plans)
 #   - curl, wget, unzip (standard shared hosting tools)
@@ -36,6 +36,7 @@ RUN apt-get update && apt-get install -y \
     zip \
     git \
     default-mysql-client \
+    libzip-dev \
     libonig-dev \
     libsqlite3-dev \
     && rm -rf /var/lib/apt/lists/*
@@ -47,6 +48,7 @@ RUN docker-php-ext-install \
     pdo_sqlite \
     mysqli \
     mbstring \
+    zip \
     opcache
 
 # ── Apache: enable mod_rewrite (required for Slim 4 routing) ─────────────────
