@@ -76,6 +76,7 @@
       "editPost": "Editar post",
       "titleCol": "Título",
       "statusCol": "Estado",
+      "likesCol": "Likes",
       "commentsCol": "Comentarios",
       "actionsCol": "Acciones",
       "noPostsYet": "Aún no hay posts. ¡Empieza a escribir!",

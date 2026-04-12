@@ -76,6 +76,7 @@
       "editPost": "投稿を編集",
       "titleCol": "タイトル",
       "statusCol": "ステータス",
+      "likesCol": "いいね",
       "commentsCol": "コメント",
       "actionsCol": "操作",
       "noPostsYet": "まだ投稿がありません。書き始めましょう！",
