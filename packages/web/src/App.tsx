@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useLocale } from '@/hooks/useLocale'
 
@@ -33,10 +34,25 @@ const queryClient = new QueryClient({
   },
 })
 
+function PublicScrollToTop() {
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    const isPublicBlogRoute = pathname === '/' || pathname === '/about' || pathname.startsWith('/post/')
+
+    if (isPublicBlogRoute) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+    }
+  }, [pathname])
+
+  return null
+}
+
 function AppInner() {
   useLocale()
   return (
     <BrowserRouter>
+      <PublicScrollToTop />
       <Routes>
         {/* Public blog */}
         <Route path="/" element={<BlogHomePage />} />

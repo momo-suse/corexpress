@@ -19,7 +19,7 @@ import { getSubscribers } from '@/api/subscribers'
 import { toast } from '@/hooks/useToast'
 import {
   FileText, MessageCircle, Check, ArrowLeft, Plus, Edit3,
-  Trash2, X, Upload, AlertTriangle, Languages, Eye, EyeOff,
+  Trash2, X, Upload, AlertTriangle, Languages, Eye, EyeOff, Heart,
 } from 'lucide-react'
 import NotifySubscribersDialog from '@/components/admin/NotifySubscribersDialog'
 import AnalyticsPanel from '@/components/admin/AnalyticsPanel'
@@ -32,7 +32,7 @@ type View = 'list' | 'editor'
 interface PostForm {
   tags: string
   reading_time: string
-  status: 'draft' | 'published'
+  status: 'draft' | 'published' | 'hidden'
   featured_image_id: number | null
   featured_image_url: string | null
   map_embed_url: string
@@ -514,10 +514,11 @@ export default function DashboardPage() {
                 <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
                   {/* Table header */}
                   <div className="grid grid-cols-12 gap-4 p-4 border-b text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    <div className="col-span-4">{t('admin.dashboard.titleCol')}</div>
+                    <div className="col-span-3">{t('admin.dashboard.titleCol')}</div>
                     <div className="col-span-2">{t('admin.dashboard.languagesCol')}</div>
                     <div className="col-span-2">{t('admin.dashboard.tagsCol')}</div>
                     <div className="col-span-1">{t('admin.dashboard.statusCol')}</div>
+                    <div className="col-span-1">{t('admin.dashboard.likesCol')}</div>
                     <div className="col-span-1">{t('admin.dashboard.commentsCol')}</div>
                     <div className="col-span-2 text-right">{t('admin.dashboard.actionsCol')}</div>
                   </div>
@@ -529,7 +530,7 @@ export default function DashboardPage() {
                         className={`grid grid-cols-12 gap-4 p-4 items-center border-b last:border-b-0 transition-colors ${post.status === 'hidden' ? 'opacity-50 bg-muted/40 hover:bg-muted/50' : 'hover:bg-muted/30'}`}
                       >
                         {/* Thumbnail + Title */}
-                        <div className="col-span-4 flex items-center gap-3 min-w-0">
+                        <div className="col-span-3 flex items-center gap-3 min-w-0">
                           {post.featured_image_url ? (
                             <img
                               src={post.featured_image_url}
@@ -582,6 +583,12 @@ export default function DashboardPage() {
                               ? t('admin.dashboard.statusHidden')
                               : t('admin.dashboard.statusDraft')}
                           </Badge>
+                        </div>
+
+                        {/* Likes count */}
+                        <div className="col-span-1 flex items-center gap-1.5 text-muted-foreground">
+                          <Heart className="h-4 w-4" />
+                          <span className="text-sm font-medium text-foreground">{post.likes_count ?? 0}</span>
                         </div>
 
                         {/* Comments count → opens drawer */}
