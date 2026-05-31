@@ -12,10 +12,10 @@
     "docker:down": "docker compose -f compose.dev.yml down -v",
     "docker:logs": "docker compose -f compose.dev.yml logs -f",
     "docker:rebuild": "docker compose -f compose.dev.yml build --no-cache",
-    "frontend:dev": "npm run dev --workspace=packages/web",
-    "frontend:build": "npm run build --workspace=packages/web",
-    "frontend:install": "npm install && npm run build --workspace=packages/web",
-    "test:web": "npm run test --workspace=packages/web",
+    "frontend:dev": "pnpm --filter @corexpress/web run dev",
+    "frontend:build": "pnpm --filter @corexpress/web run build",
+    "frontend:install": "pnpm install && pnpm --filter @corexpress/web run build",
+    "test:web": "pnpm --filter @corexpress/web run test",
     "test:php": "docker exec corexpress-hosting bash -c 'cd /var/www/html/packages/app && vendor/bin/phpunit --no-coverage'",
     "test:php:coverage": "docker exec corexpress-hosting bash -c 'cd /var/www/html/packages/app && vendor/bin/phpunit'",
     "test:php:podman": "podman exec corexpress-hosting bash -c 'cd /var/www/html/packages/app && vendor/bin/phpunit --no-coverage'"
@@ -25,7 +25,7 @@
   ],
   "engines": {
     "node": ">=20.0.0",
-    "npm": ">=10.0.0"
+    "pnpm": ">=11.4.0"
   },
   "dependencies": {
     "i18next": "^25.8.14",
