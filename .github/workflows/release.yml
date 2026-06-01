@@ -1,19 +1,58 @@
 name: Build & Release
 
-# Triggered by pushing a version tag (e.g. v1.0.0, v1.2.3)
+# Publishes a release when a version bump lands on main.
+#
+# Flow: the /release command opens a PR that bumps the VERSION file. When you
+# approve and MERGE that PR, this workflow runs, sees a VERSION with no matching
+# git tag yet, builds the ZIP, creates the tag, and publishes the GitHub Release.
+# Merging any other PR is a no-op here (the tag for the current VERSION already
+# exists, so the release job is skipped).
+#
+# Your approval = merging the PR. No manual tag pushing required.
 on:
   push:
-    tags:
-      - 'v*.*.*'
+    branches:
+      - main
+  workflow_dispatch:   # allow a manual re-run from the Actions tab if needed
 
 permissions:
-  contents: write   # needed to create GitHub Releases and upload assets
+  contents: write   # needed to push the tag and create GitHub Releases
 
 jobs:
+  # ── Decide whether this push introduces a new, untagged version ─────────────
+  check:
+    name: Check for a new version
+    runs-on: ubuntu-latest
+    outputs:
+      release: ${{ steps.ver.outputs.release }}
+      version: ${{ steps.ver.outputs.version }}
+      tag: ${{ steps.ver.outputs.tag }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Determine version from VERSION file
+        id: ver
+        run: |
+          VERSION="$(tr -d '[:space:]' < VERSION)"
+          TAG="v${VERSION}"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+
+          if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null 2>&1; then
+            echo "release=false" >> "$GITHUB_OUTPUT"
+            echo "Tag ${TAG} already exists — nothing to release."
+          else
+            echo "release=true" >> "$GITHUB_OUTPUT"
+            echo "New version detected: ${TAG} — will build and publish."
+          fi
+
+  # ── Build, tag and publish (only when a new version was detected) ───────────
   release:
     name: Build frontend and publish release
     runs-on: ubuntu-latest
-
+    needs: check
+    if: needs.check.outputs.release == 'true'
     steps:
       # ── 1. Checkout ───────────────────────────────────────────────────────────
       - name: Checkout repository
@@ -42,17 +81,11 @@ jobs:
         working-directory: packages/app
         run: composer install --no-dev --optimize-autoloader --no-interaction
 
-      # ── 5b. Write VERSION file from the git tag ───────────────────────────────
-      # Strips the leading 'v' from the tag (v1.2.3 → 1.2.3) and writes VERSION.
-      # This file is included in the ZIP so update.sh and UpdateController can
-      # determine the installed version without querying the database.
-      - name: Write VERSION file
-        run: echo "${GITHUB_REF_NAME#v}" > VERSION
-
       # ── 6. Package release ZIP ────────────────────────────────────────────────
-      # Includes:   packages/app/ (with vendor/) + packages/installer/ + install.sh + .htaccess
-      # Excludes:   packages/web/ (source), node_modules, config.php,
-      #             dev files (Dockerfile, compose.dev.yml, .claude/, blog*.html)
+      # The VERSION file already holds the right version (set by the /release PR),
+      # so no tag-derived rewrite is needed.
+      # Includes:   packages/app/ (with vendor/) + packages/installer/ + scripts + .htaccess
+      # Excludes:   packages/web/ (source), node_modules, config.php, uploads, dev files
       - name: Package release ZIP
         run: |
           mkdir -p dist
@@ -75,14 +108,23 @@ jobs:
           echo "ZIP contents (top level):"
           unzip -l dist/corexpress.zip | head -40
 
-      # ── 7. Create GitHub Release with ZIP attachment ───────────────────────────
+      # ── 7. Create and push the version tag ────────────────────────────────────
+      # Pushed with GITHUB_TOKEN, which intentionally does NOT re-trigger workflows.
+      - name: Create and push tag
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ needs.check.outputs.tag }}" -m "Corexpress ${{ needs.check.outputs.tag }}"
+          git push origin "${{ needs.check.outputs.tag }}"
+
+      # ── 8. Create GitHub Release with ZIP attachment ──────────────────────────
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: "Corexpress ${{ github.ref_name }}"
+          tag_name: ${{ needs.check.outputs.tag }}
+          name: "Corexpress ${{ needs.check.outputs.tag }}"
           body: |
-            ## Corexpress ${{ github.ref_name }}
+            ## Corexpress ${{ needs.check.outputs.tag }}
 
             ### Installation
 
@@ -113,6 +155,6 @@ jobs:
             > **Requirements:** PHP 8.3+, MySQL 8.0, Apache with mod_rewrite (Hostinger shared hosting)
           files: dist/corexpress.zip
           draft: false
-          prerelease: ${{ contains(github.ref_name, '-') }}  # v1.0.0-beta → prerelease
+          prerelease: ${{ contains(needs.check.outputs.version, '-') }}  # 1.0.0-beta → prerelease
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
