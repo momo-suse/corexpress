@@ -23,40 +23,34 @@ class SettingController extends Controller
     {
         $settings = Setting::all()->pluck('value', 'key')->toArray();
 
-        // Resolve hero image URL
-        if (!empty($settings['hero_image_id']) && is_numeric($settings['hero_image_id'])) {
-            $img = Image::find((int)$settings['hero_image_id']);
-            $settings['hero_image_url'] = $img !== null ? '/img/' . $img->filename : '';
-        }
-        else {
-            $settings['hero_image_url'] = '';
+        // Resolve image IDs to public URLs. Collect every referenced image id and
+        // fetch their filenames in a single query instead of one Image::find() per
+        // setting — this endpoint runs on every page load.
+        $imageKeys = [
+            'hero_image_id'    => 'hero_image_url',
+            'profile_image_id' => 'profile_image_url',
+            'blog_logo_id'     => 'blog_logo_url',
+            'profile_cover_id' => 'profile_cover_url',
+        ];
+
+        $ids = [];
+        foreach (array_keys($imageKeys) as $idKey) {
+            if (!empty($settings[$idKey]) && is_numeric($settings[$idKey])) {
+                $ids[] = (int) $settings[$idKey];
+            }
         }
 
-        // Resolve profile image URL
-        if (!empty($settings['profile_image_id']) && is_numeric($settings['profile_image_id'])) {
-            $img = Image::find((int)$settings['profile_image_id']);
-            $settings['profile_image_url'] = $img !== null ? '/img/' . $img->filename : '';
-        }
-        else {
-            $settings['profile_image_url'] = '';
-        }
+        $filenames = $ids !== []
+            ? Image::whereIn('id', $ids)->pluck('filename', 'id')
+            : collect();
 
-        // Resolve blog logo URL
-        if (!empty($settings['blog_logo_id']) && is_numeric($settings['blog_logo_id'])) {
-            $img = Image::find((int)$settings['blog_logo_id']);
-            $settings['blog_logo_url'] = $img !== null ? '/img/' . $img->filename : '';
-        }
-        else {
-            $settings['blog_logo_url'] = '';
-        }
-
-        // Resolve profile cover URL
-        if (!empty($settings['profile_cover_id']) && is_numeric($settings['profile_cover_id'])) {
-            $img = Image::find((int)$settings['profile_cover_id']);
-            $settings['profile_cover_url'] = $img !== null ? '/img/' . $img->filename : '';
-        }
-        else {
-            $settings['profile_cover_url'] = $settings['profile_cover_url'] ?? '';
+        foreach ($imageKeys as $idKey => $urlKey) {
+            if (!empty($settings[$idKey]) && is_numeric($settings[$idKey]) && isset($filenames[(int) $settings[$idKey]])) {
+                $settings[$urlKey] = '/img/' . $filenames[(int) $settings[$idKey]];
+            }
+            else {
+                $settings[$urlKey] = $settings[$urlKey] ?? '';
+            }
         }
 
         unset($settings['recaptcha_secret_key'], $settings['google_client_secret']);

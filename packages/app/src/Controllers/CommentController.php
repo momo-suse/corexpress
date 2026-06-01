@@ -235,11 +235,14 @@ class CommentController extends Controller
             return 'CAPTCHA verification required.';
         }
 
+        // 5s timeout so a slow/unreachable Google endpoint fails fast instead of
+        // hanging comment submission until default_socket_timeout (~60s).
+        $context = stream_context_create(['http' => ['method' => 'GET', 'timeout' => 5]]);
         $verifyResponse = @file_get_contents(self::RECAPTCHA_VERIFY_URL . '?' . http_build_query([
             'secret'   => $secretKey,
             'response' => $token,
             'remoteip' => $_SERVER['REMOTE_ADDR'] ?? '',
-        ]));
+        ]), false, $context);
 
         if ($verifyResponse === false) {
             return null;

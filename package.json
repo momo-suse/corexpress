@@ -4,10 +4,6 @@
   "private": true,
   "description": "Corexpress — personal blog platform for Hostinger shared hosting",
   "scripts": {
-    "podman:up": "podman compose -f compose.dev.yml up -d",
-    "podman:down": "podman compose -f compose.dev.yml down -v",
-    "podman:logs": "podman compose -f compose.dev.yml logs -f",
-    "podman:rebuild": "podman compose -f compose.dev.yml build --no-cache",
     "docker:up": "docker compose -f compose.dev.yml up -d",
     "docker:down": "docker compose -f compose.dev.yml down -v",
     "docker:logs": "docker compose -f compose.dev.yml logs -f",
@@ -17,8 +13,7 @@
     "frontend:install": "pnpm install && pnpm --filter @corexpress/web run build",
     "test:web": "pnpm --filter @corexpress/web run test",
     "test:php": "docker exec corexpress-hosting bash -c 'cd /var/www/html/packages/app && vendor/bin/phpunit --no-coverage'",
-    "test:php:coverage": "docker exec corexpress-hosting bash -c 'cd /var/www/html/packages/app && vendor/bin/phpunit'",
-    "test:php:podman": "podman exec corexpress-hosting bash -c 'cd /var/www/html/packages/app && vendor/bin/phpunit --no-coverage'"
+    "test:php:coverage": "docker exec corexpress-hosting bash -c 'cd /var/www/html/packages/app && vendor/bin/phpunit'"
   },
   "workspaces": [
     "packages/web"

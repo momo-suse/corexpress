@@ -1,0 +1,3 @@
+# Never commit database dumps; keep the directory and its protections.
+db-*.sql
+db-*.sql.err

@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS `page_components` (
 -- type: 'component' = top-level | 'sub-component' = child of parent_id
 -- parent_id references the parent component row; NULL for top-level
 -- has_own_page: 1 = has a dedicated public route
-INSERT INTO `component_definitions` (`name`, `label`, `type`, `parent_id`, `has_own_page`) VALUES
+INSERT IGNORE INTO `component_definitions` (`name`, `label`, `type`, `parent_id`, `has_own_page`) VALUES
     ('hero',               'Hero Banner',  'component',     NULL, 0),
     ('profile',            'Profile',      'component',     NULL, 1),
     ('post-list',          'Post List',    'component',     NULL, 0),
@@ -100,13 +100,13 @@ INSERT INTO `component_definitions` (`name`, `label`, `type`, `parent_id`, `has_
     ('download-pdf',       'Download PDF', 'sub-component', 2,    0);
 
 -- Style collections (3 built-in — default is the fallback)
-INSERT INTO `style_collections` (`name`, `label`, `is_default`) VALUES
+INSERT IGNORE INTO `style_collections` (`name`, `label`, `is_default`) VALUES
     ('default', 'Default', 1),
     ('classic', 'Classic', 0),
     ('nebula',  'Nebula',  0);
 
 -- Default collection styles (covers all 14 components)
-INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `styles_config`) VALUES
+INSERT IGNORE INTO `component_styles` (`collection_id`, `component_definition_id`, `styles_config`) VALUES
     (1, 1,  '{"background":"#f8f9fa","textColor":"#111827","layout":"full-width"}'),
     (1, 2,  '{"background":"#ffffff","textColor":"#111827","layout":"centered"}'),
     (1, 3,  '{"background":"#ffffff","textColor":"#111827","layout":"list"}'),
@@ -124,7 +124,7 @@ INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `sty
     (1, 15, '{"layout":"default"}');
 
 -- Classic collection styles (all 14 components — editorial layout)
-INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `styles_config`) VALUES
+INSERT IGNORE INTO `component_styles` (`collection_id`, `component_definition_id`, `styles_config`) VALUES
     (2, 1,  '{"background":"#fafafa","textColor":"#111827","layout":"editorial"}'),
     (2, 2,  '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
     (2, 3,  '{"background":"#ffffff","textColor":"#111827","layout":"editorial"}'),
@@ -142,13 +142,13 @@ INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `sty
     (2, 15, '{"layout":"classic"}');
 
 -- Pages (home, blog, about)
-INSERT INTO `pages` (`slug`, `title`) VALUES
+INSERT IGNORE INTO `pages` (`slug`, `title`) VALUES
     ('home',  'Home'),
     ('blog',  'Blog'),
     ('about', 'About');
 
 -- Home page components (page_id=1): hero, profile, post-list visible; social-links, search, tag-cloud hidden
-INSERT INTO `page_components` (`page_id`, `component_definition_id`, `is_visible`, `display_order`) VALUES
+INSERT IGNORE INTO `page_components` (`page_id`, `component_definition_id`, `is_visible`, `display_order`) VALUES
     (1, 1, 1, 1),
     (1, 2, 1, 2),
     (1, 3, 1, 3),
@@ -157,14 +157,14 @@ INSERT INTO `page_components` (`page_id`, `component_definition_id`, `is_visible
     (1, 14, 0, 6);
 
 -- Blog page components (page_id=2): post-list, post-detail, comment-list, comment-form visible
-INSERT INTO `page_components` (`page_id`, `component_definition_id`, `is_visible`, `display_order`) VALUES
+INSERT IGNORE INTO `page_components` (`page_id`, `component_definition_id`, `is_visible`, `display_order`) VALUES
     (2, 3, 1, 1),
     (2, 4, 1, 2),
     (2, 6, 1, 3),
     (2, 5, 1, 4);
 
 -- About page components (page_id=3): sub-components visible by default; social-links visible; download-pdf hidden by default
-INSERT INTO `page_components` (`page_id`, `component_definition_id`, `is_visible`, `display_order`) VALUES
+INSERT IGNORE INTO `page_components` (`page_id`, `component_definition_id`, `is_visible`, `display_order`) VALUES
     (3, 8,  1, 1),
     (3, 9,  1, 2),
     (3, 10, 1, 3),
@@ -174,7 +174,7 @@ INSERT INTO `page_components` (`page_id`, `component_definition_id`, `is_visible
     (3, 15, 0, 7);
 
 -- Nebula collection styles (dark tech bento-grid — all 14 components)
-INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `styles_config`) VALUES
+INSERT IGNORE INTO `component_styles` (`collection_id`, `component_definition_id`, `styles_config`) VALUES
     (3, 1,  '{"background":"#030712","textColor":"#f1f5f9","layout":"bento-hero"}'),
     (3, 2,  '{"background":"#030712","textColor":"#f1f5f9","layout":"bento-profile"}'),
     (3, 3,  '{"background":"#030712","textColor":"#f1f5f9","layout":"bento-grid"}'),

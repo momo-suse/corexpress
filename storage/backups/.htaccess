@@ -1,0 +1,7 @@
+# Deny all web access to raw database dumps stored here.
+# These files are pre-update backups, only for manual recovery via the shell:
+#   mysql -u USER -p DB_NAME < db-YYYYmmdd-HHMMSS-xxxx.sql
+Require all denied
+<IfModule !mod_authz_core.c>
+    Deny from all
+</IfModule>

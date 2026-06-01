@@ -119,7 +119,7 @@ Current public routes in the repo:
 - Node.js 20+
 - npm 10+
 - Composer
-- Docker or Podman
+- Docker
 
 ## Installation
 
@@ -153,13 +153,7 @@ https://your-domain.com/setup
 
 Corexpress includes a local environment that simulates shared hosting with Apache + PHP + MySQL.
 
-### Start with Podman
-
-```bash
-npm run podman:up
-```
-
-### Start with Docker
+### Start the environment
 
 ```bash
 npm run docker:up
@@ -246,7 +240,6 @@ Container helpers also exist in the root `package.json`:
 ```bash
 npm run test:php
 npm run test:php:coverage
-npm run test:php:podman
 ```
 
 ## Important Notes

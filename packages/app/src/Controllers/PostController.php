@@ -311,13 +311,11 @@ class PostController extends Controller
             && !empty($body['notify_subscribers'])
             && $post->notified_at === null
         ) {
-            try {
-                Mailer::notifySubscribers($post);
-                $post->notified_at = now();
-                $post->save();
-            } catch (\Throwable) {
-                // Post already saved; email failure must not fail the response
-            }
+            // Mark as notified now (prevents duplicate sends) and fan out the
+            // emails after the response is sent, so this request returns fast.
+            $post->notified_at = now();
+            $post->save();
+            Mailer::notifySubscribersAsync($post->id);
         }
 
         $data = $post->toArray();
@@ -395,13 +393,11 @@ class PostController extends Controller
             && !empty($body['notify_subscribers'])
             && $post->notified_at === null
         ) {
-            try {
-                Mailer::notifySubscribers($post);
-                $post->notified_at = now();
-                $post->save();
-            } catch (\Throwable) {
-                // Post already saved; email failure must not fail the response
-            }
+            // Mark as notified now (prevents duplicate sends) and fan out the
+            // emails after the response is sent, so this request returns fast.
+            $post->notified_at = now();
+            $post->save();
+            Mailer::notifySubscribersAsync($post->id);
         }
 
         $data = $post->toArray();

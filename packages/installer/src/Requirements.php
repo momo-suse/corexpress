@@ -120,8 +120,8 @@ final class Requirements
             'label'    => $t('req.write_public'),
             'ok'       => $ok,
             // Non-critical: actual write is tested at install time (Step 5).
-            // On rootless Podman / SELinux systems is_writable() may return false
-            // even when the write will succeed via the container's user-namespace mapping.
+            // Inside some containerized setups is_writable() may return false even
+            // when the write will succeed via the container's user mapping.
             'detail'   => $ok ? $t('req.writable_ok') : $t('req.writable_warn'),
             'critical' => false,
         ];

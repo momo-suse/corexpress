@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Corexpress\Installer;
 
 use PDO;
-use PDOException;
 use RuntimeException;
 
 /**
@@ -48,24 +47,56 @@ final class Migrator
 
         $applied = $this->getAppliedVersions();
 
-        try {
-            foreach ($files as $file) {
-                $version = basename($file);
+        foreach ($files as $file) {
+            $version = basename($file);
 
-                if (in_array($version, $applied, true)) {
-                    continue; // Already applied — skip
-                }
-
-                $sql = file_get_contents($file);
-                if ($sql === false) {
-                    throw new RuntimeException("Could not read migration file: {$file}");
-                }
-
-                $this->executeSql($sql);
-                $this->markApplied($version);
+            if (in_array($version, $applied, true)) {
+                continue; // Already applied — skip
             }
-        } catch (PDOException | RuntimeException $e) {
-            throw new RuntimeException('Migration failed: ' . $e->getMessage(), 0, $e);
+
+            $sql = file_get_contents($file);
+            if ($sql === false) {
+                throw new RuntimeException("Could not read migration file: {$file}");
+            }
+
+            $this->runOne($version, $sql);
+        }
+    }
+
+    /**
+     * Applies a single migration inside a transaction and records it.
+     *
+     * On any failure the whole update is aborted by re-throwing: the migration is
+     * NOT marked applied and no destructive cleanup runs. DDL (CREATE/ALTER) is
+     * auto-committed by MySQL and cannot be rolled back, but every migration is
+     * additive and idempotent, so a later retry re-applies it safely. The
+     * transaction still protects the DML (seed INSERTs) within the migration.
+     *
+     * @throws RuntimeException on failure
+     */
+    private function runOne(string $version, string $sql): void
+    {
+        $this->pdo->beginTransaction();
+
+        try {
+            $this->executeSql($sql);
+            $this->markApplied($version);
+
+            // A DDL statement may have implicitly committed the transaction.
+            // Only commit if one is still active.
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->commit();
+            }
+        } catch (\Throwable $e) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            throw new RuntimeException(
+                "Migration failed at {$version}: " . $e->getMessage()
+                . '. Update aborted; no data was dropped.',
+                0,
+                $e
+            );
         }
     }
 

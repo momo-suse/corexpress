@@ -24,6 +24,7 @@ final class UpdateController extends Controller
     private string $versionFile;
     private string $configPath;
     private string $imgDir;
+    private string $backupDir;
 
     public function __construct()
     {
@@ -32,6 +33,7 @@ final class UpdateController extends Controller
         $this->versionFile = $this->installDir . '/VERSION';
         $this->configPath  = $this->installDir . '/packages/app/config.php';
         $this->imgDir      = $this->installDir . '/packages/app/public/img';
+        $this->backupDir   = $this->installDir . '/storage/backups';
     }
 
     // ── GET /api/v1/admin/update/check ────────────────────────────────────────
@@ -106,6 +108,21 @@ final class UpdateController extends Controller
             if (!$this->copyDirectory($this->imgDir, $imgBackupDir)) {
                 return $this->error($response, 'Failed to backup uploaded images.', 500);
             }
+        }
+
+        // ── 5. Backup the database BEFORE touching any files ───────────────
+        // This is the recovery point. If it cannot be created we abort rather
+        // than update without a safety net. The backup is never auto-applied —
+        // it is kept for manual recovery with `mysql < backup.sql`.
+        try {
+            $dbBackupFile = $this->createDatabaseBackup();
+        } catch (\Throwable $e) {
+            error_log('Corexpress update: DB backup failed: ' . $e->getMessage());
+            return $this->error(
+                $response,
+                'Could not create a database backup before updating. Update aborted; nothing was changed.',
+                500
+            );
         }
 
         // Wrap the rest in a try/finally to always restore user data
@@ -257,7 +274,9 @@ final class UpdateController extends Controller
 
             return $this->json($response, [
                 'success' => false,
-                'error'   => 'Update failed. Please check the server logs or try again later.',
+                'error'   => 'Update failed, but no data was dropped. A pre-update database '
+                    . 'backup is available on the server for manual recovery if needed.',
+                'backup'  => $dbBackupFile,
             ], 500);
 
         } finally {
@@ -278,6 +297,7 @@ final class UpdateController extends Controller
             'previous_version'  => $previousVersion,
             'new_version'       => $newVersion,
             'migrations_applied' => $migrationsApplied,
+            'backup'            => $dbBackupFile,
         ]);
     }
 
@@ -427,7 +447,10 @@ final class UpdateController extends Controller
 
     /**
      * Loads the installer's Migrator and runs pending migrations.
-     * Takes a full DB backup before running and restores automatically on failure.
+     *
+     * Migrations are additive and idempotent and each runs in its own
+     * transaction. On failure the Migrator aborts and throws WITHOUT dropping
+     * any data; the caller surfaces the pre-update backup for manual recovery.
      *
      * @return string[] list of applied migration filenames
      */
@@ -442,70 +465,168 @@ final class UpdateController extends Controller
 
         $pdo = \Corexpress\Installer\Database::connect($config['db']);
 
-        // Backup DB before any migration — if something fails we can restore
-        $backupFile = sys_get_temp_dir()
-            . '/corexpress-db-backup-' . date('Ymd-His') . '-' . bin2hex(random_bytes(4)) . '.sql';
-        $this->backupDatabase($pdo, $backupFile);
+        $before   = $pdo->query('SELECT `version` FROM `schema_versions`')->fetchAll(\PDO::FETCH_COLUMN);
+        $migrator = new \Corexpress\Installer\Migrator($pdo);
+        $migrator->run(); // aborts and throws on failure; never drops data
+        $after    = $pdo->query('SELECT `version` FROM `schema_versions`')->fetchAll(\PDO::FETCH_COLUMN);
 
-        try {
-            $before   = $pdo->query('SELECT `version` FROM `schema_versions`')->fetchAll(\PDO::FETCH_COLUMN);
-            $migrator = new \Corexpress\Installer\Migrator($pdo);
-            $migrator->run();
-            $after    = $pdo->query('SELECT `version` FROM `schema_versions`')->fetchAll(\PDO::FETCH_COLUMN);
+        $applied = array_values(array_diff($after, $before));
 
-            $applied = array_values(array_diff($after, $before));
-
-            // Update app_version setting
-            $newVersion = $this->readCurrentVersion();
-            if ($newVersion !== 'unknown') {
-                $upd = $pdo->prepare("UPDATE `settings` SET `value` = ? WHERE `key` = 'app_version'");
-                $upd->execute([$newVersion]);
-                if ($upd->rowCount() === 0) {
-                    $pdo->prepare("INSERT INTO `settings` (`key`, `value`) VALUES ('app_version', ?)")
-                        ->execute([$newVersion]);
-                }
+        // Update app_version setting
+        $newVersion = $this->readCurrentVersion();
+        if ($newVersion !== 'unknown') {
+            $upd = $pdo->prepare("UPDATE `settings` SET `value` = ? WHERE `key` = 'app_version'");
+            $upd->execute([$newVersion]);
+            if ($upd->rowCount() === 0) {
+                $pdo->prepare("INSERT INTO `settings` (`key`, `value`) VALUES ('app_version', ?)")
+                    ->execute([$newVersion]);
             }
+        }
 
-            // Success: backup is no longer needed
-            @unlink($backupFile);
+        return $applied;
+    }
 
-            return $applied;
+    /**
+     * Creates a full database backup before updating. Tries native mysqldump
+     * first (fast, reliable); falls back to a pure-PHP dump when shell exec is
+     * unavailable (common on locked-down shared hosting). The file lands in a
+     * web-protected storage/backups directory and is meant to be imported
+     * manually with `mysql < backup.sql` if recovery is ever needed — it is
+     * never applied automatically.
+     *
+     * @return string absolute path to the backup file
+     * @throws \RuntimeException if no backup could be produced
+     */
+    private function createDatabaseBackup(): string
+    {
+        $this->ensureBackupDir();
 
-        } catch (\Throwable $migrationErr) {
-            // Attempt automatic DB restore
-            try {
-                $this->restoreDatabase($pdo, $backupFile);
-                @unlink($backupFile);
-                throw new \RuntimeException(
-                    'Migration failed — database was automatically restored to pre-update state. Error: '
-                    . $migrationErr->getMessage(),
-                    0,
-                    $migrationErr
-                );
-            } catch (\Throwable $restoreErr) {
-                // Restore also failed — keep the backup file so the admin can recover manually
-                if ($restoreErr !== $migrationErr) {
-                    // Only wrap if it's a genuinely new exception (not the re-throw above)
-                    throw new \RuntimeException(
-                        'Migration failed and automatic restore also failed. '
-                        . 'Manual backup available at: ' . $backupFile . '. '
-                        . 'Migration error: ' . $migrationErr->getMessage(),
-                        0,
-                        $migrationErr
-                    );
-                }
-                throw $restoreErr;
+        /** @var array{db: array{host:string,port:int,name:string,user:string,password:string}} $config */
+        $config = require $this->configPath;
+        $db     = $config['db'];
+
+        $outputFile = $this->backupDir
+            . '/db-' . date('Ymd-His') . '-' . bin2hex(random_bytes(4)) . '.sql';
+
+        if ($this->dumpViaMysqldump($db, $outputFile)) {
+            $this->pruneOldBackups();
+            return $outputFile;
+        }
+
+        // Fallback: pure-PHP dump via PDO (no shell required).
+        require_once $this->installDir . '/packages/installer/src/Database.php';
+        $pdo = \Corexpress\Installer\Database::connect($db);
+        $this->phpDumpDatabase($pdo, $outputFile);
+        $this->pruneOldBackups();
+
+        return $outputFile;
+    }
+
+    /**
+     * Ensures the backup directory exists and is not readable over the web.
+     *
+     * @throws \RuntimeException if the directory cannot be created
+     */
+    private function ensureBackupDir(): void
+    {
+        if (!is_dir($this->backupDir)) {
+            if (!mkdir($this->backupDir, 0750, true) && !is_dir($this->backupDir)) {
+                throw new \RuntimeException('Could not create backup directory: ' . $this->backupDir);
             }
+        }
+
+        $htaccess = $this->backupDir . '/.htaccess';
+        if (!file_exists($htaccess)) {
+            // Deny all web access to raw DB dumps (Apache 2.2 and 2.4 syntax).
+            @file_put_contents(
+                $htaccess,
+                "Require all denied\n<IfModule !mod_authz_core.c>\n    Deny from all\n</IfModule>\n"
+            );
         }
     }
 
     /**
-     * Dumps all tables to a SQL file using PDO (no shell required — works on any shared host).
-     * Output format: SET FK_CHECKS=0 → DROP TABLE IF EXISTS → CREATE TABLE → INSERTs → FK_CHECKS=1
+     * Attempts a mysqldump into $outputFile. Returns true on success (a non-empty
+     * file written with exit code 0), false if mysqldump or shell exec is
+     * unavailable so the caller can fall back to the PHP dump.
+     *
+     * @param array{host:string,port:int,name:string,user:string,password:string} $db
+     */
+    private function dumpViaMysqldump(array $db, string $outputFile): bool
+    {
+        // exec() is often disabled on shared hosting.
+        if (!function_exists('exec')) {
+            return false;
+        }
+        $disabled = array_map('trim', explode(',', (string) ini_get('disable_functions')));
+        if (in_array('exec', $disabled, true)) {
+            return false;
+        }
+
+        // Credentials go in a 0600 defaults file so the password never appears
+        // in the process list.
+        $defaultsFile = tempnam(sys_get_temp_dir(), 'cx-my-');
+        if ($defaultsFile === false) {
+            return false;
+        }
+        $ini = "[client]\n"
+            . 'host='     . $db['host']        . "\n"
+            . 'port='     . (int) $db['port']  . "\n"
+            . 'user='     . $db['user']        . "\n"
+            . 'password=' . $db['password']    . "\n";
+        if (file_put_contents($defaultsFile, $ini) === false) {
+            @unlink($defaultsFile);
+            return false;
+        }
+        @chmod($defaultsFile, 0600);
+
+        $errFile = $outputFile . '.err';
+        $cmd = 'mysqldump --defaults-extra-file=' . escapeshellarg($defaultsFile)
+            . ' --single-transaction --no-tablespaces --skip-lock-tables '
+            . escapeshellarg((string) $db['name'])
+            . ' > ' . escapeshellarg($outputFile)
+            . ' 2> ' . escapeshellarg($errFile);
+
+        $output   = [];
+        $exitCode = 1;
+        @exec($cmd, $output, $exitCode);
+
+        @unlink($defaultsFile);
+
+        $ok = ($exitCode === 0 && is_file($outputFile) && filesize($outputFile) > 0);
+
+        @unlink($errFile);
+        if (!$ok) {
+            @unlink($outputFile);
+        }
+
+        return $ok;
+    }
+
+    /**
+     * Keeps only the most recent $keep backups to avoid filling the disk
+     * (a full disk would itself break the site).
+     */
+    private function pruneOldBackups(int $keep = 5): void
+    {
+        $files = glob($this->backupDir . '/db-*.sql');
+        if ($files === false || count($files) <= $keep) {
+            return;
+        }
+        sort($files); // timestamped names sort chronologically — oldest first
+        foreach (array_slice($files, 0, count($files) - $keep) as $old) {
+            @unlink($old);
+        }
+    }
+
+    /**
+     * Pure-PHP database dump using PDO (no shell required — works on any shared host).
+     * Output format: SET FK_CHECKS=0 → DROP TABLE IF EXISTS → CREATE TABLE → INSERTs → FK_CHECKS=1.
+     * Produces a standard mysql-importable .sql file.
      *
      * @throws \RuntimeException if the backup file cannot be written
      */
-    private function backupDatabase(\PDO $pdo, string $outputFile): void
+    private function phpDumpDatabase(\PDO $pdo, string $outputFile): void
     {
         $tables = $pdo->query('SHOW TABLES')->fetchAll(\PDO::FETCH_COLUMN);
 
@@ -539,32 +660,6 @@ final class UpdateController extends Controller
 
         if (file_put_contents($outputFile, implode("\n", $lines) . "\n") === false) {
             throw new \RuntimeException('Could not write database backup to: ' . $outputFile);
-        }
-    }
-
-    /**
-     * Restores the database from a SQL backup file created by backupDatabase().
-     *
-     * @throws \RuntimeException if the backup file cannot be read or a statement fails
-     */
-    private function restoreDatabase(\PDO $pdo, string $backupFile): void
-    {
-        $sql = file_get_contents($backupFile);
-        if ($sql === false) {
-            throw new \RuntimeException('Could not read backup file: ' . $backupFile);
-        }
-
-        // Strip line comments, split on ";\n" to avoid breaking on semicolons inside quoted strings
-        // (e.g. HTML content with CSS like `style="text-align: justify;"`).
-        // backupDatabase() guarantees one statement per line ending with ";\n".
-        $sql        = preg_replace('/--[^\n]*/', '', $sql);
-        $statements = array_filter(
-            array_map('trim', explode(";\n", $sql)),
-            static fn(string $s) => $s !== ''
-        );
-
-        foreach ($statements as $stmt) {
-            $pdo->exec($stmt);
         }
     }
 }

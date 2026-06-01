@@ -15,8 +15,8 @@
 #   - systemctl / PM2 / Nginx / certbot
 #
 # Usage:
-#   podman compose -f compose.dev.yml up -d
-#   Visit http://localhost:80
+#   docker compose -f compose.dev.yml up -d
+#   Visit http://localhost:8080
 # ─────────────────────────────────────────────────────────────────────────────
 
 FROM php:8.3-apache

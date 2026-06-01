@@ -1,12 +1,13 @@
 -- Migration 007 — Add sonic style collection
 -- Brutalista musical: dark zinc-950 bg, fuchsia/cyan accents, sharp edges, grayscale images
 
-INSERT INTO `style_collections` (`name`, `label`, `is_default`) VALUES ('sonic', 'Sonic', 0);
+INSERT IGNORE INTO `style_collections` (`name`, `label`, `is_default`) VALUES ('sonic', 'Sonic', 0);
 
--- Capture the new id once — safer than calling LAST_INSERT_ID() on every row
-SET @col_id = LAST_INSERT_ID();
+-- Look up the id by name so re-running on an already-seeded DB is a no-op
+-- (LAST_INSERT_ID() would be stale when the IGNORE above skips the insert).
+SET @col_id = (SELECT `id` FROM `style_collections` WHERE `name` = 'sonic');
 
-INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `styles_config`) VALUES
+INSERT IGNORE INTO `component_styles` (`collection_id`, `component_definition_id`, `styles_config`) VALUES
     (@col_id, 1,  '{"background":"#09090b","textColor":"#f4f4f5","layout":"sonic-hero"}'),
     (@col_id, 2,  '{"background":"#09090b","textColor":"#f4f4f5","layout":"sonic-profile"}'),
     (@col_id, 3,  '{"background":"#09090b","textColor":"#f4f4f5","layout":"sonic-post-list"}'),

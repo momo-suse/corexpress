@@ -1,11 +1,13 @@
 -- Migration 008 — Add Atlas style collection
 -- Travel/explorer journal: stone-50 bg, amber-700 accent, emerald-950 secondary, serif/mono, 0px radius.
 
-INSERT INTO `style_collections` (`name`, `label`, `is_default`) VALUES ('atlas', 'Atlas', 0);
+INSERT IGNORE INTO `style_collections` (`name`, `label`, `is_default`) VALUES ('atlas', 'Atlas', 0);
 
-SET @col_id = LAST_INSERT_ID();
+-- Look up the id by name so re-running on an already-seeded DB is a no-op
+-- (LAST_INSERT_ID() would be stale when the IGNORE above skips the insert).
+SET @col_id = (SELECT `id` FROM `style_collections` WHERE `name` = 'atlas');
 
-INSERT INTO `component_styles` (`collection_id`, `component_definition_id`, `styles_config`) VALUES
+INSERT IGNORE INTO `component_styles` (`collection_id`, `component_definition_id`, `styles_config`) VALUES
     (@col_id, 1,  '{"background":"#fafaf9","textColor":"#1c1917","layout":"atlas-hero"}'),
     (@col_id, 2,  '{"background":"#022c22","textColor":"#fafaf9","layout":"atlas-profile"}'),
     (@col_id, 3,  '{"background":"#fafaf9","textColor":"#1c1917","layout":"atlas-post-list"}'),
