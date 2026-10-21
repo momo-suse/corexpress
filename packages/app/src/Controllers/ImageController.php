@@ -342,7 +342,5 @@ class ImageController extends Controller
             'image/avif' => function_exists('imageavif') ? imageavif($image, $path, 60) : null,
             default => null,
         };
-
-        imagedestroy($image);
     }
 }

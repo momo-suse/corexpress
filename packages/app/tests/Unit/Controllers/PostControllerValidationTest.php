@@ -28,7 +28,6 @@ class PostControllerValidationTest extends TestCase
     private function call(string $method, mixed ...$args): mixed
     {
         $ref = new ReflectionMethod($this->controller, $method);
-        $ref->setAccessible(true);
         return $ref->invokeArgs($this->controller, $args);
     }
 
